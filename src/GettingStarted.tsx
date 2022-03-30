@@ -1,4 +1,5 @@
 import { Button, Center, Container, Text } from "@mantine/core";
+import { Link } from "react-router-dom";
 
 function IphoneXIcon() {
   return (
@@ -128,13 +129,16 @@ export function LandingPage() {
         </Text>
         <Text
           underline
-          color={"#0BB07B"}
           style={{
             marginLeft: "10px",
             fontSize: "15px",
             fontFamily: "Inter",
             fontWeight: "Medium",
+            color:"#0BB07B"
           }}
+          variant="link"
+          component={Link}
+          to='/login'
         >
           Sign In
         </Text>
