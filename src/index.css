@@ -19,8 +19,18 @@ code {
 
 @font-face {
   font-family: "Inter";
-  font-weight: "SemiBold";
+  font-weight: bold;
   src: url(./fonts/Inter/Inter-SemiBold.ttf) format("truetype");
+}
+@font-face {
+  font-family: "Inter";
+  font-weight: lighter;
+  src: url(./fonts/Inter/Inter-Regular.ttf) format("truetype");
+}
+@font-face {
+  font-family: "Inter";
+  font-weight: normal;
+  src: url(./fonts/Inter/Inter-Medium.ttf) format("truetype");
 }
 /* @font-face {
   font-family: 'Inter';
