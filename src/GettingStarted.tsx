@@ -80,7 +80,7 @@ function CarosuelIcon() {
 }
 export function LandingPage() {
   return (
-    <Container>
+    <Container style={{ paddingLeft: "20px", paddingRight: "20px" }}>
       <Center style={{ paddingTop: "24px" }}>
         <IphoneXIcon />
       </Center>
