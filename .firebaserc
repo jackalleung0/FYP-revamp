@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "final-year-project-8ce2f"
+  },
+  "targets": {
+    "final-year-project-8ce2f": {
+      "hosting": {
+        "revamp": [
+          "final-year-project-revamp"
+        ]
+      }
+    }
   }
 }
