@@ -14,7 +14,8 @@ code {
 
 @font-face {
   font-family: "SFProDisplay";
-  src: url(./fonts/SFProDisplay/SFProDisplay-Black.ttf) format("truetype");
+  font-weight: bold;
+  src: url(./fonts/SFProDisplay/SFProDisplay-Semibold.ttf) format("truetype");
 }
 
 @font-face {
