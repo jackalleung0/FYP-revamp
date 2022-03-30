@@ -97,6 +97,7 @@ export function LandingPage() {
             fontWeight: "bold",
             fontSize: "26px",
             lineHeight: "30px",
+            height: "61px",
           }}
         >
           Get Started by <br />
@@ -112,6 +113,7 @@ export function LandingPage() {
           backgroundColor: "#111112",
           fontFamily: "Inter",
           fontWeight: "bold",
+          borderRadius: "4px",
         }}
       >
         Sign Up
@@ -123,6 +125,7 @@ export function LandingPage() {
             fontSize: "16px",
             fontFamily: "Inter",
             fontWeight: "Regular",
+            height: "20px",
           }}
         >
           Already have an account?
@@ -134,11 +137,12 @@ export function LandingPage() {
             fontSize: "15px",
             fontFamily: "Inter",
             fontWeight: "Medium",
-            color:"#0BB07B"
+            color: "#0BB07B",
+            height: "19px",
           }}
           variant="link"
           component={Link}
-          to='/login'
+          to="/login"
         >
           Sign In
         </Text>
