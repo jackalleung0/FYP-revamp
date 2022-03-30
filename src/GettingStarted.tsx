@@ -124,7 +124,7 @@ export function LandingPage() {
           style={{
             fontSize: "16px",
             fontFamily: "Inter",
-            fontWeight: "Regular",
+            fontWeight: 100,
             height: "20px",
           }}
         >
