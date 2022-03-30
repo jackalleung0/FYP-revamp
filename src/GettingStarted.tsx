@@ -81,7 +81,9 @@ function CarosuelIcon() {
 }
 export function LandingPage() {
   return (
-    <Container style={{ paddingLeft: "20px", paddingRight: "20px" }}>
+    <Container
+      style={{ paddingLeft: "20px", paddingRight: "20px", paddingTop: "10px" }}
+    >
       <Center style={{ paddingTop: "24px" }}>
         <IphoneXIcon />
       </Center>
@@ -92,7 +94,7 @@ export function LandingPage() {
         <Text
           align="center"
           style={{
-            paddingTop: "30px",
+            paddingTop: "31px",
             fontFamily: "Inter",
             fontWeight: "bold",
             fontSize: "26px",
@@ -100,7 +102,8 @@ export function LandingPage() {
             height: "61px",
           }}
         >
-          Get Started by <br />
+          Get Started by
+          <br />
           Creating an Account
         </Text>
       </Center>
@@ -109,11 +112,12 @@ export function LandingPage() {
         style={{
           fontSize: "15px",
           height: "49px",
-          marginTop: "24px",
+          marginTop: "23px",
           backgroundColor: "#111112",
           fontFamily: "Inter",
           fontWeight: "bold",
           borderRadius: "4px",
+          borderWidth: "0px",
         }}
         styles={{
           root: {
@@ -125,7 +129,7 @@ export function LandingPage() {
       >
         Sign Up
       </Button>
-      <Center style={{ display: "flex", paddingTop: "30px" }}>
+      <div style={{ paddingTop: "30px" }}>
         <Text
           color={"#4E5D78"}
           style={{
@@ -133,6 +137,9 @@ export function LandingPage() {
             fontFamily: "Inter",
             fontWeight: 100,
             height: "20px",
+            marginLeft: "36px",
+            lineHeight: "20px",
+            display: "inline",
           }}
         >
           Already have an account?
@@ -146,6 +153,8 @@ export function LandingPage() {
             fontWeight: "Medium",
             color: "#0BB07B",
             height: "19px",
+            lineHeight: "20px",
+            display: "inline",
           }}
           variant="link"
           component={Link}
@@ -153,7 +162,7 @@ export function LandingPage() {
         >
           Sign In
         </Text>
-      </Center>
+      </div>
     </Container>
   );
 }
