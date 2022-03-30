@@ -115,6 +115,13 @@ export function LandingPage() {
           fontWeight: "bold",
           borderRadius: "4px",
         }}
+        styles={{
+          root: {
+            "&:hover": {
+              backgroundColor: "transparent",
+            },
+          },
+        }}
       >
         Sign Up
       </Button>
