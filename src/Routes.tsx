@@ -1,11 +1,13 @@
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import { LandingPage } from "./GettingStarted";
+import { Login } from "./Login";
 function Rout() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />}>
           <Route index element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
           {/* <Route index element={<Home />} />
           <Route path="teams" element={<Teams />}>
             <Route path=":teamId" element={<Team />} />
@@ -28,3 +30,4 @@ function GettingStarted() {
 function Home() {
   return <>Home</>;
 }
+
