@@ -129,7 +129,7 @@ export function LandingPage() {
       >
         Sign Up
       </Button>
-      <div style={{ paddingTop: "30px" }}>
+      <Center style={{ paddingTop: "30px" }}>
         <Text
           color={"#4E5D78"}
           style={{
@@ -137,7 +137,7 @@ export function LandingPage() {
             fontFamily: "Inter",
             fontWeight: 100,
             height: "20px",
-            marginLeft: "36px",
+            // marginLeft: "36px",
             lineHeight: "20px",
             display: "inline",
           }}
@@ -147,7 +147,7 @@ export function LandingPage() {
         <Text
           underline
           style={{
-            marginLeft: "10px",
+            marginLeft: "13px",
             fontSize: "15px",
             fontFamily: "Inter",
             fontWeight: "Medium",
@@ -162,7 +162,7 @@ export function LandingPage() {
         >
           Sign In
         </Text>
-      </div>
+      </Center>
     </Container>
   );
 }
