@@ -1,9 +1,9 @@
+import { MantineProvider } from "@mantine/core";
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
 import App from "./App";
-
-import { MantineProvider } from "@mantine/core";
+import "./index.css";
+import Rout from "./Routes";
 
 function Root() {
   return (
@@ -14,7 +14,8 @@ function Root() {
         spacing: { xs: 15, sm: 20, md: 25, lg: 30, xl: 40 },
       }}
     >
-      <App />
+      <Rout />
+      {/* <App /> */}
     </MantineProvider>
   );
 }
