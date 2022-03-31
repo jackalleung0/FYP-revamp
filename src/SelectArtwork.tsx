@@ -132,6 +132,7 @@ function ArtworkCheckBox({ ...props }: ArtworkCheckBox): JSX.Element {
           height: "144px",
           top: "0",
           opacity: 0,
+          borderRadius:"8px",
           ...(props.checked
             ? { opacity: 0.5, backgroundColor: "#CFF8EB" }
             : {}),
