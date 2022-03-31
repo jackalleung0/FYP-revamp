@@ -60,7 +60,7 @@ export function Login() {
         <BackIcon />
         <Text
           style={{
-            marginTop: "41px", // 42
+            marginTop: "40px",
             fontSize: "32px",
             fontFamily: "SFProDisplay",
             fontWeight: "bold",
@@ -90,7 +90,7 @@ export function Login() {
               color: "#0A1F44",
               fontSize: "16px",
               fontFamily: "Inter",
-              fontWeight: "lighter",
+              fontWeight: 100,
               lineHeight: "24px",
               borderColor: "#E1E4E8",
               borderRadius: "4px",
@@ -117,17 +117,17 @@ export function Login() {
               fontWeight: "normal",
             },
             input: {
-              color: "#0A1F44",
-              fontSize: "16px",
-              fontFamily: "Inter",
-              fontWeight: "lighter",
-              lineHeight: "24px",
+              height: "50px",
               borderColor: "#E1E4E8",
               borderRadius: "4px",
               borderWidth: "1px",
-              input: {
-                height: "50px",
-              },
+            },
+            innerInput: {
+              color: "#0A1F44",
+              fontSize: "16px",
+              fontFamily: "Inter",
+              fontWeight: 100,
+              lineHeight: "24px",
               height: "50px",
             },
             visibilityToggle: {
