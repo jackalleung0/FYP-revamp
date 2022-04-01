@@ -11,7 +11,7 @@ import {
 import React from "react";
 import { Link } from "react-router-dom";
 import { BackIcon } from "./BackIcon";
-import { useOnLoadImages } from "./useOnLoadImages";
+import { useOnLoadImages } from "./hooks/useOnLoadImages";
 
 export function SelectArtwork() {
   const [selectedArtwork, setSelectedArtwork] = React.useState<
