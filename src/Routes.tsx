@@ -5,6 +5,7 @@ import { SelectArtwork } from "./SelectArtwork";
 
 import React from "react";
 import { PageAnimation } from "./components/PageAnimation";
+import { Home } from "./Home";
 
 function Rout() {
   return (
@@ -32,6 +33,4 @@ function App() {
 function GettingStarted() {
   return <>getting started</>;
 }
-function Home() {
-  return <>Home</>;
-}
+
