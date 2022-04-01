@@ -19,8 +19,8 @@ function IphoneXIcon() {
           y2="1"
           gradientUnits="objectBoundingBox"
         >
-          <stop offset="0" stop-color="#f1f2f4" />
-          <stop offset="1" stop-color="#ececec" />
+          <stop offset="0" stopColor="#f1f2f4" />
+          <stop offset="1" stopColor="#ececec" />
         </linearGradient>
       </defs>
       <path
