@@ -14,7 +14,7 @@ import { BackIcon } from "./BackIcon";
 import { useOnLoadImages } from "./useOnLoadImages";
 
 export function SelectArtwork() {
-  const [selectedArtwork, setSelectedArtword] = React.useState<
+  const [selectedArtwork, setSelectedArtwork] = React.useState<
     (string | number)[]
   >([]);
   const toggleArtwork = (index: string | number) => () => {
@@ -25,8 +25,8 @@ export function SelectArtwork() {
     }
     console.log(`${index} onclick`);
     selectedArtwork.includes(index)
-      ? setSelectedArtword(copy)
-      : setSelectedArtword((e) => [...e, index]);
+      ? setSelectedArtwork(copy)
+      : setSelectedArtwork((e) => [...e, index]);
   };
 
   const wrapperRef = React.useRef<HTMLDivElement>(null);
