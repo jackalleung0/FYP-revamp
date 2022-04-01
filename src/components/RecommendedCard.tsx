@@ -35,7 +35,7 @@ export const RecommendedCard = () => {
             bottom: 0,
             marginLeft: "20px",
             marginRight: "20px",
-            marginBottom: "28px",
+            marginBottom: "27px",
           }}
         >
           <Text
@@ -51,7 +51,7 @@ export const RecommendedCard = () => {
           </Text>
           <Text
             style={{
-              marginTop: "12px",
+              marginTop: "10px",
               fontFamily: "Inter",
               fontWeight: "normal",
               fontSize: "14px",
@@ -68,11 +68,9 @@ export const RecommendedCard = () => {
         style={{
           display: "flex",
           width: "317px",
-          alignItems: "center",
+          height: "63px",
           justifyContent: "space-between",
-          paddingTop: "23px",
-          paddingBottom: "23px",
-
+          alignItems: "center",
           backgroundColor: "#FFF",
           borderBottomLeftRadius: "12px",
           borderBottomRightRadius: "12px",
@@ -90,7 +88,7 @@ export const RecommendedCard = () => {
           Vincent van Gogh
         </Text>
         <svg
-          style={{ marginRight: "22px" }}
+          style={{ marginRight: "21px" }}
           xmlns="http://www.w3.org/2000/svg"
           width="17"
           height="15"
