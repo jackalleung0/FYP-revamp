@@ -4,12 +4,14 @@ import {
   CheckboxProps,
   Container,
   Image,
+  LoadingOverlay,
   SimpleGrid,
   Text,
 } from "@mantine/core";
 import React from "react";
 import { Link } from "react-router-dom";
 import { BackIcon } from "./BackIcon";
+import { useOnLoadImages } from "./useOnLoadImages";
 
 export function SelectArtwork() {
   const [selectedArtwork, setSelectedArtword] = React.useState<
@@ -27,12 +29,17 @@ export function SelectArtwork() {
       : setSelectedArtword((e) => [...e, index]);
   };
 
+  const wrapperRef = React.useRef<HTMLDivElement>(null);
+  const imagesLoaded = useOnLoadImages(wrapperRef);
+
   return (
     <Container
       style={{
         paddingTop: "10px",
         paddingLeft: 0,
         paddingRight: 0,
+        position: "relative",
+        height: "100%",
       }}
     >
       <ActionIcon
@@ -95,7 +102,7 @@ export function SelectArtwork() {
           position: "relative",
         }}
       >
-        <SimpleGrid cols={2} spacing={13}>
+        <SimpleGrid cols={2} spacing={13} ref={wrapperRef}>
           {Array(10)
             .fill(1)
             .map((_, index) => (
@@ -107,6 +114,12 @@ export function SelectArtwork() {
             ))}
         </SimpleGrid>
       </div>
+      <LoadingOverlay
+        visible={!imagesLoaded}
+        overlayOpacity={0.6}
+        overlayColor="#FFF"
+        loaderProps={{ color: "#111112" }}
+      />
     </Container>
   );
 }
