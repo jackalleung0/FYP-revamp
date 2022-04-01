@@ -32,6 +32,19 @@ export const RecommendedCard = () => {
         <div
           style={{
             position: "absolute",
+            top: 0,
+            left: 0,
+            width: "317px",
+            height: "322px",
+            borderTopLeftRadius: "12px",
+            borderTopRightRadius: "12px",
+            opacity: 0.2,
+            backgroundColor: "#000",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
             bottom: 0,
             marginLeft: "20px",
             marginRight: "20px",
