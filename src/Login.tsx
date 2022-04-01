@@ -7,7 +7,7 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BackIcon } from "./BackIcon";
 function EyeIcon({ reveal, size }: { reveal: boolean; size: number }) {
   return (
@@ -28,6 +28,7 @@ function EyeIcon({ reveal, size }: { reveal: boolean; size: number }) {
 }
 
 export function Login() {
+  const nav = useNavigate();
   return (
     <>
       <Container
@@ -37,7 +38,7 @@ export function Login() {
           paddingTop: "10px",
         }}
       >
-        <BackIcon />
+        <BackIcon onClick={() => nav(-1)} />
         <Text
           style={{
             marginTop: "40px",
