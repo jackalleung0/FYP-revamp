@@ -12,6 +12,7 @@ import { SelectArtwork } from "./SelectArtwork";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import "./route.css";
 import React from "react";
+
 function Rout() {
   const location = useLocation();
   const navType = useNavigationType();
@@ -40,12 +41,6 @@ function Rout() {
             <Route path="/login" element={<Login />} />
             <Route path="/select-artwork" element={<SelectArtwork />} />
             <Route path="/home" element={<Home />} />
-            {/* 
-          <Route path="teams" element={<Teams />}>
-            <Route path=":teamId" element={<Team />} />
-            <Route path="new" element={<NewTeamForm />} />
-            <Route index element={<LeagueStandings />} />
-          </Route> */}
           </Route>
         </Routes>
       </CSSTransition>
