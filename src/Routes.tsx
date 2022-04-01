@@ -10,7 +10,8 @@ function Rout() {
           <Route index element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/select-artwork" element={<SelectArtwork />} />
-          {/* <Route index element={<Home />} />
+          <Route path="/home" element={<Home />} />
+          {/* 
           <Route path="teams" element={<Teams />}>
             <Route path=":teamId" element={<Team />} />
             <Route path="new" element={<NewTeamForm />} />
@@ -32,4 +33,3 @@ function GettingStarted() {
 function Home() {
   return <>Home</>;
 }
-

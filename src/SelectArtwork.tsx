@@ -8,6 +8,7 @@ import {
   Text,
 } from "@mantine/core";
 import React from "react";
+import { Link } from "react-router-dom";
 import { BackIcon } from "./BackIcon";
 
 export function SelectArtwork() {
@@ -35,6 +36,8 @@ export function SelectArtwork() {
       }}
     >
       <ActionIcon
+        component={Link}
+        to="/home"
         radius={9999}
         size={70}
         style={{
@@ -132,7 +135,7 @@ function ArtworkCheckBox({ ...props }: ArtworkCheckBox): JSX.Element {
           height: "144px",
           top: "0",
           opacity: 0,
-          borderRadius:"8px",
+          borderRadius: "8px",
           ...(props.checked
             ? { opacity: 0.5, backgroundColor: "#CFF8EB" }
             : {}),
