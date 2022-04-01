@@ -112,6 +112,7 @@ export function SelectArtwork() {
 }
 type ArtworkCheckBox = CheckboxProps & React.RefAttributes<HTMLInputElement>;
 function ArtworkCheckBox({ ...props }: ArtworkCheckBox): JSX.Element {
+  const ref = React.useRef<any>();
   return (
     <div
       style={{
@@ -119,7 +120,7 @@ function ArtworkCheckBox({ ...props }: ArtworkCheckBox): JSX.Element {
         width: "165px",
         height: "144px",
       }}
-      onClick={props.onClick}
+      onClick={() => ref?.current?.click()}
     >
       <Image
         width={165}
@@ -145,6 +146,12 @@ function ArtworkCheckBox({ ...props }: ArtworkCheckBox): JSX.Element {
         radius={100}
         icon={CheckIcon}
         {...props}
+        checked={props.checked || false}
+        ref={ref}
+        onClick={(ev) => {
+          ev.stopPropagation();
+          props.onClick && props.onClick(ev);
+        }}
         style={{
           position: "absolute",
           right: "8px",
@@ -194,7 +201,7 @@ function CheckIcon({
         d="M12.791,5.209a.714.714,0,0,1,0,1.01L7.076,11.934a.714.714,0,0,1-1.01,0L3.209,9.077a.714.714,0,1,1,1.01-1.01l2.352,2.352,5.209-5.209A.714.714,0,0,1,12.791,5.209Z"
         transform="translate(-3 -5)"
         fill="#0bb07b"
-        fill-rule="evenodd"
+        fillRule="evenodd"
       />
     </svg>
   );

@@ -12,9 +12,9 @@ export function BackIcon() {
         transform="translate(-5.086 -6.086)"
         fill="none"
         stroke="#000"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2" />
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2" />
     </svg>
   );
 }
