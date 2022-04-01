@@ -9,6 +9,7 @@
     "deploy": "firebase deploy --only hosting:revamp"
   },
   "dependencies": {
+    "@heroicons/react": "^1.0.6",
     "@mantine/core": "^4.1.0",
     "@mantine/dates": "^4.1.0",
     "@mantine/form": "^4.1.0",
