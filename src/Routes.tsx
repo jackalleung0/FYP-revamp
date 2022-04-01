@@ -17,7 +17,6 @@ function Rout() {
   const navType = useNavigationType();
 
   const getClassName = React.useMemo(() => {
-    console.log(navType);
     switch (navType) {
       // next
       case "PUSH":
