@@ -487,7 +487,7 @@ const TrendingTags = () => (
       >
         <Button
           component={Link}
-          to="search-by-tag"
+          to="/search-by-tag"
           variant="outline"
           style={{
             borderColor: "#0BB07B",
