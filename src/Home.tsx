@@ -9,6 +9,7 @@ import {
 import React from "react";
 import { HeartIcon } from "@heroicons/react/outline";
 import { RecommendedCard } from "./components/RecommendedCard";
+import { Link } from "react-router-dom";
 const useStyles = createStyles((theme, _params, getRef) => ({
   userAvatar: {
     boxShadow: theme.shadows.xl,
@@ -310,6 +311,8 @@ const RecentlyViewed = () => {
           Recently Viewed
         </Text>
         <Text
+          component={Link}
+          to="/recently-viewed"
           underline
           transform="uppercase"
           style={{
@@ -318,6 +321,7 @@ const RecentlyViewed = () => {
             fontWeight: "bold",
             height: "15px",
             color: "#8A94A6",
+            paddingBottom:"1px"
           }}
         >
           View More

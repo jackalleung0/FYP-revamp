@@ -16,6 +16,7 @@ function Rout() {
           <Route path="/login" element={<Login />} />
           <Route path="/select-artwork" element={<SelectArtwork />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/recently-viewed" element={<RecentlyViewed />} />
         </Route>
       </Routes>
     </PageAnimation>
@@ -27,10 +28,13 @@ export default () => (
   </BrowserRouter>
 );
 
+function RecentlyViewed() {
+  return <></>;
+}
+
 function App() {
   return <Outlet />;
 }
 function GettingStarted() {
   return <>getting started</>;
 }
-
