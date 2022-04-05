@@ -1,5 +1,4 @@
 import {
-  Button,
   Container,
   createStyles,
   Text,
@@ -10,6 +9,7 @@ import React from "react";
 import { HeartIcon } from "@heroicons/react/outline";
 import { RecommendedCard } from "./components/RecommendedCard";
 import { Link } from "react-router-dom";
+import { TagButton } from "./TagButton";
 const useStyles = createStyles((theme, _params, getRef) => ({
   userAvatar: {
     boxShadow: theme.shadows.xl,
@@ -33,6 +33,8 @@ export function Home() {
         }}
       >
         <ActionIcon
+          component={Link}
+          to="/search"
           className={classes.ActionIcon}
           radius={9999}
           size={70}
@@ -454,6 +456,7 @@ const RecommendedForYou = () => {
     </>
   );
 };
+
 const TrendingTags = () => (
   <>
     <Text
@@ -489,59 +492,11 @@ const TrendingTags = () => (
           minWidth: "min-content",
         }}
       >
-        <Button
-          component={Link}
-          to="/search-by-tag"
-          variant="outline"
-          style={{
-            borderColor: "#0BB07B",
-            borderRadius: "4px",
-            color: "#00865A",
-            height: "33px",
-            paddingLeft: "12px",
-            paddingRight: "12px",
-
-            fontFamily: "Inter",
-            fontWeight: "normal",
-            fontSize: "14px",
-            lineHeight: "24px",
-          }}
-          styles={{
-            root: {
-              "&:hover": {
-                backgroundColor: "transparent",
-              },
-            },
-          }}
-        >
+        <TagButton to="/search-by-tag" popular>
           oil in canvas
-        </Button>
+        </TagButton>
         {["painting", "women", "painting", "women"].map((e) => (
-          <Button
-            variant="outline"
-            style={{
-              borderColor: "#111112",
-              borderRadius: "4px",
-              color: "#111112",
-              height: "33px",
-              paddingLeft: "16px",
-              paddingRight: "16px",
-
-              fontFamily: "Inter",
-              fontWeight: "normal",
-              fontSize: "14px",
-              lineHeight: "24px",
-            }}
-            styles={{
-              root: {
-                "&:hover": {
-                  backgroundColor: "transparent",
-                },
-              },
-            }}
-          >
-            {e}
-          </Button>
+          <TagButton to="/search-by-tag">{e}</TagButton>
         ))}
       </div>
     </div>
