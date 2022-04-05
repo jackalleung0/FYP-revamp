@@ -6,6 +6,7 @@ import { SelectArtwork } from "./SelectArtwork";
 import React from "react";
 import { PageAnimation } from "./components/PageAnimation";
 import { Home } from "./Home";
+import { RecentlyViewed } from "./RecentlyViewed";
 
 function Rout() {
   return (
@@ -27,10 +28,6 @@ export default () => (
     <Rout />
   </BrowserRouter>
 );
-
-function RecentlyViewed() {
-  return <></>;
-}
 
 function App() {
   return <Outlet />;
