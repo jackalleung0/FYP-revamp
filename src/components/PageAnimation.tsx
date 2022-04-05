@@ -8,6 +8,7 @@ export function PageAnimation({ children }: React.PropsWithChildren<{}>) {
   const navType = useNavigationType();
 
   const getClassName = React.useMemo(() => {
+    console.log(navType);
     switch (navType) {
       // next
       case "PUSH":
@@ -19,6 +20,8 @@ export function PageAnimation({ children }: React.PropsWithChildren<{}>) {
         return "left-to-right";
       // set root
       case "REPLACE":
+        return "fade";
+      default:
         return "fade";
     }
   }, [navType]);

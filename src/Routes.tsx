@@ -1,4 +1,10 @@
-import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter,
+  Outlet,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import { LandingPage } from "./GettingStarted";
 import { Login } from "./Login";
 import { SelectArtwork } from "./SelectArtwork";
@@ -9,6 +15,12 @@ import { Home } from "./Home";
 import { RecentlyViewed } from "./RecentlyViewed";
 
 function Rout() {
+  // scroll to top when there are page routing event
+  const location = useLocation();
+  React.useEffect(() => {
+    if (location) window.scrollTo(0, 0);
+  }, [location]);
+
   return (
     <PageAnimation>
       <Routes>

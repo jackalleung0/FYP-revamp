@@ -20,7 +20,7 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 export function Home() {
   const { classes } = useStyles();
   return (
-    <>
+    <div>
       <Container
         style={{
           paddingLeft: "20px",
@@ -89,7 +89,7 @@ export function Home() {
       <NewDiscover />
       <RecentlyViewed />
       <LatestArtwork />
-    </>
+    </div>
   );
 }
 const LatestArtwork = () => {

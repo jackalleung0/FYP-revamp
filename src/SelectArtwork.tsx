@@ -9,7 +9,7 @@ import {
   Text,
 } from "@mantine/core";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BackIcon } from "./BackIcon";
 import { useOnLoadImages } from "./hooks/useOnLoadImages";
 
@@ -31,6 +31,7 @@ export function SelectArtwork() {
 
   const wrapperRef = React.useRef<HTMLDivElement>(null);
   const imagesLoaded = useOnLoadImages(wrapperRef);
+  const nav = useNavigate();
 
   return (
     <Container
@@ -78,7 +79,7 @@ export function SelectArtwork() {
           paddingRight: "20px",
         }}
       >
-        <BackIcon />
+        <BackIcon onClick={() => nav(-1)} />
         <Text
           style={{
             marginTop: "40px",
