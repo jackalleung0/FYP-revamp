@@ -1,10 +1,23 @@
-import { Container, ActionIcon, Text, Image } from "@mantine/core";
+import {
+  Container,
+  ActionIcon,
+  Text,
+  Image,
+  createStyles,
+} from "@mantine/core";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { BackIcon } from "./BackIcon";
 
+const useStyles = createStyles((theme, _params, getRef) => ({
+  ActionIcon: {
+    boxShadow: theme.shadows.lg,
+  },
+}));
+
 export function SearchByTag() {
   const nav = useNavigate();
+  const { classes } = useStyles();
   return (
     <Container
       style={{
@@ -15,6 +28,7 @@ export function SearchByTag() {
       }}
     >
       <ActionIcon
+        className={classes.ActionIcon}
         radius={9999}
         size={70}
         style={{

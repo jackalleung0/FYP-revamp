@@ -1,10 +1,24 @@
-import { Container, Text, Image, ActionIcon } from "@mantine/core";
+import {
+  Container,
+  Text,
+  Image,
+  ActionIcon,
+  createStyles,
+} from "@mantine/core";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { BackIcon } from "./BackIcon";
 
+const useStyles = createStyles((theme, _params, getRef) => ({
+  ActionIcon: {
+    boxShadow: theme.shadows.lg,
+  },
+}));
+
 export function RecentlyViewed() {
   const nav = useNavigate();
+  const { classes } = useStyles();
+
   return (
     <>
       <Container
@@ -16,6 +30,7 @@ export function RecentlyViewed() {
         }}
       >
         <ActionIcon
+          className={classes.ActionIcon}
           radius={9999}
           size={70}
           style={{

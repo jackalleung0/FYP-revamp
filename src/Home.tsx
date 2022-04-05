@@ -15,6 +15,9 @@ const useStyles = createStyles((theme, _params, getRef) => ({
     boxShadow: theme.shadows.xl,
     borderRadius: "999px",
   },
+  ActionIcon: {
+    boxShadow: theme.shadows.lg,
+  },
 }));
 
 export function Home() {
@@ -30,6 +33,7 @@ export function Home() {
         }}
       >
         <ActionIcon
+          className={classes.ActionIcon}
           radius={9999}
           size={70}
           style={{

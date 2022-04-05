@@ -3,6 +3,7 @@ import {
   Checkbox,
   CheckboxProps,
   Container,
+  createStyles,
   Image,
   LoadingOverlay,
   SimpleGrid,
@@ -13,7 +14,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { BackIcon } from "./BackIcon";
 import { useOnLoadImages } from "./hooks/useOnLoadImages";
 
+const useStyles = createStyles((theme, _params, getRef) => ({
+  ActionIcon: {
+    boxShadow: theme.shadows.lg,
+  },
+}));
+
 export function SelectArtwork() {
+  const { classes } = useStyles();
+
   const [selectedArtwork, setSelectedArtwork] = React.useState<
     (string | number)[]
   >([]);
@@ -44,6 +53,7 @@ export function SelectArtwork() {
       }}
     >
       <ActionIcon
+        className={classes.ActionIcon}
         component={Link}
         to="/home"
         radius={9999}
