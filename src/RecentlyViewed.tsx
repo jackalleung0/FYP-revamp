@@ -5,6 +5,7 @@ import {
   ActionIcon,
   createStyles,
 } from "@mantine/core";
+import { useWindowScroll } from "@mantine/hooks";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { BackIcon } from "./BackIcon";
@@ -18,6 +19,7 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 export function RecentlyViewed() {
   const nav = useNavigate();
   const { classes } = useStyles();
+  const [scroll, scrollTo] = useWindowScroll();
 
   return (
     <>
@@ -30,6 +32,7 @@ export function RecentlyViewed() {
         }}
       >
         <ActionIcon
+          onClickCapture={() => scrollTo({ y: 0 })}
           className={classes.ActionIcon}
           radius={9999}
           size={70}
