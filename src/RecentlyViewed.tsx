@@ -114,12 +114,26 @@ export function RecentlyViewed() {
                       Mark Rothko (Marcus Rothkowitz)
                     </Text>
                   </div>
-                  <Image
-                    width={97}
-                    height={93}
-                    src="https://picsum.photos/1200"
-                    radius={8}
-                  />
+                  <div style={{ position: "relative" }}>
+                    <Image
+                      width={97}
+                      height={93}
+                      src="https://picsum.photos/1200"
+                      radius={8}
+                    />
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: 97,
+                        height: 93,
+                        borderRadius: "8px",
+                        opacity: 0.2,
+                        backgroundColor: "#000",
+                      }}
+                    />
+                  </div>
                 </div>
                 <hr
                   style={{

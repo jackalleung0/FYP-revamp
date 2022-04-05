@@ -136,13 +136,27 @@ function ArtworkCheckBox({ ...props }: ArtworkCheckBox): JSX.Element {
       }}
       onClick={() => ref?.current?.click()}
     >
-      <Image
-        width={165}
-        height={144}
-        radius={8}
-        src="https://picsum.photos/1200"
-        alt="Panda"
-      />
+      <div style={{ position: "relative" }}>
+        <Image
+          width={165}
+          height={144}
+          radius={8}
+          src="https://picsum.photos/1200"
+          alt="Panda"
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: 165,
+            height: 144,
+            borderRadius: "8px",
+            opacity: 0.2,
+            backgroundColor: "#000",
+          }}
+        />
+      </div>
       <div
         style={{
           position: "absolute",
