@@ -173,17 +173,31 @@ const LatestArtwork = () => {
                     2022-03-19 12:08
                   </Text>
                 </div>
-                <Image
-                  width={289}
-                  height={210}
-                  styles={{
-                    image: {
+                <div style={{ position: "relative" }}>
+                  <Image
+                    width={289}
+                    height={210}
+                    styles={{
+                      image: {
+                        borderRadius: "8px",
+                      },
+                      root: { paddingBottom: "24px" },
+                    }}
+                    src="https://picsum.photos/1200"
+                  />
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: 289,
+                      height: 210,
                       borderRadius: "8px",
-                    },
-                    root: { paddingBottom: "24px" },
-                  }}
-                  src="https://picsum.photos/1200"
-                />
+                      opacity: 0.2,
+                      backgroundColor: "#000",
+                    }}
+                  />
+                </div>
               </>
             ))}
           </div>
@@ -231,7 +245,7 @@ const NewDiscover = () => {
           {Array(4)
             .fill(1)
             .map(() => (
-              <div>
+              <div style={{ position: "relative" }}>
                 <Image
                   src="https://picsum.photos/1200"
                   width={228}
@@ -240,6 +254,18 @@ const NewDiscover = () => {
                     image: {
                       borderRadius: "8px",
                     },
+                  }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: 228,
+                    height: 182,
+                    borderRadius: "8px",
+                    opacity: 0.2,
+                    backgroundColor: "#000",
                   }}
                 />
                 <Text
@@ -321,7 +347,7 @@ const RecentlyViewed = () => {
             fontWeight: "bold",
             height: "15px",
             color: "#8A94A6",
-            paddingBottom:"1px"
+            paddingBottom: "1px",
           }}
         >
           View More
@@ -347,16 +373,30 @@ const RecentlyViewed = () => {
           {Array(4)
             .fill(1)
             .map(() => (
-              <Image
-                src="https://picsum.photos/1200"
-                width={196}
-                height={156}
-                styles={{
-                  image: {
+              <div style={{ position: "relative" }}>
+                <Image
+                  src="https://picsum.photos/1200"
+                  width={196}
+                  height={156}
+                  styles={{
+                    image: {
+                      borderRadius: "8px",
+                    },
+                  }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: 196,
+                    height: 156,
                     borderRadius: "8px",
-                  },
-                }}
-              />
+                    opacity: 0.2,
+                    backgroundColor: "#000",
+                  }}
+                />
+              </div>
             ))}
         </div>
       </div>
