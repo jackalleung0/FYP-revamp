@@ -344,7 +344,7 @@ const RecentlyViewed = () => {
           style={{
             fontSize: "12px",
             fontFamily: "Inter",
-            fontWeight: "bold",
+            fontWeight: "normal",
             height: "15px",
             color: "#8A94A6",
             paddingBottom: "1px",
