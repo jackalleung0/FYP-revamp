@@ -3,7 +3,7 @@ import React from "react";
 
 const style = createStyles((theme, _params, getRef) => ({
   root: {
-    boxShadow: theme.shadows.xl,
+    boxShadow: theme.shadows.lg,
   },
 }));
 

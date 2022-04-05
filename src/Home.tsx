@@ -1,4 +1,11 @@
-import { Button, Container, createStyles, Text } from "@mantine/core";
+import {
+  Button,
+  Container,
+  createStyles,
+  Text,
+  Image,
+  ActionIcon,
+} from "@mantine/core";
 import React from "react";
 import { HeartIcon } from "@heroicons/react/outline";
 import { RecommendedCard } from "./components/RecommendedCard";
@@ -18,8 +25,39 @@ export function Home() {
           paddingLeft: "20px",
           paddingRight: "20px",
           paddingTop: "10px",
+          position: "relative",
         }}
       >
+        <ActionIcon
+          radius={9999}
+          size={70}
+          style={{
+            backgroundColor: "#111112",
+            position: "fixed",
+            bottom: "30px",
+            right: "22px",
+            zIndex: 2,
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="22.414"
+            height="22.414"
+            viewBox="0 0 22.414 22.414"
+          >
+            <path
+              id="Search_Icon"
+              d="M23,23l-6.667-6.667m2.222-5.556A7.778,7.778,0,1,1,10.778,3,7.778,7.778,0,0,1,18.556,10.778Z"
+              transform="translate(-2 -2)"
+              fill="none"
+              stroke="#fff"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+            />
+          </svg>
+        </ActionIcon>
+
         <div
           style={{
             display: "flex",
@@ -47,9 +85,280 @@ export function Home() {
       </Container>
       <TrendingTags />
       <RecommendedForYou />
+      <NewDiscover />
+      <RecentlyViewed />
+      <LatestArtwork />
     </>
   );
 }
+const LatestArtwork = () => {
+  return (
+    <>
+      <Container
+        style={{
+          paddingLeft: "20px",
+          paddingRight: "20px",
+          paddingBottom: "100px",
+        }}
+      >
+        <Text
+          transform="uppercase"
+          style={{
+            fontSize: "13px",
+            fontFamily: "Inter",
+            fontWeight: "bold",
+            color: "#4E5D78",
+            height: "16px",
+            lineHeight: "16px",
+            paddingBottom: "16px",
+          }}
+        >
+          Latest Artwork
+        </Text>
+        {/* TODO: fix when there are >1 days */}
+        <div style={{ display: "flex" }}>
+          <Text
+            align="center"
+            style={{
+              fontSize: "15px",
+              fontFamily: "Inter",
+              fontWeight: "normal",
+              color: "#000000",
+              lineHeight: "18px",
+
+              marginTop: "3px",
+              width: "34px",
+              height: "37px",
+              paddingRight: "12px",
+            }}
+          >
+            19 MAR
+          </Text>
+          <div>
+            {["Nude under a Pine Tree", "Apples"].map((title) => (
+              <>
+                <div
+                  style={{
+                    paddingLeft: "14px",
+                    marginBottom: "16px",
+
+                    borderLeft: "1px solid #8A94A6",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: "18px",
+                      fontFamily: "SFProDisplay",
+                      fontWeight: "bold",
+                      color: "#000000",
+                      height: "21px",
+                      lineHeight: "20px",
+
+                      paddingBottom: "4px",
+                    }}
+                  >
+                    {title}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: "14px",
+                      fontFamily: "Inter",
+                      fontWeight: "100",
+                      color: "#8A94A6",
+                      height: "18px",
+                      lineHeight: "18px",
+                    }}
+                  >
+                    2022-03-19 12:08
+                  </Text>
+                </div>
+                <Image
+                  width={289}
+                  height={210}
+                  styles={{
+                    image: {
+                      borderRadius: "8px",
+                    },
+                    root: { paddingBottom: "24px" },
+                  }}
+                  src="https://picsum.photos/1200"
+                />
+              </>
+            ))}
+          </div>
+        </div>
+      </Container>
+    </>
+  );
+};
+const NewDiscover = () => {
+  return (
+    <>
+      <Text
+        transform="uppercase"
+        style={{
+          marginLeft: "20px",
+          // marginTop: "36px",
+          fontSize: "13px",
+          fontFamily: "Inter",
+          fontWeight: "bold",
+          color: "#4E5D78",
+          height: "16px",
+          lineHeight: "16px",
+          paddingBottom: "15px",
+        }}
+      >
+        New Discover
+      </Text>
+      <div
+        style={{
+          overflowY: "hidden",
+          width: "100%",
+          paddingBottom: "36px",
+        }}
+        className="no-scrollbar"
+      >
+        <div
+          style={{
+            display: "flex",
+            gap: "16px",
+            paddingLeft: "20px",
+            paddingRight: "20px",
+            minWidth: "min-content",
+          }}
+        >
+          {Array(4)
+            .fill(1)
+            .map(() => (
+              <div>
+                <Image
+                  src="https://picsum.photos/1200"
+                  width={228}
+                  height={182}
+                  styles={{
+                    image: {
+                      borderRadius: "8px",
+                    },
+                  }}
+                />
+                <Text
+                  style={{
+                    paddingTop: "13px",
+                    fontSize: "13px",
+                    fontFamily: "Inter",
+                    fontWeight: "normal",
+                    lineHeight: "16px",
+                    color: "#00865A",
+                  }}
+                >
+                  oil on canvas
+                </Text>
+                <Text
+                  style={{
+                    paddingTop: "8px",
+                    fontSize: "18px",
+                    fontFamily: "SFProDisplay",
+                    fontWeight: "bold",
+                    lineHeight: "20px",
+                  }}
+                >
+                  The Girl by the Window
+                </Text>
+                <Text
+                  style={{
+                    paddingTop: "9px",
+                    fontSize: "13px",
+                    fontFamily: "Inter",
+                    fontWeight: "normal",
+                    lineHeight: "16px",
+                    color: "#8A94A6",
+                  }}
+                >
+                  Edvard Munch
+                </Text>
+              </div>
+            ))}
+        </div>
+      </div>
+    </>
+  );
+};
+const RecentlyViewed = () => {
+  return (
+    <>
+      <span
+        style={{
+          display: "flex",
+          paddingBottom: "15px",
+          justifyContent: "space-between",
+          paddingLeft: "20px",
+          paddingRight: "20px",
+          alignContent: "center",
+        }}
+      >
+        <Text
+          transform="uppercase"
+          style={{
+            fontSize: "13px",
+            fontFamily: "Inter",
+            fontWeight: "bold",
+            color: "#4E5D78",
+            height: "16px",
+            lineHeight: "16px",
+          }}
+        >
+          Recently Viewed
+        </Text>
+        <Text
+          underline
+          transform="uppercase"
+          style={{
+            fontSize: "12px",
+            fontFamily: "Inter",
+            fontWeight: "bold",
+            height: "15px",
+            color: "#8A94A6",
+          }}
+        >
+          View More
+        </Text>
+      </span>
+      <div
+        style={{
+          overflowY: "hidden",
+          width: "100%",
+          paddingBottom: "37px",
+        }}
+        className="no-scrollbar"
+      >
+        <div
+          style={{
+            display: "flex",
+            gap: "12px",
+            paddingLeft: "20px",
+            paddingRight: "20px",
+            minWidth: "min-content",
+          }}
+        >
+          {Array(4)
+            .fill(1)
+            .map(() => (
+              <Image
+                src="https://picsum.photos/1200"
+                width={196}
+                height={156}
+                styles={{
+                  image: {
+                    borderRadius: "8px",
+                  },
+                }}
+              />
+            ))}
+        </div>
+      </div>
+    </>
+  );
+};
 const RecommendedForYou = () => {
   return (
     <>
@@ -73,6 +382,7 @@ const RecommendedForYou = () => {
         style={{
           overflowY: "hidden",
           width: "100%",
+          paddingBottom: "37px",
         }}
         className="no-scrollbar"
       >
@@ -82,7 +392,7 @@ const RecommendedForYou = () => {
             gap: "18px",
             paddingLeft: "20px",
             paddingRight: "20px",
-            paddingBottom: "50px",
+
             minWidth: "min-content",
           }}
         >
