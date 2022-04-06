@@ -84,7 +84,8 @@ export function Search() {
               borderRadius: "8px",
             },
             icon: {
-              paddingLeft: "5px",
+              paddingLeft: "18px",
+              width: "min-content",
             },
             input: {
               color: "#0A1F44",
@@ -100,6 +101,8 @@ export function Search() {
               padding: 0,
               borderLeft: 10,
               height: "50px",
+              paddingTop: 2,
+              paddingLeft: "46px !important",
             },
           }}
         />
