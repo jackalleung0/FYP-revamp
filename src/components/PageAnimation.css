@@ -1,3 +1,4 @@
+/* set root animation */
 .fade-enter {
   opacity: 0;
   transform: translate(0, 25px);
@@ -20,6 +21,7 @@
   transition: opacity 250ms ease-out, transform 300ms ease;
 }
 
+/* push animation */
 .right-to-left-enter {
   transform: translateX(100%);
 }
@@ -33,6 +35,7 @@
   opacity: 0;
 }
 
+/* pop animation */
 .left-to-right-enter {
   transform: translateX(-100%);
 }
