@@ -4,6 +4,8 @@ import {
   ActionIcon,
   Text,
   TextInput,
+  Affix,
+  Transition,
 } from "@mantine/core";
 import React from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -20,45 +22,41 @@ export function Search() {
 
   const nav = useNavigate();
   return (
-    <Container
-      style={{
-        paddingTop: "10px",
-        paddingLeft: 0,
-        paddingRight: 0,
-        position: "relative",
-        height: "100%",
-      }}
-    >
-      <ActionIcon
-        className={classes.ActionIcon}
-        component={Link}
-        to="/home"
-        radius={9999}
-        size={70}
+    <div>
+      <Affix position={{ bottom: 30, right: 22 }}>
+        <Transition mounted={true} transition="slide-left" duration={300}>
+          {(transitionStyles) => (
+            <ActionIcon
+              className={classes.ActionIcon}
+              component={Link}
+              to="/home"
+              radius={9999}
+              size={70}
+              style={{
+                backgroundColor: "#111112",
+                ...transitionStyles,
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  id="Home_Icon"
+                  d="M12.884,2.366a1.25,1.25,0,0,0-1.768,0l-8.75,8.75a1.25,1.25,0,1,0,1.768,1.768l.366-.366V20.75A1.25,1.25,0,0,0,5.75,22h2.5A1.25,1.25,0,0,0,9.5,20.75v-2.5A1.25,1.25,0,0,1,10.75,17h2.5a1.25,1.25,0,0,1,1.25,1.25v2.5A1.25,1.25,0,0,0,15.75,22h2.5a1.25,1.25,0,0,0,1.25-1.25V12.517l.366.366a1.25,1.25,0,1,0,1.768-1.768l-8.75-8.75Z"
+                  transform="translate(-2 -2)"
+                  fill="#fff"
+                />
+              </svg>
+            </ActionIcon>
+          )}
+        </Transition>
+      </Affix>
+      <Container
         style={{
-          backgroundColor: "#111112",
-          position: "fixed",
-          bottom: "30px",
-          right: "22px",
-          zIndex: 2,
-        }}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 20 20"
-        >
-          <path
-            id="Home_Icon"
-            d="M12.884,2.366a1.25,1.25,0,0,0-1.768,0l-8.75,8.75a1.25,1.25,0,1,0,1.768,1.768l.366-.366V20.75A1.25,1.25,0,0,0,5.75,22h2.5A1.25,1.25,0,0,0,9.5,20.75v-2.5A1.25,1.25,0,0,1,10.75,17h2.5a1.25,1.25,0,0,1,1.25,1.25v2.5A1.25,1.25,0,0,0,15.75,22h2.5a1.25,1.25,0,0,0,1.25-1.25V12.517l.366.366a1.25,1.25,0,1,0,1.768-1.768l-8.75-8.75Z"
-            transform="translate(-2 -2)"
-            fill="#fff"
-          />
-        </svg>
-      </ActionIcon>
-      <div
-        style={{
+          paddingTop: "10px",
           paddingLeft: "20px",
           paddingRight: "20px",
         }}
@@ -146,8 +144,8 @@ export function Search() {
             ))}
           </div>
         </div>
-      </div>
-    </Container>
+      </Container>
+    </div>
   );
 }
 

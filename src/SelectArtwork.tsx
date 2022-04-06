@@ -1,5 +1,6 @@
 import {
   ActionIcon,
+  Affix,
   Checkbox,
   CheckboxProps,
   Container,
@@ -8,6 +9,7 @@ import {
   LoadingOverlay,
   SimpleGrid,
   Text,
+  Transition,
 } from "@mantine/core";
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -52,37 +54,43 @@ export function SelectArtwork() {
         height: "100%",
       }}
     >
-      <ActionIcon
-        className={classes.ActionIcon}
-        component={Link}
-        to="/home"
-        radius={9999}
-        size={70}
-        style={{
-          backgroundColor: "#111112",
-          opacity: selectedArtwork.length > 0 ? 1 : 0,
-          position: "fixed",
-          bottom: "30px",
-          right: "22px",
-          zIndex: 2,
-        }}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="18"
-          height="18"
-          viewBox="0 0 18 18"
-          style={{ transform: "rotate(90deg)" }}
-        >
-          <path
-            id="Up_Icon"
-            d="M3.377,10.67a1.029,1.029,0,0,1,0-1.591l7.714-6.75a1.419,1.419,0,0,1,1.818,0l7.714,6.75a1.028,1.028,0,0,1,0,1.591,1.419,1.419,0,0,1-1.818,0l-5.52-4.83V18.875A1.213,1.213,0,0,1,12,20a1.213,1.213,0,0,1-1.286-1.125V5.841l-5.52,4.83a1.419,1.419,0,0,1-1.818,0Z"
-            transform="translate(-3 -2)"
-            fill="#fff"
-            fillRule="evenodd"
-          />
-        </svg>
-      </ActionIcon>
+      <Affix position={{ bottom: 30, right: 22 }}>
+        <Transition mounted={true} transition="slide-left" duration={300}>
+          {(transitionStyles) =>
+            selectedArtwork.length > 0 ? (
+              <ActionIcon
+                className={classes.ActionIcon}
+                component={Link}
+                to="/home"
+                radius={9999}
+                size={70}
+                style={{
+                  backgroundColor: "#111112",
+                  ...transitionStyles,
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 18 18"
+                  style={{ transform: "rotate(90deg)" }}
+                >
+                  <path
+                    id="Up_Icon"
+                    d="M3.377,10.67a1.029,1.029,0,0,1,0-1.591l7.714-6.75a1.419,1.419,0,0,1,1.818,0l7.714,6.75a1.028,1.028,0,0,1,0,1.591,1.419,1.419,0,0,1-1.818,0l-5.52-4.83V18.875A1.213,1.213,0,0,1,12,20a1.213,1.213,0,0,1-1.286-1.125V5.841l-5.52,4.83a1.419,1.419,0,0,1-1.818,0Z"
+                    transform="translate(-3 -2)"
+                    fill="#fff"
+                    fillRule="evenodd"
+                  />
+                </svg>
+              </ActionIcon>
+            ) : (
+              <></>
+            )
+          }
+        </Transition>
+      </Affix>
       <div
         style={{
           paddingLeft: "20px",

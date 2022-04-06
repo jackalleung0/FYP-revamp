@@ -4,6 +4,8 @@ import {
   Text,
   Image,
   createStyles,
+  Affix,
+  Transition,
 } from "@mantine/core";
 import { useWindowScroll } from "@mantine/hooks";
 import React from "react";
@@ -27,66 +29,69 @@ export function SearchByTag() {
       .map(() => Math.floor(Math.random() * 6) * 100)
       .map((width) => `https://picsum.photos/300/${width}`);
   }, []);
-
   return (
-    <Container
-      style={{
-        paddingTop: 10,
-        paddingLeft: 20,
-        paddingRight: 20,
-        position: "relative",
-      }}
-    >
-      <ActionIcon
-        onClickCapture={() => scrollTo({ y: 0 })}
-        className={classes.ActionIcon}
-        radius={9999}
-        size={70}
+    <div>
+      <Affix position={{ bottom: 30, right: 22 }}>
+        <Transition mounted={true} transition="slide-left" duration={300}>
+          {(transitionStyles) => (
+            <ActionIcon
+              onClickCapture={() => scrollTo({ y: 0 })}
+              className={classes.ActionIcon}
+              radius={9999}
+              size={70}
+              style={{
+                backgroundColor: "#111112",
+                ...transitionStyles,
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 18 18"
+              >
+                <path
+                  id="Up_Icon"
+                  d="M3.377,10.67a1.029,1.029,0,0,1,0-1.591l7.714-6.75a1.419,1.419,0,0,1,1.818,0l7.714,6.75a1.028,1.028,0,0,1,0,1.591,1.419,1.419,0,0,1-1.818,0l-5.52-4.83V18.875A1.213,1.213,0,0,1,12,20a1.213,1.213,0,0,1-1.286-1.125V5.841l-5.52,4.83a1.419,1.419,0,0,1-1.818,0Z"
+                  transform="translate(-3 -2)"
+                  fill="#fff"
+                  fill-rule="evenodd"
+                />
+              </svg>
+            </ActionIcon>
+          )}
+        </Transition>
+      </Affix>
+      <Container
         style={{
-          backgroundColor: "#111112",
-          position: "fixed",
-          bottom: "30px",
-          right: "22px",
-          zIndex: 2,
+          paddingTop: 10,
+          paddingLeft: 20,
+          paddingRight: 20,
         }}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="18"
-          height="18"
-          viewBox="0 0 18 18"
+        <BackIcon onClick={() => nav(-1)} />
+        <Text
+          align="center"
+          style={{
+            marginTop: "9px",
+            fontSize: "14px",
+            fontFamily: "Inter",
+            fontWeight: "100",
+            color: "#8A94A6",
+            height: "17px",
+            lineHeight: "16px",
+            paddingBottom: "36px",
+          }}
         >
-          <path
-            id="Up_Icon"
-            d="M3.377,10.67a1.029,1.029,0,0,1,0-1.591l7.714-6.75a1.419,1.419,0,0,1,1.818,0l7.714,6.75a1.028,1.028,0,0,1,0,1.591,1.419,1.419,0,0,1-1.818,0l-5.52-4.83V18.875A1.213,1.213,0,0,1,12,20a1.213,1.213,0,0,1-1.286-1.125V5.841l-5.52,4.83a1.419,1.419,0,0,1-1.818,0Z"
-            transform="translate(-3 -2)"
-            fill="#fff"
-            fill-rule="evenodd"
-          />
-        </svg>
-      </ActionIcon>
-      <BackIcon onClick={() => nav(-1)} />
-      <Text
-        align="center"
-        style={{
-          marginTop: "9px",
-          fontSize: "14px",
-          fontFamily: "Inter",
-          fontWeight: "100",
-          color: "#8A94A6",
-          height: "17px",
-          lineHeight: "16px",
-          paddingBottom: "36px",
-        }}
-      >
-        See 6321 results for oil in canvas
-      </Text>
-      <div style={{ columnCount: 2, columnGap: "15px" }}>
-        {images.map((src, index) => (
-          <MasImage src={src} key={index} />
-        ))}
-      </div>
-    </Container>
+          See 6321 results for oil in canvas
+        </Text>
+        <div style={{ columnCount: 2, columnGap: "15px" }}>
+          {images.map((src, index) => (
+            <MasImage src={src} key={index} />
+          ))}
+        </div>
+      </Container>
+    </div>
   );
 }
 const MasImage = ({ src }: { src: string }) => {

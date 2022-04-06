@@ -27,7 +27,11 @@ export function PageAnimation({ children }: React.PropsWithChildren<{}>) {
   }, [navType]);
   return (
     <>
-      <TransitionGroup style={{ overflow: "hidden" }}>
+      <TransitionGroup
+        style={{
+          overflowX: "hidden",
+        }}
+      >
         <CSSTransition
           key={location.key}
           classNames={getClassName}

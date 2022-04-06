@@ -4,12 +4,16 @@ import {
   Text,
   Image,
   ActionIcon,
+  Affix,
+  Button,
+  Transition,
 } from "@mantine/core";
 import React from "react";
-import { HeartIcon } from "@heroicons/react/outline";
+import { ArrowUpIcon, HeartIcon } from "@heroicons/react/outline";
 import { RecommendedCard } from "./components/RecommendedCard";
 import { Link } from "react-router-dom";
 import { TagButton } from "./TagButton";
+import { useWindowScroll } from "@mantine/hooks";
 const useStyles = createStyles((theme, _params, getRef) => ({
   userAvatar: {
     boxShadow: theme.shadows.xl,
@@ -24,52 +28,53 @@ export function Home() {
   const { classes } = useStyles();
   return (
     <div>
+      <Affix position={{ bottom: 30, right: 22 }}>
+        <Transition mounted={true} transition="slide-left" duration={300}>
+          {(transitionStyles) => (
+            <ActionIcon
+              component={Link}
+              to="/search"
+              className={classes.ActionIcon}
+              radius={9999}
+              size={70}
+              style={{
+                backgroundColor: "#111112",
+                ...transitionStyles,
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="22.414"
+                height="22.414"
+                viewBox="0 0 22.414 22.414"
+              >
+                <path
+                  id="Search_Icon"
+                  d="M23,23l-6.667-6.667m2.222-5.556A7.778,7.778,0,1,1,10.778,3,7.778,7.778,0,0,1,18.556,10.778Z"
+                  transform="translate(-2 -2)"
+                  fill="none"
+                  stroke="#fff"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                />
+              </svg>
+            </ActionIcon>
+          )}
+        </Transition>
+      </Affix>
+
       <Container
         style={{
           paddingLeft: "20px",
           paddingRight: "20px",
-          paddingTop: "10px",
-          position: "relative",
         }}
       >
-        <ActionIcon
-          component={Link}
-          to="/search"
-          className={classes.ActionIcon}
-          radius={9999}
-          size={70}
-          style={{
-            backgroundColor: "#111112",
-            position: "fixed",
-            bottom: "30px",
-            right: "22px",
-            zIndex: 2,
-          }}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="22.414"
-            height="22.414"
-            viewBox="0 0 22.414 22.414"
-          >
-            <path
-              id="Search_Icon"
-              d="M23,23l-6.667-6.667m2.222-5.556A7.778,7.778,0,1,1,10.778,3,7.778,7.778,0,0,1,18.556,10.778Z"
-              transform="translate(-2 -2)"
-              fill="none"
-              stroke="#fff"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-            />
-          </svg>
-        </ActionIcon>
-
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
-            paddingTop: "4px",
+            paddingTop: "14px",
           }}
         >
           <UserAvatar className={classes.userAvatar} />
