@@ -486,8 +486,8 @@ const TrendingTags = () => (
           flexGrow: 1,
           display: "flex",
           gap: "6px",
-          paddingLeft: "18px",
-          paddingRight: "18px",
+          paddingLeft: "20px",
+          paddingRight: "20px",
           height: "34px",
           minWidth: "min-content",
         }}
