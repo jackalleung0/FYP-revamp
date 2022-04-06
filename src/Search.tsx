@@ -6,6 +6,8 @@ import {
   TextInput,
   Affix,
   Transition,
+  Button,
+  Image,
 } from "@mantine/core";
 import React from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -17,14 +19,23 @@ const useStyles = createStyles((theme, _params, getRef) => ({
   },
 }));
 
+const scaleY = {
+  in: { opacity: 1, transform: "scaleY(1)" },
+  out: { opacity: 1, transform: "scaleY(0)" },
+  common: { transformOrigin: "top" },
+  transitionProperty: "transform, opacity",
+};
+
 export function Search() {
   const { classes } = useStyles();
 
+  const [isFocus, setIsFocus] = React.useState(false);
+
   const nav = useNavigate();
   return (
-    <div>
+    <div style={{ position: "relative" }}>
       <Affix position={{ bottom: 30, right: 22 }}>
-        <Transition mounted={true} transition="slide-left" duration={300}>
+        <Transition mounted={!isFocus} transition="slide-left" duration={300}>
           {(transitionStyles) => (
             <ActionIcon
               className={classes.ActionIcon}
@@ -56,97 +67,226 @@ export function Search() {
       </Affix>
       <Container
         style={{
-          paddingTop: "10px",
+          paddingTop: isFocus ? 14 : 10,
           paddingLeft: "20px",
           paddingRight: "20px",
         }}
       >
-        <BackIcon onClick={() => nav(-1)} />
-        <Text
-          style={{
-            marginTop: "40px",
-            fontSize: "32px",
-            fontFamily: "SFProDisplay",
-            fontWeight: "bold",
-            color: "#000000",
-            height: "72px",
-            lineHeight: "34px",
-          }}
+        <Transition
+          mounted={!isFocus}
+          transition="fade"
+          duration={400}
+          timingFunction="ease"
         >
-          Search
-        </Text>
+          {(styles) => (
+            <>
+              <BackIcon onClick={() => nav(-1)} style={styles} />
+              <Text
+                style={{
+                  marginTop: "40px",
+                  fontSize: "32px",
+                  fontFamily: "SFProDisplay",
+                  fontWeight: "bold",
+                  color: "#000000",
+                  height: "72px",
+                  lineHeight: "34px",
+                  ...styles,
+                }}
+              >
+                Search
+              </Text>
+            </>
+          )}
+        </Transition>
 
-        <TextInput
-          placeholder="Search artworks & artists..."
-          icon={<SearchIcon />}
-          styles={{
-            root: {
-              borderRadius: "8px",
-            },
-            icon: {
-              paddingLeft: "18px",
-              width: "min-content",
-            },
-            input: {
-              color: "#0A1F44",
-              fontSize: "16px",
-              fontFamily: "Inter",
-              fontWeight: 100,
-              lineHeight: "24px",
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <TextInput
+            placeholder={isFocus ? "" : "Search artworks & artists..."}
+            icon={<SearchIcon />}
+            onFocus={() => setIsFocus(true)}
+            onBlur={() => setIsFocus(false)}
+            styles={{
+              root: {
+                borderRadius: "8px",
+                flexGrow: 1,
+              },
+              icon: {
+                paddingLeft: "18px",
+                width: "min-content",
+              },
+              input: {
+                color: "#8A94A6",
+                fontSize: "16px",
+                fontFamily: "Inter",
+                fontWeight: 100,
+                lineHeight: "24px",
 
-              borderRadius: "8px",
-              borderWidth: 0,
-              backgroundColor: "#F1F2F4",
+                borderRadius: "8px",
+                borderWidth: 0,
+                backgroundColor: "#F1F2F4",
 
-              padding: 0,
-              borderLeft: 10,
-              height: "50px",
-              paddingTop: 2,
-              paddingLeft: "46px !important",
-            },
-          }}
-        />
-
-        <div>
-          <Text
-            style={{
-              marginTop: "37px",
-              fontSize: "13px",
-              fontFamily: "Inter",
-              fontWeight: "bold",
-              color: "#4E5D78",
-              height: "16px",
-              lineHeight: "16px",
-              paddingBottom: "15px",
+                padding: 0,
+                borderLeft: 10,
+                height: "50px",
+                paddingTop: 2,
+                paddingLeft: "46px !important",
+              },
             }}
+          />
+          <Transition
+            mounted={isFocus}
+            transition="fade"
+            duration={400}
+            timingFunction="ease"
           >
-            TRENDING TAGS
-          </Text>
-          <div
-            style={{
-              display: "flex",
-              gap: "16px 6px",
-              minWidth: "min-content",
-              flexWrap: "wrap",
-            }}
-          >
-            {[
-              "oil in canvas",
-              "painting",
-              "women",
-              "Post-Impressionism",
-              "domestic scenes",
-              "interiors",
-              "abstract figure",
-              "leisure",
-              "modern and contemporary art",
-            ].map((value, i) => (
-              <TagButton popular={i === 0} to="/search-by-tag">
-                {value}
-              </TagButton>
-            ))}
-          </div>
+            {(styles) => (
+              <Button
+                variant="subtle"
+                styles={{
+                  root: {
+                    "&:hover": {
+                      backgroundColor: "transparent",
+                    },
+                    border: 0,
+                    paddingRight: 0,
+                  },
+                }}
+                style={{
+                  color: "#4E5D78",
+                  fontFamily: "Inter",
+                  fontSize: "14px",
+                  fontWeight: "normal",
+                  ...styles,
+                }}
+                component={Text}
+              >
+                Cancel
+              </Button>
+            )}
+          </Transition>
         </div>
+
+        <Transition
+          mounted={isFocus}
+          transition="fade"
+          duration={400}
+          timingFunction="ease"
+        >
+          {(styles) => (
+            <div
+              style={{
+                paddingTop: "14px",
+                ...styles,
+              }}
+            >
+              {Array(5)
+                .fill(1)
+                .map(() => (
+                  <>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 18,
+                        paddingTop: 16,
+                        paddingBottom: 15,
+                      }}
+                    >
+                      <Image
+                        width={58}
+                        height={46}
+                        src="https://picsum.photos/1200"
+                      />
+                      <div>
+                        <Text
+                          style={{
+                            paddingTop: 3,
+                            fontSize: "16px",
+                            fontFamily: "Inter",
+                            fontWeight: "normal",
+                            color: "#111112",
+                            height: 20,
+                          }}
+                        >
+                          The Bedroom
+                        </Text>
+                        <Text
+                          style={{
+                            paddingTop: 4,
+                            fontSize: "12px",
+                            fontFamily: "Inter",
+                            fontWeight: "100",
+                            color: "#8A94A6",
+                            height: 15,
+                          }}
+                        >
+                          Vincent van Gogh
+                        </Text>
+                      </div>
+                    </div>
+                    <hr
+                      style={{
+                        margin: 0,
+                        border: "none",
+                        height: "1px",
+                        backgroundColor: "#F1F2F4",
+                      }}
+                    />
+                  </>
+                ))}
+            </div>
+          )}
+        </Transition>
+
+        <Transition
+          mounted={!isFocus}
+          transition="fade"
+          duration={400}
+          timingFunction="ease"
+        >
+          {(styles) => (
+            <div>
+              <Text
+                style={{
+                  marginTop: "37px",
+                  fontSize: "13px",
+                  fontFamily: "Inter",
+                  fontWeight: "bold",
+                  color: "#4E5D78",
+                  height: "16px",
+                  lineHeight: "16px",
+                  paddingBottom: "15px",
+                  ...styles,
+                }}
+              >
+                TRENDING TAGS
+              </Text>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "16px 6px",
+                  minWidth: "min-content",
+                  flexWrap: "wrap",
+                }}
+              >
+                {[
+                  "oil in canvas",
+                  "painting",
+                  "women",
+                  "Post-Impressionism",
+                  "domestic scenes",
+                  "interiors",
+                  "abstract figure",
+                  "leisure",
+                  "modern and contemporary art",
+                ].map((value, i) => (
+                  <TagButton popular={i === 0} to="/search-by-tag">
+                    {value}
+                  </TagButton>
+                ))}
+              </div>
+            </div>
+          )}
+        </Transition>
       </Container>
     </div>
   );
