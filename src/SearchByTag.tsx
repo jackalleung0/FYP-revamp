@@ -5,6 +5,7 @@ import {
   Image,
   createStyles,
 } from "@mantine/core";
+import { useWindowScroll } from "@mantine/hooks";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { BackIcon } from "./BackIcon";
@@ -17,7 +18,16 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 
 export function SearchByTag() {
   const nav = useNavigate();
+  const [scroll, scrollTo] = useWindowScroll();
   const { classes } = useStyles();
+
+  const images = React.useMemo(() => {
+    return Array(20)
+      .fill(1)
+      .map(() => Math.floor(Math.random() * 6) * 100)
+      .map((width) => `https://picsum.photos/300/${width}`);
+  }, []);
+
   return (
     <Container
       style={{
@@ -28,6 +38,7 @@ export function SearchByTag() {
       }}
     >
       <ActionIcon
+        onClickCapture={() => scrollTo({ y: 0 })}
         className={classes.ActionIcon}
         radius={9999}
         size={70}
@@ -71,17 +82,14 @@ export function SearchByTag() {
         See 6321 results for oil in canvas
       </Text>
       <div style={{ columnCount: 2, columnGap: "15px" }}>
-        {Array(20)
-          .fill(1)
-          .map(() => (
-            <MasImage />
-          ))}
+        {images.map((src, index) => (
+          <MasImage src={src} key={index} />
+        ))}
       </div>
     </Container>
   );
 }
-const MasImage = () => {
-  const width = Math.floor(Math.random() * 6) * 100;
+const MasImage = ({ src }: { src: string }) => {
   return (
     <div
       style={{
@@ -89,7 +97,7 @@ const MasImage = () => {
         display: "inline-block",
       }}
     >
-      <Image radius={12} src={`https://picsum.photos/300/${width}`} />
+      <Image radius={12} src={src} />
       <Text
         style={{
           paddingTop: 11,
