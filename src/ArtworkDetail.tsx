@@ -20,6 +20,9 @@ const useStyles = createStyles((theme, _params, getRef) => ({
   ActionIcon: {
     boxShadow: theme.shadows.lg,
   },
+  Image: {
+    boxShadow: theme.shadows.lg,
+  },
 }));
 
 export function ArtworkDetail() {
@@ -81,7 +84,8 @@ export function ArtworkDetail() {
           width={335}
           height={263}
           withPlaceholder
-          style={{ padding: "68px 20px" }}
+          className={classes.Image}
+          style={{ margin: "68px 20px" }}
           src="https://picsum.photos/1200"
         />
       </Center>
