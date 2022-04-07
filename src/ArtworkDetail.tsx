@@ -13,7 +13,9 @@ import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Transition } from "react-transition-group";
 import { BackIcon } from "./BackIcon";
+import { CommentIcon } from "./CommentIcon";
 import { DiscoverCard } from "./DiscoverCard";
+import { ShareIcon } from "./ShareIcon";
 import { TagButton } from "./TagButton";
 
 const useStyles = createStyles((theme, _params, getRef) => ({
@@ -218,7 +220,7 @@ export function ArtworkDetail() {
         style={{
           paddingLeft: 20,
           paddingRight: 20,
-          paddingTop: 32,
+          paddingTop: 17,
         }}
       >
         <div>
@@ -276,7 +278,7 @@ export function ArtworkDetail() {
         transform="uppercase"
         style={{
           marginLeft: "20px",
-          marginTop: "24px",
+          marginTop: "25px",
           fontSize: "13px",
           fontFamily: "Inter",
           fontWeight: "bold",
@@ -368,45 +370,6 @@ const LikeIcon = (props: any) => (
       transform="translate(-2 -4)"
       fill="none"
       stroke="#111112"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-    />
-  </svg>
-);
-
-const CommentIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="20"
-    height="18"
-    viewBox="0 0 20 18"
-  >
-    <path
-      id="Comment_Icon"
-      d="M7,8H17M7,12h4m1,8L8,16H5a2,2,0,0,1-2-2V6A2,2,0,0,1,5,4H19a2,2,0,0,1,2,2v8a2,2,0,0,1-2,2H16Z"
-      transform="translate(-2 -3)"
-      fill="none"
-      stroke="#000"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-    />
-  </svg>
-);
-const ShareIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="18.01"
-    height="18.318"
-    viewBox="0 0 18.01 18.318"
-  >
-    <path
-      id="Share_Icon"
-      d="M8.052,12.192a2.673,2.673,0,0,0,0-2.385m0,2.385a2.666,2.666,0,1,1,0-2.385m0,2.385,5.895,2.947M8.052,9.806l5.895-2.947m0,0A2.667,2.667,0,1,0,15.14,3.281,2.667,2.667,0,0,0,13.947,6.859Zm0,8.28a2.667,2.667,0,1,0,3.579-1.193,2.667,2.667,0,0,0-3.579,1.193Z"
-      transform="translate(-2.001 -1.84)"
-      fill="none"
-      stroke="#000"
       stroke-linecap="round"
       stroke-linejoin="round"
       stroke-width="2"

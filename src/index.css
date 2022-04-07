@@ -53,6 +53,11 @@ code {
   font-weight: normal;
   src: url(./fonts/Inter/Inter-Medium.ttf) format("truetype");
 }
+
+:focus {
+  outline: 0 !important;
+}
+
 /* @font-face {
   font-family: 'Inter';
   src: url(./fonts/Inter/Inter-Black.ttf) format('truetype');
