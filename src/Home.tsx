@@ -497,11 +497,11 @@ const TrendingTags = () => (
           minWidth: "min-content",
         }}
       >
-        <TagButton to="/search-by-tag" popular>
+        <TagButton to="/search-result" popular>
           oil in canvas
         </TagButton>
         {["painting", "women", "painting", "women"].map((e) => (
-          <TagButton to="/search-by-tag">{e}</TagButton>
+          <TagButton to="/search-result">{e}</TagButton>
         ))}
       </div>
     </div>

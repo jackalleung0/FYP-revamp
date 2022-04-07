@@ -13,7 +13,7 @@ import React from "react";
 import { PageAnimation } from "./components/PageAnimation";
 import { Home } from "./Home";
 import { RecentlyViewed } from "./RecentlyViewed";
-import { SearchByTag } from "./SearchByTag";
+import { SearchByTag } from "./SearchResult";
 import { Search } from "./Search";
 
 function Rout() {
@@ -32,7 +32,7 @@ function Rout() {
           <Route path="/select-artwork" element={<SelectArtwork />} />
           <Route path="/home" element={<Home />} />
           <Route path="/recently-viewed" element={<RecentlyViewed />} />
-          <Route path="/search-by-tag" element={<SearchByTag />} />
+          <Route path="/search-result" element={<SearchByTag />} />
           <Route path="/search" element={<Search />} />
         </Route>
       </Routes>

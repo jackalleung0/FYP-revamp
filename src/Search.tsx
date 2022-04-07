@@ -9,8 +9,14 @@ import {
   Button,
   Image,
 } from "@mantine/core";
+import { useForm } from "@mantine/form";
 import React from "react";
-import { useNavigate, Link } from "react-router-dom";
+import {
+  useNavigate,
+  Link,
+  useSearchParams,
+  createSearchParams,
+} from "react-router-dom";
 import { BackIcon } from "./BackIcon";
 import { TagButton } from "./TagButton";
 const useStyles = createStyles((theme, _params, getRef) => ({
@@ -32,6 +38,13 @@ export function Search() {
   const [isFocus, setIsFocus] = React.useState(false);
 
   const nav = useNavigate();
+  let [searchParams, setSearchParams] = useSearchParams();
+  const form = useForm({
+    initialValues: {
+      term: "",
+    },
+  });
+
   return (
     <div style={{ position: "relative" }}>
       <Affix position={{ bottom: 30, right: 22 }}>
@@ -99,12 +112,19 @@ export function Search() {
           )}
         </Transition>
 
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <form
+          style={{ display: "flex", alignItems: "center" }}
+          onSubmit={form.onSubmit((values) => {
+            console.log(values);
+            nav(`/search-result?term=${values.term}`);
+          })}
+        >
           <TextInput
             placeholder={isFocus ? "" : "Search artworks & artists..."}
             icon={<SearchIcon />}
             onFocus={() => setIsFocus(true)}
             onBlur={() => setIsFocus(false)}
+            {...form.getInputProps("term")}
             styles={{
               root: {
                 borderRadius: "8px",
@@ -164,7 +184,7 @@ export function Search() {
               </Button>
             )}
           </Transition>
-        </div>
+        </form>
 
         <Transition
           mounted={isFocus}
@@ -279,7 +299,7 @@ export function Search() {
                   "leisure",
                   "modern and contemporary art",
                 ].map((value, i) => (
-                  <TagButton popular={i === 0} to="/search-by-tag">
+                  <TagButton popular={i === 0} to="/search-result">
                     {value}
                   </TagButton>
                 ))}

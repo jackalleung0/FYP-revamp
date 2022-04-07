@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { useWindowScroll } from "@mantine/hooks";
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { BackIcon } from "./BackIcon";
 
 const useStyles = createStyles((theme, _params, getRef) => ({
@@ -22,13 +22,14 @@ export function SearchByTag() {
   const nav = useNavigate();
   const [scroll, scrollTo] = useWindowScroll();
   const { classes } = useStyles();
-
+  const { search } = useLocation();
   const images = React.useMemo(() => {
     return Array(20)
       .fill(1)
       .map(() => Math.floor(Math.random() * 6) * 100)
       .map((width) => `https://picsum.photos/300/${width}`);
   }, []);
+  const [searchParams] = useSearchParams();
   return (
     <div>
       <Affix position={{ bottom: 30, right: 22 }}>
@@ -83,7 +84,7 @@ export function SearchByTag() {
             paddingBottom: "36px",
           }}
         >
-          See 6321 results for oil in canvas
+          See 6321 results for {searchParams.get("term") || "oil in canvas"}
         </Text>
         <div style={{ columnCount: 2, columnGap: "15px" }}>
           {images.map((src, index) => (
