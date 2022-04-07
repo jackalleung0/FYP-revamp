@@ -96,12 +96,14 @@ export function SearchByTag() {
   );
 }
 const MasImage = ({ src }: { src: string }) => {
+  const nav = useNavigate();
   return (
     <div
       style={{
         marginBottom: "23px",
         display: "inline-block",
       }}
+      onClickCapture={() => nav("/artwork/1")}
     >
       <Image radius={12} src={src} />
       <Text

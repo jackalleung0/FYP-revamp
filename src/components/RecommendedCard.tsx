@@ -1,5 +1,6 @@
 import { createStyles, Text, Image } from "@mantine/core";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const style = createStyles((theme, _params, getRef) => ({
   root: {
@@ -9,6 +10,7 @@ const style = createStyles((theme, _params, getRef) => ({
 
 export const RecommendedCard = () => {
   const { classes } = style();
+  const nav = useNavigate();
   return (
     <div
       style={{
@@ -16,6 +18,7 @@ export const RecommendedCard = () => {
         borderRadius: "12px",
       }}
       className={classes.root}
+      onClickCapture={() => nav("/artwork/1")}
     >
       <div style={{ position: "relative" }}>
         <Image
