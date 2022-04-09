@@ -1,11 +1,12 @@
 import React from "react";
 
-export const ShareIcon = () => (
+export const ShareIcon = ({ ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="18.01"
     height="18.318"
     viewBox="0 0 18.01 18.318"
+    {...props}
   >
     <path
       id="Share_Icon"
@@ -15,6 +16,7 @@ export const ShareIcon = () => (
       stroke="#000"
       stroke-linecap="round"
       stroke-linejoin="round"
-      stroke-width="2" />
+      stroke-width="2"
+    />
   </svg>
 );
