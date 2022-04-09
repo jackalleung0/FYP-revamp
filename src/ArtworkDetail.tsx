@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { useWindowScroll } from "@mantine/hooks";
 import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Transition } from "react-transition-group";
 import { BackIcon } from "./BackIcon";
 import { CommentIcon } from "./CommentIcon";
@@ -66,10 +66,9 @@ export function ArtworkDetail() {
         style={{
           position: "sticky",
           top: 10,
-          paddingTop: 10,
           paddingLeft: 20,
           paddingRight: 20,
-          paddingBottom: 24,
+          paddingBottom: 34,
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -177,6 +176,8 @@ export function ArtworkDetail() {
             ABOUT ARTWORK
           </Title>
           <Text
+            component={Link}
+            to="about"
             underline
             transform="uppercase"
             style={{
