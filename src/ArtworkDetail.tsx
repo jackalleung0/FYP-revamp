@@ -123,6 +123,8 @@ export function ArtworkDetail() {
         </Title>
 
         <Text
+          component={Link}
+          to="about-artist"
           style={{
             paddingTop: 4,
 

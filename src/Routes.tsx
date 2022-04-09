@@ -17,6 +17,7 @@ import { SearchByTag } from "./SearchResult";
 import { Search } from "./Search";
 import { ArtworkDetail } from "./ArtworkDetail";
 import { AboutArtwork } from "./AboutArtwork";
+import { AboutArtist } from "./AboutArtist";
 
 function Rout() {
   // scroll to top when there are page routing event
@@ -38,6 +39,7 @@ function Rout() {
           <Route path="/search" element={<Search />} />
           <Route path="/artwork/:id" element={<ArtworkDetail />} />
           <Route path="/artwork/:id/about" element={<AboutArtwork />} />
+          <Route path="/artwork/:id/about-artist" element={<AboutArtist />} />
         </Route>
       </Routes>
     </PageAnimation>
