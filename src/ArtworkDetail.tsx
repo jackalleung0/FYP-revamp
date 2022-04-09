@@ -21,6 +21,7 @@ import { CommentIcon } from "./CommentIcon";
 import { DiscoverCard } from "./DiscoverCard";
 import { ShareIcon } from "./ShareIcon";
 import { TagButton } from "./TagButton";
+import { showNotification } from "@mantine/notifications";
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   ActionIcon: {
@@ -36,6 +37,39 @@ export function ArtworkDetail() {
   const nav = useNavigate();
   let { id } = useParams();
   const [show, setShow] = useState(false);
+  const copyToClipboard = () => {
+    setShow(false);
+    showNotification({
+      message: "Copied to clipboard",
+      icon: <NotificationIcon />,
+      autoClose: 2000,
+      disallowClose: true,
+      closeButtonProps: { style: { color: "#0BB07B", width: 16, height: 16 } },
+      styles: (theme) => ({
+        root: {
+          backgroundColor: "#EAFCF7",
+          padding: 14,
+          paddingLeft: "14px !important",
+          width: 293,
+          height: 45,
+          margin: "0 auto",
+        },
+        icon: {
+          backgroundColor: "unset !important" as "unset",
+          width: "unset",
+          height: "unset",
+          marginRight: 14,
+        },
+        description: {
+          fontSize: 14,
+          fontFamily: "Inter",
+          fontWeight: "normal",
+          lineHeight: "24px",
+          color: "#00865A !important",
+        },
+      }),
+    });
+  };
   return (
     <div>
       <BottomSheet
@@ -68,7 +102,7 @@ export function ArtworkDetail() {
               width: "max-content",
             }}
           >
-            <UnstyledButton>
+            <UnstyledButton onClickCapture={copyToClipboard}>
               <div
                 style={{
                   borderRadius: 99,
@@ -188,6 +222,7 @@ export function ArtworkDetail() {
             }}
           >
             <Button
+              onClickCapture={() => setShow(false)}
               fullWidth
               variant="outline"
               style={{
@@ -596,4 +631,21 @@ const TelegramIcon = ({ ...props }) => (
     {...props}
     src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaWQ9IkxheWVyXzEiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDUxMiA1MTI7IiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB4bWw6c3BhY2U9InByZXNlcnZlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj48c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoJLnN0MHtmaWxsOnVybCgjU1ZHSURfMV8pO30KCS5zdDF7ZmlsbDojRkZGRkZGO30KCS5zdDJ7ZmlsbDojRDJFNEYwO30KCS5zdDN7ZmlsbDojQjVDRkU0O30KPC9zdHlsZT48Zz48bGluZWFyR3JhZGllbnQgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIGlkPSJTVkdJRF8xXyIgeDE9IjI1NiIgeDI9IjI1NiIgeTE9IjAiIHkyPSI1MTAuMTMyMiI+PHN0b3Agb2Zmc2V0PSIwIiBzdHlsZT0ic3RvcC1jb2xvcjojNDFCQ0U3Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdHlsZT0ic3RvcC1jb2xvcjojMjJBNkRDIi8+PC9saW5lYXJHcmFkaWVudD48Y2lyY2xlIGNsYXNzPSJzdDAiIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjI1NiIvPjxnPjxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik0zODAuNiwxNDcuM2wtNDUuNywyMzAuNWMwLDAtNi40LDE2LTI0LDguM2wtMTA1LjUtODAuOUwxNjcsMjg2LjdsLTY0LjYtMjEuN2MwLDAtOS45LTMuNS0xMC45LTExLjIgICAgYy0xLTcuNywxMS4yLTExLjgsMTEuMi0xMS44bDI1Ni44LTEwMC43QzM1OS41LDE0MS4yLDM4MC42LDEzMS45LDM4MC42LDE0Ny4zeiIvPjxwYXRoIGNsYXNzPSJzdDIiIGQ9Ik0xOTcuMiwzNzUuMmMwLDAtMy4xLTAuMy02LjktMTIuNGMtMy44LTEyLjEtMjMuMy03Ni4xLTIzLjMtNzYuMWwxNTUuMS05OC41YzAsMCw5LTUuNCw4LjYsMCAgICBjMCwwLDEuNiwxLTMuMiw1LjRjLTQuOCw0LjUtMTIxLjgsMTA5LjctMTIxLjgsMTA5LjciLz48cGF0aCBjbGFzcz0ic3QzIiBkPSJNMjQ1LjgsMzM2LjJsLTQxLjcsMzguMWMwLDAtMy4zLDIuNS02LjgsMC45bDgtNzAuNyIvPjwvZz48L2c+PC9zdmc+"
   />
+);
+
+const NotificationIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="17"
+    height="17"
+    viewBox="0 0 17 17"
+  >
+    <path
+      id="_Icon_style"
+      data-name="🎨 Icon style"
+      d="M8.5,17A8.5,8.5,0,1,1,17,8.5,8.51,8.51,0,0,1,8.5,17Zm0-9.775a.851.851,0,0,0-.851.85V11.9a.85.85,0,1,0,1.7,0V8.075A.851.851,0,0,0,8.5,7.225Zm0-2.975a.85.85,0,1,0,.85.85A.851.851,0,0,0,8.5,4.25Z"
+      transform="translate(0 0)"
+      fill="#0bb07b"
+    />
+  </svg>
 );

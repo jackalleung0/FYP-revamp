@@ -5,6 +5,7 @@ import App from "./App";
 import "./index.css";
 import "react-spring-bottom-sheet/dist/style.css";
 import Rout from "./Routes";
+import { NotificationsProvider } from "@mantine/notifications";
 
 function Root() {
   return (
@@ -16,7 +17,13 @@ function Root() {
         focusRing: "never",
       }}
     >
-      <Rout />
+      <NotificationsProvider
+        position="top-right"
+        limit={1}
+        style={{ paddingTop: 31 }}
+      >
+        <Rout />
+      </NotificationsProvider>
       {/* <App /> */}
     </MantineProvider>
   );
