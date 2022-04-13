@@ -45,17 +45,18 @@ export function Login() {
   };
   const [user, loading, error] = useAuthState(auth);
 
-  const [values, _, __, snapshot] = useDocumentData<any>(
+  const [values, userDocLoading, __, snapshot] = useDocumentData<any>(
     user && doc(getFirestore(app), `users/${user.uid}`)
   );
   useEffect(() => {
-    if (!pressedSignIn) return;
+    if (!pressedSignIn || userDocLoading) return;
+    console.log(values.skipGettingStarted);
     if (values && values.skipGettingStarted) {
       nav("/home");
     } else {
       nav("/select-artwork");
     }
-  }, [values, pressedSignIn]);
+  }, [values, pressedSignIn, userDocLoading]);
   return (
     <>
       <Container
