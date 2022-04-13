@@ -11,10 +11,23 @@ import {
   Text,
   Transition,
 } from "@mantine/core";
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { getAuth } from "firebase/auth";
+import {
+  doc,
+  DocumentReference,
+  getFirestore,
+  setDoc,
+} from "firebase/firestore";
+import React, { useEffect } from "react";
+import { useAsync } from "react-async-hook";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useDocumentDataOnce } from "react-firebase-hooks/firestore";
+import { useNavigate } from "react-router-dom";
 import { BackIcon } from "./BackIcon";
+import { app } from "./firebaseConfig";
 import { useOnLoadImages } from "./hooks/useOnLoadImages";
+import { UserProfile } from "./types";
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   ActionIcon: {
@@ -22,12 +35,23 @@ const useStyles = createStyles((theme, _params, getRef) => ({
   },
 }));
 
+const instance = axios.create({
+  baseURL: "https://api.artic.edu/api/v1",
+  timeout: 10000,
+});
+
+const fetchArtworks = async () =>
+  instance
+    .get("artworks/search", {
+      params: {
+        fields: ["id", "title", "image_id"].join(",").replaceAll(" ", ""),
+      },
+    })
+    .then(({ data }) => data.data);
+
 export function SelectArtwork() {
   const { classes } = useStyles();
 
-  const [selectedArtwork, setSelectedArtwork] = React.useState<
-    (string | number)[]
-  >([]);
   const toggleArtwork = (index: string | number) => () => {
     const copy = [...selectedArtwork];
     const i = copy.indexOf(index);
@@ -43,6 +67,45 @@ export function SelectArtwork() {
   const wrapperRef = React.useRef<HTMLDivElement>(null);
   const imagesLoaded = useOnLoadImages(wrapperRef);
   const nav = useNavigate();
+
+  const { loading, result } = useAsync(fetchArtworks, []);
+
+  const auth = getAuth(app);
+  const [user] = useAuthState(auth);
+
+  const [value, docLoading, error, snapshot, reload] =
+    useDocumentDataOnce<UserProfile>(
+      user &&
+        (doc(
+          getFirestore(app),
+          `users/${user.uid}`
+        ) as DocumentReference<UserProfile>)
+    );
+
+  useEffect(() => {
+    if (value) {
+      setSelectedArtwork(value.likedArtworks);
+    }
+  }, [value, docLoading]);
+
+  const [selectedArtwork, setSelectedArtwork] = React.useState<
+    (string | number)[]
+  >([]);
+
+  const addToFavorite = (ids: (number | string)[]) => async () => {
+    if (!value) return;
+    // creating a set of likedArtworks to prevent duplicated artwork id
+    const likedArtworks = new Set(value.likedArtworks) || [];
+    ids.forEach((id) => likedArtworks.add(String(id)));
+    snapshot?.ref &&
+      (await setDoc(
+        snapshot.ref,
+        // unset the gettingStartedSteps, to prevent user get directed to this page again
+        { likedArtworks: Array.from(likedArtworks), skipGettingStarted: true },
+        { merge: true }
+      ));
+    nav("/home");
+  };
 
   return (
     <Container
@@ -60,8 +123,9 @@ export function SelectArtwork() {
             selectedArtwork.length > 0 ? (
               <ActionIcon
                 className={classes.ActionIcon}
-                component={Link}
-                to="/home"
+                // component={Link}
+                // to="/home"
+                onClickCapture={addToFavorite(selectedArtwork)}
                 radius={9999}
                 size={70}
                 style={{
@@ -122,13 +186,15 @@ export function SelectArtwork() {
         }}
       >
         <SimpleGrid cols={2} spacing={13} ref={wrapperRef}>
-          {Array(10)
-            .fill(1)
-            .map((_, index) => (
+          {!loading &&
+            result.map(({ image_id, id, title }: any, index: any) => (
               <ArtworkCheckBox
                 key={index}
-                onClick={toggleArtwork(index)}
-                checked={selectedArtwork.includes(index)}
+                src={`https://www.artic.edu/iiif/2/${image_id}/full/843,/0/default.jpg`}
+                alt={title}
+                onClick={toggleArtwork(String(id))}
+                onChange={() => {}}
+                checked={selectedArtwork.includes(String(id))}
               />
             ))}
         </SimpleGrid>
@@ -143,7 +209,7 @@ export function SelectArtwork() {
   );
 }
 type ArtworkCheckBox = CheckboxProps & React.RefAttributes<HTMLInputElement>;
-function ArtworkCheckBox({ ...props }: ArtworkCheckBox): JSX.Element {
+function ArtworkCheckBox({ src, alt, ...props }: ArtworkCheckBox): JSX.Element {
   const ref = React.useRef<any>();
   return (
     <div
@@ -159,8 +225,9 @@ function ArtworkCheckBox({ ...props }: ArtworkCheckBox): JSX.Element {
           width={165}
           height={144}
           radius={8}
-          src="https://picsum.photos/1200"
-          alt="Panda"
+          withPlaceholder
+          src={src ? src : undefined}
+          alt={alt}
         />
         <div
           style={{

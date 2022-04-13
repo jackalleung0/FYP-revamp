@@ -7,13 +7,10 @@ import {
   TextInput,
 } from "@mantine/core";
 import { getAuth } from "firebase/auth";
-import { collection, doc, getFirestore } from "firebase/firestore";
-import { useEffect } from "react";
+import { doc, getFirestore } from "firebase/firestore";
+import { useEffect, useState } from "react";
 import { useAuthState, useSignInWithGoogle } from "react-firebase-hooks/auth";
-import {
-  useCollectionData,
-  useDocumentData,
-} from "react-firebase-hooks/firestore";
+import { useDocumentData } from "react-firebase-hooks/firestore";
 import { Link, useNavigate } from "react-router-dom";
 import { BackIcon } from "./BackIcon";
 import { app } from "./firebaseConfig";
@@ -36,13 +33,14 @@ function EyeIcon({ reveal, size }: { reveal: boolean; size: number }) {
 }
 
 const auth = getAuth(app);
-
 export function Login() {
   const nav = useNavigate();
   const [signInWithGoogle] = useSignInWithGoogle(auth);
-  const login = (method: "Google") => () => {
+  const [pressedSignIn, setPressedSignIn] = useState(false);
+  const login = (method: "Google") => async () => {
     if (method === "Google") {
-      signInWithGoogle();
+      await signInWithGoogle();
+      setPressedSignIn(true);
     }
   };
   const [user, loading, error] = useAuthState(auth);
@@ -51,11 +49,13 @@ export function Login() {
     user && doc(getFirestore(app), `users/${user.uid}`)
   );
   useEffect(() => {
-    const { gettingStartedSteps } = values;
-    if (gettingStartedSteps === "select-artwork") {
+    if (!pressedSignIn) return;
+    if (values && values.skipGettingStarted) {
+      nav("/home");
+    } else {
       nav("/select-artwork");
     }
-  }, [values]);
+  }, [values, pressedSignIn]);
   return (
     <>
       <Container
