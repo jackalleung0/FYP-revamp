@@ -1,5 +1,4 @@
 import {
-  ActionIcon,
   Button,
   Center,
   Container,
@@ -7,8 +6,17 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
+import { getAuth } from "firebase/auth";
+import { collection, doc, getFirestore } from "firebase/firestore";
+import { useEffect } from "react";
+import { useAuthState, useSignInWithGoogle } from "react-firebase-hooks/auth";
+import {
+  useCollectionData,
+  useDocumentData,
+} from "react-firebase-hooks/firestore";
 import { Link, useNavigate } from "react-router-dom";
 import { BackIcon } from "./BackIcon";
+import { app } from "./firebaseConfig";
 function EyeIcon({ reveal, size }: { reveal: boolean; size: number }) {
   return (
     <svg
@@ -27,8 +35,27 @@ function EyeIcon({ reveal, size }: { reveal: boolean; size: number }) {
   );
 }
 
+const auth = getAuth(app);
+
 export function Login() {
   const nav = useNavigate();
+  const [signInWithGoogle] = useSignInWithGoogle(auth);
+  const login = (method: "Google") => () => {
+    if (method === "Google") {
+      signInWithGoogle();
+    }
+  };
+  const [user, loading, error] = useAuthState(auth);
+
+  const [values, _, __, snapshot] = useDocumentData<any>(
+    user && doc(getFirestore(app), `users/${user.uid}`)
+  );
+  useEffect(() => {
+    const { gettingStartedSteps } = values;
+    if (gettingStartedSteps === "select-artwork") {
+      nav("/select-artwork");
+    }
+  }, [values]);
   return (
     <>
       <Container
@@ -195,8 +222,9 @@ export function Login() {
           />
         </span>
         <Button
-          component={Link}
-          to="/select-artwork"
+          onClickCapture={login("Google")}
+          // component={Link}
+          // to="/select-artwork"
           leftIcon={
             <svg
               xmlns="http://www.w3.org/2000/svg"
