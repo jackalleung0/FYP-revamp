@@ -7,7 +7,6 @@ import "react-spring-bottom-sheet/dist/style.css";
 import Rout from "./Routes";
 import { NotificationsProvider } from "@mantine/notifications";
 
-
 function Root() {
   return (
     <MantineProvider
@@ -21,7 +20,7 @@ function Root() {
       <NotificationsProvider
         position="top-right"
         limit={1}
-        style={{ paddingTop: 31 }}
+        style={{ marginTop: 31 }}
       >
         <Rout />
       </NotificationsProvider>
