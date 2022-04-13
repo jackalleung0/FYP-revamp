@@ -58,6 +58,21 @@ code {
   outline: 0 !important;
 }
 
+[data-rsbs-overlay] {
+  border-top-left-radius: 12px !important;
+  border-top-right-radius: 12px !important;
+}
+
+[data-rsbs-header]:before {
+  height: 8px !important;
+  border-radius: 99px !important;
+  width: 35px !important;
+}
+
+[data-rsbs-has-header="false"] [data-rsbs-header] {
+  padding-top: 16px !important;
+}
+
 /* @font-face {
   font-family: 'Inter';
   src: url(./fonts/Inter/Inter-Black.ttf) format('truetype');
