@@ -7,11 +7,13 @@ import {
   Affix,
   Button,
   Transition,
+  Avatar,
+  UnstyledButton,
 } from "@mantine/core";
 import React from "react";
 import { ArrowUpIcon, HeartIcon } from "@heroicons/react/outline";
 import { RecommendedCard } from "./components/RecommendedCard";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { TagButton } from "./TagButton";
 import { useWindowScroll } from "@mantine/hooks";
 import { DiscoverCard } from "./DiscoverCard";
@@ -24,12 +26,20 @@ const useStyles = createStyles((theme, _params, getRef) => ({
     boxShadow: theme.shadows.lg,
   },
 }));
-
+import { getAuth, signOut } from "firebase/auth";
+import { app } from "./firebaseConfig";
 export function Home() {
   const { classes } = useStyles();
+  const nav = useNavigate();
+  const auth = getAuth(app);
+  const { currentUser } = auth;
+  const logout = async () => {
+    await signOut(auth);
+    nav("/", { replace: true });
+  };
   return (
     <div>
-      <Affix position={{ bottom: 30, right: 22 }}>
+      <Affix position={{ bottom: 30, right: 22 }} id="searchbutton">
         <Transition mounted={true} transition="slide-left" duration={300}>
           {(transitionStyles) => (
             <ActionIcon
@@ -78,7 +88,16 @@ export function Home() {
             paddingTop: "14px",
           }}
         >
-          <UserAvatar className={classes.userAvatar} />
+          {currentUser?.photoURL ? (
+            <Avatar
+              component={UnstyledButton}
+              onClickCapture={logout}
+              src={currentUser?.photoURL}
+              className={classes.userAvatar}
+            />
+          ) : (
+            <UserAvatar className={classes.userAvatar} />
+          )}
           <Bell style={{ paddingTop: "8px", paddingRight: "2px" }} />
         </div>
         <Text
