@@ -117,9 +117,9 @@ export const RecommendedCard = () => {
             transform="translate(-2 -4)"
             fill="none"
             stroke="#111112"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
           />
         </svg>
       </div>

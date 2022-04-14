@@ -14,9 +14,9 @@ export const ShareIcon = ({ ...props }) => (
       transform="translate(-2.001 -1.84)"
       fill="none"
       stroke="#000"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
     />
   </svg>
 );

@@ -65,9 +65,9 @@ export function Home() {
                   transform="translate(-2 -2)"
                   fill="none"
                   stroke="#fff"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                 />
               </svg>
             </ActionIcon>
@@ -168,7 +168,7 @@ const LatestArtwork = () => {
           </Text>
           <div>
             {["Nude under a Pine Tree", "Apples"].map((title) => (
-              <>
+              <div key={title}>
                 <div
                   style={{
                     paddingLeft: "14px",
@@ -229,7 +229,7 @@ const LatestArtwork = () => {
                     }}
                   />
                 </div>
-              </>
+              </div>
             ))}
           </div>
         </div>
@@ -345,8 +345,8 @@ const RecentlyViewed = () => {
         >
           {Array(4)
             .fill(1)
-            .map(() => (
-              <div style={{ position: "relative" }}>
+            .map((_, index) => (
+              <div style={{ position: "relative" }} key={index}>
                 <Image
                   src="https://picsum.photos/1200"
                   width={196}
@@ -415,8 +415,8 @@ const RecommendedForYou = () => {
         >
           {Array(4)
             .fill(1)
-            .map(() => (
-              <RecommendedCard />
+            .map((_, index) => (
+              <RecommendedCard key={index} />
             ))}
         </div>
       </div>
@@ -462,8 +462,10 @@ const TrendingTags = () => (
         <TagButton to="/search-result" popular>
           oil in canvas
         </TagButton>
-        {["painting", "women", "painting", "women"].map((e) => (
-          <TagButton to="/search-result">{e}</TagButton>
+        {["painting", "women", "painting", "women"].map((e, index) => (
+          <TagButton to="/search-result" key={index}>
+            {e}
+          </TagButton>
         ))}
       </div>
     </div>
@@ -484,9 +486,9 @@ const Bell = ({ ...props }) => {
         transform="translate(-3 -2)"
         fill="none"
         stroke="#000"
-        stroke-linecap="round"
+        strokeLinecap="round"
         strokeLinejoin="round"
-        stroke-width="2"
+        strokeWidth="2"
       />
     </svg>
   );

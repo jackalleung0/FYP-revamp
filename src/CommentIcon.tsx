@@ -13,8 +13,8 @@ export const CommentIcon = () => (
       transform="translate(-2 -3)"
       fill="none"
       stroke="#000"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2" />
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2" />
   </svg>
 );

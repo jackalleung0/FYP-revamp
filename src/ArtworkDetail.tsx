@@ -243,9 +243,9 @@ export function ArtworkDetail() {
               transform="translate(-2.658 -2)"
               fill="none"
               stroke="#fff"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
             />
           </svg>
         </ActionIcon>
@@ -561,9 +561,9 @@ const LikeIcon = (props: any) => (
       transform="translate(-2 -4)"
       fill="none"
       stroke="#111112"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
     />
   </svg>
 );
