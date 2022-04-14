@@ -10,7 +10,7 @@ import {
   Avatar,
   UnstyledButton,
 } from "@mantine/core";
-import React from "react";
+import React, { useEffect } from "react";
 import { ArrowUpIcon, HeartIcon } from "@heroicons/react/outline";
 import { RecommendedCard } from "./components/RecommendedCard";
 import { Link, useNavigate } from "react-router-dom";
@@ -28,6 +28,13 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 }));
 import { getAuth, signOut } from "firebase/auth";
 import { app } from "./firebaseConfig";
+import { useAuthState } from "react-firebase-hooks/auth";
+import {
+  useDocumentData,
+  useDocumentOnce,
+} from "react-firebase-hooks/firestore";
+import { doc, DocumentReference, getFirestore } from "firebase/firestore";
+import axios from "axios";
 export function Home() {
   const { classes } = useStyles();
   const nav = useNavigate();
@@ -376,7 +383,133 @@ const RecentlyViewed = () => {
     </>
   );
 };
+
+const instance = axios.create({
+  baseURL: "https://api.artic.edu/api/v1",
+  timeout: 10000,
+});
+
+const getImageURL = (image_id: string) =>
+  `https://www.artic.edu/iiif/2/${image_id}/full/843,/0/default.jpg`;
+
+const getArtistName = (artist_display: string) => {
+  if (!artist_display) return "";
+  return artist_display.split("\n")[0];
+};
+
 const RecommendedForYou = () => {
+  const auth = getAuth(app);
+  const [user] = useAuthState(auth);
+
+  const [recommendedImages, setRecommendedImages] = React.useState<
+    {
+      id: string;
+      src: string;
+      artist: string;
+      text: string;
+      title: string;
+    }[]
+  >([]);
+
+  const [values, userDocLoading, __, snapshot] = useDocumentData<{
+    preferenceTags: { [key: string]: number };
+    likedArtworks: string[];
+  }>(
+    user &&
+      (doc(getFirestore(app), `users/${user.uid}`) as DocumentReference<{
+        preferenceTags: { [key: string]: number };
+        likedArtworks: string[];
+      }>)
+  );
+
+  useEffect(() => {
+    if (!values) return;
+    const should =
+      Object.entries(values.preferenceTags || {}).map(([tags, rating]) => {
+        return {
+          multi_match: {
+            query: tags,
+            fields: ["term_titles"],
+            boost: rating,
+          },
+        };
+      }) || [];
+
+    const must_not =
+      (values.likedArtworks || []).map((id) => ({
+        multi_match: {
+          query: id,
+          fields: ["id"],
+        },
+      })) || [];
+
+    instance
+      .post<{
+        data: {
+          api_link: string;
+          api_model: string;
+          artist_display: string;
+          id: number;
+          thumbnail: {
+            alt_text: string;
+            height: number;
+            lqip: string;
+            width: number;
+          };
+          timestamp: string;
+          title: string;
+          _score: number;
+        }[];
+      }>("artworks/search", {
+        query: {
+          bool: {
+            should,
+            must_not,
+          },
+        },
+        fields: [
+          "api_link",
+          "id",
+          "artist_display",
+          "thumbnail",
+          "api_model",
+          "id",
+          "title",
+          "timestamp",
+        ],
+        limit: 31,
+      })
+      .then(({ data }) => data.data)
+      .then((recommendedArtworks) => {
+        console.log(recommendedArtworks);
+        // return Promise.all<{ id: string; src: string }>(
+        return Promise.all<any>(
+          recommendedArtworks
+            .filter(({ id }) => {
+              return !(snapshot?.data()?.likedArtworks || []).includes(
+                String(id)
+              );
+            })
+            .map((art) =>
+              axios.get(art.api_link).then(({ data }) => {
+                return {
+                  id: art.id,
+                  src:
+                    (data.data.image_id && getImageURL(data.data.image_id)) ||
+                    "",
+                  artist: getArtistName(art.artist_display),
+                  text: art.thumbnail.alt_text,
+                  title: art.title,
+                };
+              })
+            )
+        );
+      })
+      .then((e) => {
+        setRecommendedImages(e);
+      });
+  }, [snapshot]);
+
   return (
     <>
       <Text
@@ -395,31 +528,32 @@ const RecommendedForYou = () => {
       >
         Recommended For You
       </Text>
-      <div
-        style={{
-          overflowY: "hidden",
-          width: "100%",
-          paddingBottom: "37px",
-        }}
-        className="no-scrollbar"
-      >
+      {/* display recommend only if user is logged in */}
+      {user && (
         <div
           style={{
-            display: "flex",
-            gap: "18px",
-            paddingLeft: "20px",
-            paddingRight: "20px",
-
-            minWidth: "min-content",
+            overflowY: "hidden",
+            width: "100%",
+            paddingBottom: "37px",
           }}
+          className="no-scrollbar"
         >
-          {Array(4)
-            .fill(1)
-            .map((_, index) => (
-              <RecommendedCard key={index} />
+          <div
+            style={{
+              display: "flex",
+              gap: "18px",
+              paddingLeft: "20px",
+              paddingRight: "20px",
+
+              minWidth: "min-content",
+            }}
+          >
+            {recommendedImages.map(({ id, ...props }) => (
+              <RecommendedCard key={id} {...props} />
             ))}
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 };

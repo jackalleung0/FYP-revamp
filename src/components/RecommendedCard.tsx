@@ -8,9 +8,10 @@ const style = createStyles((theme, _params, getRef) => ({
   },
 }));
 
-export const RecommendedCard = () => {
+export const RecommendedCard = ({ src, title, text, artist }: any) => {
   const { classes } = style();
   const nav = useNavigate();
+
   return (
     <div
       style={{
@@ -30,7 +31,7 @@ export const RecommendedCard = () => {
               borderTopRightRadius: "12px",
             },
           }}
-          src="https://picsum.photos/1200"
+          src={src}
         />
         <div
           style={{
@@ -63,7 +64,7 @@ export const RecommendedCard = () => {
               color: "#FFF",
             }}
           >
-            The Bedroom
+            {title}
           </Text>
           <Text
             style={{
@@ -76,7 +77,7 @@ export const RecommendedCard = () => {
             }}
             lineClamp={3}
           >
-            Painting of bedroom, blue walls, green window, tan bed, red bedding.
+            {text}
           </Text>
         </div>
       </div>
@@ -101,7 +102,7 @@ export const RecommendedCard = () => {
             lineHeight: "24px",
           }}
         >
-          Vincent van Gogh
+          {artist}
         </Text>
         <svg
           style={{ marginRight: "21px" }}
@@ -117,9 +118,9 @@ export const RecommendedCard = () => {
             transform="translate(-2 -4)"
             fill="none"
             stroke="#111112"
-            strokeLinecap="round"
+            stroke-linecap="round"
             strokeLinejoin="round"
-            strokeWidth="2"
+            stroke-width="2"
           />
         </svg>
       </div>
