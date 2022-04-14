@@ -50,7 +50,6 @@ export function Login() {
   );
   useEffect(() => {
     if (!pressedSignIn || userDocLoading) return;
-    console.log(values.skipGettingStarted);
     if (values && values.skipGettingStarted) {
       nav("/home");
     } else {
