@@ -481,8 +481,6 @@ const RecommendedForYou = () => {
       })
       .then(({ data }) => data.data)
       .then((recommendedArtworks) => {
-        console.log(recommendedArtworks);
-        // return Promise.all<{ id: string; src: string }>(
         return Promise.all<any>(
           recommendedArtworks
             .filter(({ id }) => {
@@ -508,7 +506,7 @@ const RecommendedForYou = () => {
       .then((e) => {
         setRecommendedImages(e);
       });
-  }, [snapshot]);
+  }, [values]);
 
   return (
     <>
@@ -549,7 +547,7 @@ const RecommendedForYou = () => {
             }}
           >
             {recommendedImages.map(({ id, ...props }) => (
-              <RecommendedCard key={id} {...props} />
+              <RecommendedCard key={id} {...props} id={id} />
             ))}
           </div>
         </div>

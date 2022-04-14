@@ -8,7 +8,7 @@ const style = createStyles((theme, _params, getRef) => ({
   },
 }));
 
-export const RecommendedCard = ({ src, title, text, artist }: any) => {
+export const RecommendedCard = ({ src, title, text, artist, id }: any) => {
   const { classes } = style();
   const nav = useNavigate();
 
@@ -19,7 +19,7 @@ export const RecommendedCard = ({ src, title, text, artist }: any) => {
         borderRadius: "12px",
       }}
       className={classes.root}
-      onClickCapture={() => nav("/artwork/1")}
+      onClickCapture={() => nav(`/artwork/${id}`)}
     >
       <div style={{ position: "relative" }}>
         <Image
