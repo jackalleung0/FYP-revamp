@@ -9,6 +9,7 @@ import {
   Transition,
   Avatar,
   UnstyledButton,
+  LoadingOverlay,
 } from "@mantine/core";
 import React, { useEffect } from "react";
 import { ArrowUpIcon, HeartIcon } from "@heroicons/react/outline";
@@ -35,6 +36,9 @@ import {
 } from "react-firebase-hooks/firestore";
 import { doc, DocumentReference, getFirestore } from "firebase/firestore";
 import axios from "axios";
+import { getImageURL } from "./getImageURL";
+import { getArtistName } from "./getArtistName";
+import { useAsync } from "react-async-hook";
 export function Home() {
   const { classes } = useStyles();
   const nav = useNavigate();
@@ -389,27 +393,102 @@ const instance = axios.create({
   timeout: 10000,
 });
 
-const getImageURL = (image_id: string) =>
-  `https://www.artic.edu/iiif/2/${image_id}/full/843,/0/default.jpg`;
+const getRecommendArtworks = async (values: any) => {
+  if (!values) return [];
+  const should =
+    Object.entries(values.preferenceTags || {}).map(([tags, rating]) => {
+      return {
+        multi_match: {
+          query: tags,
+          fields: ["term_titles"],
+          boost: rating,
+        },
+      };
+    }) || [];
 
-const getArtistName = (artist_display: string) => {
-  if (!artist_display) return "";
-  return artist_display.split("\n")[0];
+  const must_not =
+    (values.likedArtworks || []).map((id: string) => ({
+      multi_match: {
+        query: id,
+        fields: ["id"],
+      },
+    })) || [];
+
+  return await instance
+    .post<{
+      data: {
+        api_link: string;
+        api_model: string;
+        artist_display: string;
+        id: number;
+        thumbnail: {
+          alt_text: string;
+          height: number;
+          lqip: string;
+          width: number;
+        };
+        timestamp: string;
+        title: string;
+        _score: number;
+      }[];
+    }>("artworks/search", {
+      query: {
+        bool: {
+          should,
+          must_not,
+        },
+      },
+      fields: [
+        "api_link",
+        "id",
+        "artist_display",
+        "thumbnail",
+        "api_model",
+        "id",
+        "title",
+        "timestamp",
+      ],
+      limit: 31,
+    })
+    .then(({ data }) => data.data)
+    .then((recommendedArtworks) => {
+      return Promise.all<any>(
+        recommendedArtworks
+          .filter(({ id }) => {
+            return !(values.likedArtworks || []).includes(String(id));
+          })
+          .map((art) =>
+            axios.get(art.api_link).then(({ data }) => {
+              return {
+                id: art.id,
+                src:
+                  (data.data.image_id && getImageURL(data.data.image_id)) || "",
+                artist: getArtistName(art.artist_display),
+                text: art.thumbnail.alt_text,
+                title: art.title,
+              };
+            })
+          )
+      );
+    });
+  // .then((e) => {
+  //   setRecommendedImages(e);
+  // });
 };
 
 const RecommendedForYou = () => {
   const auth = getAuth(app);
   const [user] = useAuthState(auth);
 
-  const [recommendedImages, setRecommendedImages] = React.useState<
-    {
-      id: string;
-      src: string;
-      artist: string;
-      text: string;
-      title: string;
-    }[]
-  >([]);
+  // const [recommendedImages, setRecommendedImages] = React.useState<
+  //   {
+  //     id: string;
+  //     src: string;
+  //     artist: string;
+  //     text: string;
+  //     title: string;
+  //   }[]
+  // >([]);
 
   const [values, userDocLoading, __, snapshot] = useDocumentData<{
     preferenceTags: { [key: string]: number };
@@ -421,92 +500,11 @@ const RecommendedForYou = () => {
         likedArtworks: string[];
       }>)
   );
+  const { result, loading } = useAsync(getRecommendArtworks, [values]);
 
-  useEffect(() => {
-    if (!values) return;
-    const should =
-      Object.entries(values.preferenceTags || {}).map(([tags, rating]) => {
-        return {
-          multi_match: {
-            query: tags,
-            fields: ["term_titles"],
-            boost: rating,
-          },
-        };
-      }) || [];
-
-    const must_not =
-      (values.likedArtworks || []).map((id) => ({
-        multi_match: {
-          query: id,
-          fields: ["id"],
-        },
-      })) || [];
-
-    instance
-      .post<{
-        data: {
-          api_link: string;
-          api_model: string;
-          artist_display: string;
-          id: number;
-          thumbnail: {
-            alt_text: string;
-            height: number;
-            lqip: string;
-            width: number;
-          };
-          timestamp: string;
-          title: string;
-          _score: number;
-        }[];
-      }>("artworks/search", {
-        query: {
-          bool: {
-            should,
-            must_not,
-          },
-        },
-        fields: [
-          "api_link",
-          "id",
-          "artist_display",
-          "thumbnail",
-          "api_model",
-          "id",
-          "title",
-          "timestamp",
-        ],
-        limit: 31,
-      })
-      .then(({ data }) => data.data)
-      .then((recommendedArtworks) => {
-        return Promise.all<any>(
-          recommendedArtworks
-            .filter(({ id }) => {
-              return !(snapshot?.data()?.likedArtworks || []).includes(
-                String(id)
-              );
-            })
-            .map((art) =>
-              axios.get(art.api_link).then(({ data }) => {
-                return {
-                  id: art.id,
-                  src:
-                    (data.data.image_id && getImageURL(data.data.image_id)) ||
-                    "",
-                  artist: getArtistName(art.artist_display),
-                  text: art.thumbnail.alt_text,
-                  title: art.title,
-                };
-              })
-            )
-        );
-      })
-      .then((e) => {
-        setRecommendedImages(e);
-      });
-  }, [values]);
+  // useEffect(() => {
+  //   if (!values) return;
+  // }, [values]);
 
   return (
     <>
@@ -546,9 +544,20 @@ const RecommendedForYou = () => {
               minWidth: "min-content",
             }}
           >
-            {recommendedImages.map(({ id, ...props }) => (
-              <RecommendedCard key={id} {...props} id={id} />
-            ))}
+            {result &&
+              result.map(({ id, ...props }) => (
+                <RecommendedCard key={id} {...props} id={id} />
+              ))}
+            {loading && (
+              <div style={{ height: 385, width: "100%", position: "relative" }}>
+                <LoadingOverlay
+                  visible={loading}
+                  loaderProps={{ color: "#000000" }}
+                  overlayOpacity={0.3}
+                  overlayColor="#c5c5c5"
+                />
+              </div>
+            )}
           </div>
         </div>
       )}
