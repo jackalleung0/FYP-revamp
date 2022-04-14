@@ -551,6 +551,7 @@ const RecommendedForYou = () => {
             {loading && (
               <div style={{ height: 385, width: "100%", position: "relative" }}>
                 <LoadingOverlay
+                  zIndex={2}
                   visible={loading}
                   loaderProps={{ color: "#000000" }}
                   overlayOpacity={0.3}
