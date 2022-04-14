@@ -1,39 +1,51 @@
+import { HeartIcon as SolidHeartIcon, StarIcon } from "@heroicons/react/solid";
+import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/outline";
 import {
-  Affix,
   ActionIcon,
+  Affix,
+  Button,
+  Center,
   Container,
   createStyles,
-  Center,
   Image,
-  Title,
   Text,
-  Button,
-  Group,
+  Title,
   UnstyledButton,
 } from "@mantine/core";
-import { BottomSheet } from "react-spring-bottom-sheet";
-import { useWindowScroll } from "@mantine/hooks";
+import { showNotification } from "@mantine/notifications";
+import axios from "axios";
+import { getAuth } from "firebase/auth";
+import {
+  deleteDoc,
+  doc,
+  DocumentReference,
+  getDoc,
+  getFirestore,
+  increment,
+  setDoc,
+} from "firebase/firestore";
 import React, { useState } from "react";
+import { useAsync } from "react-async-hook";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useDocumentData } from "react-firebase-hooks/firestore";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Transition } from "react-transition-group";
+import { BottomSheet } from "react-spring-bottom-sheet";
+import StarRatingComponent from "react-star-rating-component";
 import { BackIcon } from "./BackIcon";
 import { CommentIcon } from "./CommentIcon";
 import { DiscoverCard } from "./DiscoverCard";
+import { app } from "./firebaseConfig";
+import { getArtistName } from "./getArtistName";
+import { getImageURL } from "./getImageURL";
+import { LinkIcon } from "./LinkIcon";
+import { NotificationIcon } from "./NotificationIcon";
 import { ShareIcon } from "./ShareIcon";
 import { TagButton } from "./TagButton";
-import { showNotification } from "@mantine/notifications";
-import axios from "axios";
 import { TelegramIcon } from "./TelegramIcon";
-import { WhatsAppIcon } from "./WhatsAppIcon";
 import { TwitterIcon } from "./TwitterIcon";
-import { NotificationIcon } from "./NotificationIcon";
-import { LinkIcon } from "./LinkIcon";
-import { LikeIcon } from "./LikeIcon";
-import { EmptyStar } from "./EmptyStar";
-import { FilledStar } from "./FilledStar";
-import { useAsync } from "react-async-hook";
-import { getImageURL } from "./getImageURL";
-import { getArtistName } from "./getArtistName";
+import { WhatsAppIcon } from "./WhatsAppIcon";
+
+const rating_weight = 0.8;
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   ActionIcon: {
@@ -41,6 +53,11 @@ const useStyles = createStyles((theme, _params, getRef) => ({
   },
   Image: {
     boxShadow: theme.shadows.lg,
+  },
+  Star: {
+    width: 23,
+    height: 23,
+    paddingRight: 1,
   },
 }));
 
@@ -170,6 +187,24 @@ export function ArtworkDetail() {
   console.log(id);
 
   const { loading, result } = useAsync(fetchArtwork, [id]);
+  const auth = getAuth(app);
+  const [user] = useAuthState(auth);
+
+  const [values, userDocLoading, __, snapshot] = useDocumentData(
+    user &&
+      (doc(
+        getFirestore(app),
+        `users/${user.uid}/ratings/${id}`
+      ) as DocumentReference<{
+        rating: number;
+      }>)
+  );
+  const [userProfile] = useDocumentData(
+    user &&
+      (doc(getFirestore(app), `users/${user.uid}`) as DocumentReference<{
+        likedArtworks: string[];
+      }>)
+  );
 
   const [show, setShow] = useState(false);
   const copyToClipboard = () => {
@@ -207,6 +242,181 @@ export function ArtworkDetail() {
   };
 
   console.log(result);
+
+  const handleStarClick = async (r: number) => {
+    // if (!user) return;
+    // await updateDoc(doc(getFirestore(app), `users/${user.uid}/ratings/${id}`), {
+    //   rating: newRating,
+    // });
+    if (!user) {
+      return;
+    }
+
+    const fs = getFirestore(app);
+
+    // make reference to user & artwork ratings
+    const userRatingRef = doc(fs, `/users/${user.uid}/ratings/${id}`);
+    const userRef = doc(fs, `/users/${user.uid}`);
+    const userDoc = await getDoc(userRef);
+
+    const ratingDoc = await getDoc(userRatingRef);
+
+    // update users' tag preference
+    // increment user preference by r points
+    // TODO: check if user has already rated the artwork, may need to reduce the ratings
+
+    // get the difference between new and old ratings
+    const adjustment =
+      r - ((ratingDoc.exists() && ratingDoc.data()?.rating) || 0);
+
+    const weightedOldPreference = Object.entries(
+      (userDoc.data()?.preferenceTags as {
+        [key: string]: number;
+      }) || {}
+    ).reduce(
+      (acc, [id, value]) => {
+        acc[id] = value * rating_weight;
+        return acc;
+      },
+      {} as {
+        [key: string]: number;
+      }
+    );
+
+    const preferencePayload =
+      result?.term_titles.reduce(
+        (acc, cur) => {
+          const i = Object.keys(acc).indexOf(cur);
+          if (i > -1) {
+            acc[cur] = (acc[cur] || 0) + adjustment;
+          } else {
+            acc[cur] = adjustment;
+          }
+          return acc;
+        },
+        { ...weightedOldPreference } as {
+          [key: string]: number;
+        }
+      ) || {};
+
+    await setDoc(
+      userRef,
+      { preferenceTags: preferencePayload },
+      { merge: true }
+    );
+    await setDoc(userRatingRef, { rating: r }, { merge: true });
+  };
+
+  const handleLikeArtwork = async () => {
+    // const increment = increment(1);
+    // const decrement = firebase.firestore.FieldValue.increment(-1);
+
+    if (!user) return;
+    if (!id) return;
+    if (!result) return;
+
+    const fs = getFirestore(app);
+    const artworkRef = doc(fs, `artworks/${id}`);
+    const userRef = doc(fs, `users/${user.uid}`);
+    const artworkRating = doc(fs, `/users/${user.uid}/ratings/${id}`);
+
+    const userDoc = await getDoc(userRef);
+
+    // condition factor: like / unlike, profile existence, doc field existence
+
+    // handle profile existence
+    if (userDoc.exists()) {
+      // handle field existence
+      const likedArtworks: string[] = userDoc.data()!.likedArtworks || [];
+
+      // handle like / unlike
+      if (likedArtworks.includes(id)) {
+        const artworkIndex = likedArtworks.indexOf(id);
+        likedArtworks.splice(artworkIndex, 1);
+        await setDoc(
+          artworkRef,
+          { numberOfLikes: increment(-1) },
+          { merge: true }
+        );
+
+        await deleteDoc(artworkRating);
+      } else {
+        likedArtworks.push(id);
+        await setDoc(
+          artworkRef,
+          { numberOfLikes: increment(1) },
+          { merge: true }
+        );
+        await setDoc(artworkRating, { rating: 1 }, { merge: true });
+      }
+
+      // newly heart artwork have a default rating of 1
+      const adjustment = likedArtworks.includes(id) ? 1 : -1;
+
+      const preferencePayload =
+        result.term_titles.reduce(
+          (acc, cur) => {
+            const i = Object.keys(acc).indexOf(cur);
+            if (i > -1) {
+              acc[cur] = (acc[cur] || 0) + adjustment;
+            } else {
+              acc[cur] = adjustment;
+            }
+            return acc;
+          },
+          { ...(userDoc.data()?.preferenceTags || {}) } as {
+            [key: string]: number;
+          }
+        ) || {};
+
+      await setDoc(
+        userRef,
+        { likedArtworks, preferenceTags: preferencePayload },
+        { merge: true }
+      );
+    } else {
+      // userDoc does not exists, need to create/update a new doc
+
+      // there should be no previous liked artwork, thus empty array
+      const likedArtworks: string[] = [];
+
+      // newly heart artwork have a default rating of 1
+      const adjustment = likedArtworks.includes(id) ? 1 : -1;
+
+      const preferencePayload =
+        result.term_titles.reduce(
+          (acc, cur) => {
+            const i = Object.keys(acc).indexOf(cur);
+            if (i > -1) {
+              acc[cur] = (acc[cur] || 0) + adjustment;
+            } else {
+              acc[cur] = adjustment;
+            }
+            return acc;
+          },
+          { ...(userDoc.data()?.preferenceTags || {}) } as {
+            [key: string]: number;
+          }
+        ) || {};
+
+      // new user should not have previous liked artwork to pop
+      // thus bypass the like / dislike checking
+      await setDoc(
+        userRef,
+        { likedArtworks, preferenceTags: preferencePayload },
+        { merge: true }
+      );
+      await setDoc(
+        artworkRef,
+        { numberOfLikes: increment(1) },
+        { merge: true }
+      );
+    }
+  };
+
+  const userLikedArtwork =
+    (id && userProfile && (userProfile.likedArtworks || []).includes(id)) ||
+    false;
 
   return (
     <div>
@@ -426,14 +636,37 @@ export function ArtworkDetail() {
               paddingTop: 33,
             }}
           >
-            <LikeIcon style={{ float: "right", paddingTop: 5 }} />
+            <div
+              style={{ float: "right", paddingTop: 0, position: "relative" }}
+              onClickCapture={handleLikeArtwork}
+            >
+              {userLikedArtwork ? (
+                <SolidHeartIcon
+                  style={{
+                    width: 23,
+                    height: 25,
+                    right: -2,
+                    position: "absolute",
+                    color: "#ED5466",
+                  }}
+                />
+              ) : (
+                <OutlineHeartIcon
+                  style={{
+                    width: 23,
+                    height: 25,
+                    right: -2,
+                    position: "absolute",
+                  }}
+                />
+              )}
+            </div>
             <Title
               style={{
                 fontSize: "24px",
                 fontFamily: "SFProDisplay",
                 fontWeight: "bold",
                 color: "#000000",
-                height: "29px",
                 lineHeight: "28px",
               }}
             >
@@ -456,16 +689,42 @@ export function ArtworkDetail() {
             >
               {getArtistName(result.artist_display)}
             </Text>
-            <div style={{ display: "flex", paddingTop: 25, gap: 8 }}>
-              <FilledStar />
-              <FilledStar />
-              <FilledStar />
-              <EmptyStar />
-              <EmptyStar />
+          </Container>
+          <Container
+            style={{
+              paddingLeft: 17,
+              paddingRight: 17,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                paddingTop: 23,
+                gap: 8,
+                position: "relative",
+              }}
+            >
+              <StarRatingComponent
+                name="rating"
+                value={values?.rating || 0}
+                editing={!!values?.rating}
+                renderStarIcon={() => <StarIcon className={classes.Star} />}
+                onStarClick={handleStarClick}
+                starColor={"#000"}
+                emptyStarColor={"#E1E4E8"}
+              />
             </div>
+          </Container>
+          <Container
+            style={{
+              paddingLeft: 20,
+              paddingRight: 20,
+              paddingTop: 0,
+            }}
+          >
             <hr
               style={{
-                marginTop: 32,
+                marginTop: 32 - 9,
 
                 flexGrow: 1,
                 border: "none",
