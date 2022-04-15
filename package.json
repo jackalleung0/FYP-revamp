@@ -27,7 +27,8 @@
     "react-router-dom": "^6.2.2",
     "react-spring-bottom-sheet": "^3.4.0",
     "react-star-rating-component": "^1.4.1",
-    "react-transition-group": "^4.4.2"
+    "react-transition-group": "^4.4.2",
+    "sanitize-html": "^2.7.0"
   },
   "devDependencies": {
     "@types/react": "^17.0.33",
