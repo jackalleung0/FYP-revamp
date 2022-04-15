@@ -184,7 +184,7 @@ export function AboutArtist() {
             backgroundColor: "#F1F2F4",
           }}
         />
-        {artistResult ? (
+        {artistResult && artistResult.description ? (
           <Text
             style={{
               paddingTop: 24 - 15,
