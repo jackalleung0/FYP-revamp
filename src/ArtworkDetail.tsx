@@ -66,6 +66,27 @@ const instance = axios.create({
   timeout: 10000,
 });
 
+// artwork.artist_title
+const getRelatedArtwork = async (artistName: string, currentID: string) => {
+  return await instance
+    .get("artworks/search", {
+      params: {
+        limit: 20,
+        // just put all the author in the search list, and let the search do its thing
+        // the array is for readability
+        q: artistName,
+        fields: ["image_id", "title", "thumbnail", "id",'artist_display','term_titles'].join(","),
+      },
+    })
+    .then(({ data }) => {
+      const artworks = data.data;
+
+      //   // get artworks except current artwork
+      return artworks.filter(
+        (d: any) => String(d.id) !== currentID && !!d.image_id
+      );
+    });
+};
 const fetchArtwork = async (id: any) => {
   const fields = [
     "id",
@@ -187,6 +208,11 @@ export function ArtworkDetail() {
   console.log(id);
 
   const { loading, result } = useAsync(fetchArtwork, [id]);
+  const { result: recommendArtworks, loading: otherArtworkLoading } = useAsync(
+    getRelatedArtwork,
+    [getArtistName(result?.artist_display || ""), id || ""]
+  );
+  console.log(recommendArtworks);
   const auth = getAuth(app);
   const [user] = useAuthState(auth);
 
@@ -643,19 +669,19 @@ export function ArtworkDetail() {
               {userLikedArtwork ? (
                 <SolidHeartIcon
                   style={{
-                    width: 23,
-                    height: 25,
-                    right: -2,
+                    width: 28,
+                    height: 26,
+                    right: -1,
                     position: "absolute",
-                    color: "#ED5466",
+                    color: "#DD2727",
                   }}
                 />
               ) : (
                 <OutlineHeartIcon
                   style={{
-                    width: 23,
-                    height: 25,
-                    right: -2,
+                    width: 28,
+                    height: 26,
+                    right: -1,
                     position: "absolute",
                   }}
                 />
@@ -874,14 +900,15 @@ export function ArtworkDetail() {
                 minWidth: "min-content",
               }}
             >
-              {Array(4)
-                .fill(1)
-                .map((_, index) => (
+              {!otherArtworkLoading &&
+                recommendArtworks &&
+                recommendArtworks.map((a) => (
                   <DiscoverCard
-                    key={index}
-                    title="Self-Portrait"
-                    tag="oil on board"
-                    author="Vincent van Gogh"
+                    key={a.id}
+                    src={getImageURL(a.image_id)}
+                    title={a.title}
+                    tag={a?.term_titles?.length > 0? a.term_titles[0]:""}
+                    author={getArtistName(a.artist_display)}
                   />
                 ))}
             </div>

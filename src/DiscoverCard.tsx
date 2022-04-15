@@ -1,19 +1,21 @@
 import { Text, Image } from "@mantine/core";
 import React from "react";
+import { getImageURL } from "./getImageURL";
 
 const defaultValue = {
   title: "The Girl by the Window",
   tag: "oil on canvas",
   author: "Edvard Munch",
+  src: "https://picsum.photos/1200",
 };
 
 export function DiscoverCard(props: any): JSX.Element {
   // @ts-expect-error 2525
-  const { title, tag, author } = { ...defaultValue, ...props };
+  const { title, tag, author, src } = { ...defaultValue, ...props };
   return (
     <div style={{ position: "relative" }}>
       <Image
-        src="https://picsum.photos/1200"
+        src={src}
         width={228}
         height={182}
         styles={{
@@ -47,6 +49,7 @@ export function DiscoverCard(props: any): JSX.Element {
         {tag}
       </Text>
       <Text
+        lineClamp={1}
         style={{
           paddingTop: "8px",
           fontSize: "18px",
