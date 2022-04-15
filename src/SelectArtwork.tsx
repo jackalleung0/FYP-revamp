@@ -83,27 +83,27 @@ export function SelectArtwork() {
     );
 
   useEffect(() => {
+    console.log(value);
     if (value) {
       setSelectedArtwork(value.likedArtworks);
     }
   }, [value, docLoading]);
 
-  const [selectedArtwork, setSelectedArtwork] = React.useState<
-    (string | number)[]
-  >([]);
+  const [selectedArtwork, setSelectedArtwork] = React.useState<string[]>([]);
 
-  const addToFavorite = (ids: (number | string)[]) => async () => {
-    if (!value) return;
-    // creating a set of likedArtworks to prevent duplicated artwork id
-    const likedArtworks = new Set(value.likedArtworks) || [];
-    ids.forEach((id) => likedArtworks.add(String(id)));
-    snapshot?.ref &&
-      (await setDoc(
-        snapshot.ref,
-        // unset the gettingStartedSteps, to prevent user get directed to this page again
-        { likedArtworks: Array.from(likedArtworks), skipGettingStarted: true },
-        { merge: true }
-      ));
+  const addToFavorite = (likedArtworks: string[]) => async () => {
+    if (!snapshot) {
+      console.error("there are no user snapshot");
+      return;
+    }
+
+    await setDoc(
+      snapshot.ref,
+      // unset the gettingStartedSteps, to prevent user get directed to this page again
+      { likedArtworks, skipGettingStarted: true },
+      { merge: true }
+    );
+
     nav("/home");
   };
 
