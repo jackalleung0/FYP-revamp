@@ -36,7 +36,7 @@ const searchArtworkBySearchTerm = async (term: string) => {
   return (
     await instance.get("artworks/search", {
       params: {
-        limit: 20,
+        limit: 100,
         // just put all the author in the search list, and let the search do its thing
         // the array is for readability
         q: term,
