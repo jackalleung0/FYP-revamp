@@ -213,14 +213,14 @@ export function ArtworkDetail() {
   const { classes } = useStyles();
   const nav = useNavigate();
   let { id } = useParams<{ id: string }>();
-  console.log(id);
-
+  const toArtwork = (id: string) => () => {
+    nav(`/artwork/${id}`);
+  };
   const { loading, result } = useAsync(fetchArtwork, [id]);
   const { result: recommendArtworks, loading: otherArtworkLoading } = useAsync(
     getRelatedArtwork,
     [getArtistName(result?.artist_display || ""), id || ""]
   );
-  console.log(recommendArtworks);
   const auth = getAuth(app);
   const [user] = useAuthState(auth);
 
@@ -274,8 +274,6 @@ export function ArtworkDetail() {
       }),
     });
   };
-
-  console.log(result);
 
   const handleStarClick = async (r: number) => {
     // if (!user) return;
@@ -858,7 +856,7 @@ export function ArtworkDetail() {
                 }}
               >
                 {result.term_titles.map((value, i) => (
-                  <TagButton popular={i === 0} to="/search-result">
+                  <TagButton popular={i === 0} to="/search-result" key={i}>
                     {value}
                   </TagButton>
                 ))}
@@ -910,8 +908,9 @@ export function ArtworkDetail() {
             >
               {!otherArtworkLoading &&
                 recommendArtworks &&
-                recommendArtworks.map((a:any) => (
+                recommendArtworks.map((a: any) => (
                   <DiscoverCard
+                    onClickCapture={toArtwork(a.id)}
                     key={a.id}
                     src={getImageURL(a.image_id)}
                     title={a.title}

@@ -11,9 +11,12 @@ const defaultValue = {
 
 export function DiscoverCard(props: any): JSX.Element {
   // @ts-expect-error 2525
-  const { title, tag, author, src } = { ...defaultValue, ...props };
+  const { title, tag, author, src, onClickCapture } = {
+    ...defaultValue,
+    ...props,
+  };
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative" }} onClickCapture={onClickCapture}>
       <Image
         src={src}
         width={228}
