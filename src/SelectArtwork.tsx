@@ -52,7 +52,7 @@ const fetchArtworks = async () =>
 export function SelectArtwork() {
   const { classes } = useStyles();
 
-  const toggleArtwork = (index: string | number) => () => {
+  const toggleArtwork = (index: string) => () => {
     const copy = [...selectedArtwork];
     const i = copy.indexOf(index);
     if (i !== -1) {
