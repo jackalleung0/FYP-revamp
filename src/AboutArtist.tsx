@@ -7,11 +7,16 @@ import {
   Text,
   Affix,
 } from "@mantine/core";
+import axios from "axios";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useAsync } from "react-async-hook";
+import { useNavigate, useParams } from "react-router-dom";
+import { Artwork } from "./Artwork";
 import { BackIcon } from "./BackIcon";
 import { CommentIcon } from "./CommentIcon";
+import { getArtistName } from "./getArtistName";
 import { ShareIcon } from "./ShareIcon";
+import sanitizeHtml from "sanitize-html";
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   ActionIcon: {
@@ -22,9 +27,79 @@ const useStyles = createStyles((theme, _params, getRef) => ({
   },
 }));
 
+const instance = axios.create({
+  baseURL: "https://api.artic.edu/api/v1",
+  timeout: 10000,
+});
+
+const getArtworkDetails = async (id: string) => {
+  const fields = ["artist_display", "artist_id"].join(",").replaceAll(" ", "");
+
+  const { data } = await instance.get<{ data: Artwork }>(`/artworks/${id}`, {
+    params: {
+      fields: fields,
+    },
+  });
+  return data.data;
+};
+
+function sanitizeLinks(description: any) {
+  return description
+    .replace(/href="(.*?)"/g, function () {
+      return 'href="#"';
+    })
+    .replace(/target="(.*?)"/g, function () {
+      return 'target="_self"';
+    });
+}
+
+const searchArtwork = async (term: string) => {
+  return (
+    await instance.get(`artworks/search`, {
+      params: {
+        q: term,
+        fields: ["image_id", "artist_display"].join(",").replaceAll(" ", ""),
+      },
+    })
+  ).data.data[0];
+};
+const getArtist = async (artists: string) =>
+  (await instance.get(`artists/${artists}`)).data.data;
+
+const getArtistsInfo = async (artistsId: string) => {
+  const getTopResult = async (term: string) =>
+    (
+      await instance.get(`artworks/search`, {
+        params: {
+          q: term,
+          // fields: "id,title,artist_display,date_display,main_reference_number",
+          fields: ["image_id", "artist_display", "artist_display"]
+            .join(",")
+            .replaceAll(" ", ""),
+        },
+      })
+    ).data.data[0];
+
+  const { title, description } = await getArtist(artistsId);
+  const { artist_display, image_id } = await getTopResult(title);
+  return {
+    title: title,
+    image_id: image_id,
+    description: description ? sanitizeLinks(description) : "",
+    artist_display: artist_display,
+  };
+};
+
 export function AboutArtist() {
   const nav = useNavigate();
-  const [haveInformation, setHaveInformation] = useState(true);
+  // const [haveInformation, setHaveInformation] = useState(true);
+  let { id } = useParams<{ id: string }>();
+  const { result } = useAsync(getArtworkDetails, [id || ""]);
+  const { result: artistResult } = useAsync(getArtistsInfo, [
+    (result?.artist_id && String(result?.artist_id)) || "",
+  ]);
+  console.log(artistResult);
+  // console.log(result);
   return (
     <div>
       <div
@@ -69,7 +144,7 @@ export function AboutArtist() {
             color: "#4E5D78",
           }}
         >
-          ARTIST PROFILE
+          ABOUT ARTIST
         </Title>
         <Title
           style={{
@@ -82,8 +157,7 @@ export function AboutArtist() {
             color: "#000000",
           }}
         >
-          {/* Francesco Mochi */}
-          Vincent van Gogh
+          {(artistResult && artistResult.title) || ""}
         </Title>
         <Text
           style={{
@@ -98,7 +172,8 @@ export function AboutArtist() {
           }}
         >
           {/* Italian, 1580-1654 */}
-          Dutch, 1853-1890
+          {/* Dutch, 1853-1890 */}
+          {artistResult && artistResult.artist_display.split("\n")[1]}
         </Text>
         <hr
           style={{
@@ -109,10 +184,10 @@ export function AboutArtist() {
             backgroundColor: "#F1F2F4",
           }}
         />
-        {haveInformation ? (
+        {artistResult ? (
           <Text
             style={{
-              paddingTop: 24,
+              paddingTop: 24 - 15,
               fontFamily: "Inter",
               fontSize: 15,
               fontWeight: "100",
@@ -120,38 +195,14 @@ export function AboutArtist() {
               color: "#283A5B",
               paddingBottom: 120,
             }}
+          sx={{
+            "& p > a":{
+              color: "#283A5B !important",
+            }
+          }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(artistResult.description) }}
           >
-            During Vincent van Gogh’s tumultuous career as a painter, he created
-            a revolutionary style characterized by exaggerated forms, a vivid
-            color palette, and loose, spontaneous handling of paint. Although he
-            only actively pursued his art for five years before his death in
-            1890, his impact has lived on through his works. In 1886 Van Gogh
-            left his native Holland and settled in Paris, where his beloved
-            brother, Theo, was a paintings dealer. In the two years he spent in
-            Paris, Van Gogh painted no fewer than two dozen self-portraits. The
-            Art Institute’s early, modestly sized example displays the bright
-            palette he adopted with an overlay of small, even brushstrokes, a
-            response to the Pointillist technique Georges Seurat used, most
-            notably in A Sunday on La Grande Jatte—1884. Works such as Fishing
-            in Spring, the Pont de Clichy (Asnières); Grapes, Lemons, Pears, and
-            Apples; and Cypresses show the influence of the Impressionists.
-            Exhausted with the Parisian city life, Van Gogh moved on to the town
-            of Arles in 1888. It was here that he created compositions of such
-            personal importance that he repeated them several times, such as The
-            Bedroom and Madame Roulin Rocking the Cradle (La berceuse), with
-            slight variations on each repetition. After experiencing several
-            bouts of mental illness, at the time diagnosed as epilepsy, Van Gogh
-            was admitted to the Asylum of Saint Paul in Saint-Rémy. There he
-            sketched and painted the grounds of the asylum and the town around
-            him. On days when he was unable to go out, he copied works by other
-            artists, such as The Drinkers, after a wood engraving of the same
-            title by Honoré Daumier. Van Gogh spent the last few months of his
-            life in Auvers-sur-Oise, a small town to the north of Paris. Here,
-            he continued drawing and painting the town and those around him,
-            capturing people, landscapes, houses, and flowers in his work until
-            his untimely death. The Art Institute of Chicago has celebrated van
-            Gogh’s path-breaking work in the exhibitions Van Gogh and Gauguin:
-            The Studio of the South (2001–2002) and Van Gogh’s Bedrooms (2016).
+            {/* {artistResult && artistResult.description} */}
           </Text>
         ) : (
           <div
