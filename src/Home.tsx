@@ -605,7 +605,7 @@ const TrendingTags = () => (
           oil in canvas
         </TagButton>
         {["painting", "women", "painting", "women"].map((e, index) => (
-          <TagButton to="/search-result" key={index}>
+          <TagButton to={`/search-result?term=${e}`} key={index}>
             {e}
           </TagButton>
         ))}

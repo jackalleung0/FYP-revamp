@@ -856,7 +856,11 @@ export function ArtworkDetail() {
                 }}
               >
                 {result.term_titles.map((value, i) => (
-                  <TagButton popular={i === 0} to="/search-result" key={i}>
+                  <TagButton
+                    popular={i === 0}
+                    to={`/search-result?term=${value}`}
+                    key={i}
+                  >
                     {value}
                   </TagButton>
                 ))}

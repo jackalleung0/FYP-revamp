@@ -3,8 +3,13 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 export const TagButton = ({
-  style, styles, to, children, popular, ...props
-}: ButtonProps<typeof Link> & { popular?: boolean; }) => (
+  style,
+  styles,
+  to,
+  children,
+  popular,
+  ...props
+}: ButtonProps<typeof Link> & { popular?: boolean }) => (
   <Button
     component={Link}
     to={to}
