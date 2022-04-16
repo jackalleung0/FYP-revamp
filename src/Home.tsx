@@ -260,7 +260,17 @@ const LatestArtwork = () => {
     </>
   );
 };
+
+const getLatestImage = async () => {
+  return (await instance.get<{ data: Artwork[] }>(`/artworks`)).data.data;
+};
+
 const NewDiscover = () => {
+  // currently, get the latest image from api
+  const { result, loading } = useAsync(getLatestImage, []);
+
+  console.log(result);
+
   return (
     <>
       <Text
@@ -296,10 +306,15 @@ const NewDiscover = () => {
             minWidth: "min-content",
           }}
         >
-          {Array(4)
-            .fill(1)
-            .map((_, index) => (
-              <DiscoverCard key={index} />
+          {result &&
+            result.map((artwork, index) => (
+              <DiscoverCard
+                key={index}
+                title={artwork.title}
+                author={getArtistName(artwork.artist_display)}
+                src={getImageURL(artwork.image_id)}
+                tag={artwork.style_title || artwork.artwork_type_title}
+              />
             ))}
         </div>
       </div>
