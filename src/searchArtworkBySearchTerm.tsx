@@ -19,5 +19,6 @@ export const searchArtworkBySearchTerm = async (term: string, limit = 100) => {
         ].join(","),
       },
     })
-  ).data.data;
+    // ensure there are image_id for search result
+  ).data.data.filter((e:any) => !!e.image_id);
 };
