@@ -20,6 +20,7 @@ import {
 import { BackIcon } from "./BackIcon";
 import { getArtistName } from "./getArtistName";
 import { getImageURL } from "./getImageURL";
+import { searchArtworkBySearchTerm } from "./searchArtworkBySearchTerm";
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   ActionIcon: {
@@ -27,31 +28,10 @@ const useStyles = createStyles((theme, _params, getRef) => ({
   },
 }));
 
-const instance = axios.create({
+export const instance = axios.create({
   baseURL: "https://api.artic.edu/api/v1",
   timeout: 10000,
 });
-
-const searchArtworkBySearchTerm = async (term: string) => {
-  return (
-    await instance.get("artworks/search", {
-      params: {
-        limit: 100,
-        // just put all the author in the search list, and let the search do its thing
-        // the array is for readability
-        q: term,
-        fields: [
-          "image_id",
-          "title",
-          "thumbnail",
-          "id",
-          "artist_display",
-          "term_titles",
-        ].join(","),
-      },
-    })
-  ).data.data;
-};
 
 export function SearchByTag() {
   const nav = useNavigate();

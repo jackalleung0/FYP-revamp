@@ -32,6 +32,12 @@ const scaleY = {
   transitionProperty: "transform, opacity",
 };
 
+import { useDebouncedValue } from "@mantine/hooks";
+import { searchArtworkBySearchTerm } from "./searchArtworkBySearchTerm";
+import { useAsync } from "react-async-hook";
+import { getImageURL } from "./getImageURL";
+import { getArtistName } from "./getArtistName";
+
 export function Search() {
   const { classes } = useStyles();
 
@@ -44,6 +50,10 @@ export function Search() {
       term: "",
     },
   });
+
+  const [debouncedTerm] = useDebouncedValue(form.values.term, 200);
+  const { result } = useAsync(searchArtworkBySearchTerm, [debouncedTerm, 20]);
+  console.log(result);
 
   return (
     <div style={{ position: "relative" }}>
@@ -199,9 +209,8 @@ export function Search() {
                 ...styles,
               }}
             >
-              {Array(5)
-                .fill(1)
-                .map(() => (
+              {result &&
+                result.map((artwork: any) => (
                   <>
                     <div
                       style={{
@@ -214,7 +223,8 @@ export function Search() {
                       <Image
                         width={58}
                         height={46}
-                        src="https://picsum.photos/1200"
+                        withPlaceholder
+                        src={artwork.image_id && getImageURL(artwork.image_id)}
                       />
                       <div>
                         <Text
@@ -226,8 +236,9 @@ export function Search() {
                             color: "#111112",
                             height: 20,
                           }}
+                          lineClamp={1}
                         >
-                          The Bedroom
+                          {artwork.title || "(Untitled)"}
                         </Text>
                         <Text
                           style={{
@@ -238,8 +249,9 @@ export function Search() {
                             color: "#8A94A6",
                             height: 15,
                           }}
+                           lineClamp={1}
                         >
-                          Vincent van Gogh
+                          {getArtistName(artwork.artist_display)}
                         </Text>
                       </div>
                     </div>
@@ -299,7 +311,11 @@ export function Search() {
                   "leisure",
                   "modern and contemporary art",
                 ].map((value, i) => (
-                  <TagButton popular={i === 0} to={`/search-result?term=${value}`} key={i}>
+                  <TagButton
+                    popular={i === 0}
+                    to={`/search-result?term=${value}`}
+                    key={i}
+                  >
                     {value}
                   </TagButton>
                 ))}
