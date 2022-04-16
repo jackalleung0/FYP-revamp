@@ -11,7 +11,7 @@ import {
   UnstyledButton,
   LoadingOverlay,
 } from "@mantine/core";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ArrowUpIcon, HeartIcon } from "@heroicons/react/outline";
 import { RecommendedCard } from "./components/RecommendedCard";
 import { Link, useNavigate } from "react-router-dom";
@@ -31,14 +31,26 @@ import { getAuth, signOut } from "firebase/auth";
 import { app } from "./firebaseConfig";
 import { useAuthState } from "react-firebase-hooks/auth";
 import {
+  useCollection,
+  useCollectionData,
   useDocumentData,
   useDocumentOnce,
 } from "react-firebase-hooks/firestore";
-import { doc, DocumentReference, getFirestore } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  DocumentReference,
+  getFirestore,
+  limit,
+  orderBy,
+  query,
+} from "firebase/firestore";
 import axios from "axios";
 import { getImageURL } from "./getImageURL";
 import { getArtistName } from "./getArtistName";
 import { useAsync } from "react-async-hook";
+import { fetchArtwork } from "./fetchArtwork";
+import { Artwork } from "./Artwork";
 export function Home() {
   const { classes } = useStyles();
   const nav = useNavigate();
@@ -295,95 +307,126 @@ const NewDiscover = () => {
   );
 };
 const RecentlyViewed = () => {
+  const [user] = useAuthState(getAuth(app));
+
+  const [snapshot, loading, error] = useCollection<any>(
+    (user?.uid &&
+      query(
+        collection(getFirestore(app), `/users/${user.uid}/history`),
+        orderBy("lastAccessed", "desc"),
+        limit(10)
+      )) ||
+      undefined
+  );
+  const ids = useMemo(
+    () => snapshot?.docs.map((doc) => doc.id) || [],
+    [snapshot]
+  );
+
+  const [artworks, setArtworks] = useState<Artwork[]>([]);
+
+  useEffect(() => {
+    if (ids) {
+      Promise.allSettled(ids.map(fetchArtwork))
+        .then((e) =>
+          // filter success result, and map to their values
+          e.filter((e) => e.status === "fulfilled").map((e: any) => e.value)
+        )
+        .then(setArtworks);
+    }
+  }, [ids]);
+
   return (
     <>
-      <span
-        style={{
-          display: "flex",
-          paddingBottom: "15px",
-          justifyContent: "space-between",
-          paddingLeft: "20px",
-          paddingRight: "20px",
-          alignContent: "center",
-        }}
-      >
-        <Text
-          transform="uppercase"
-          style={{
-            fontSize: "13px",
-            fontFamily: "Inter",
-            fontWeight: "bold",
-            color: "#4E5D78",
-            height: "16px",
-            lineHeight: "16px",
-          }}
-        >
-          Recently Viewed
-        </Text>
-        <Text
-          component={Link}
-          to="/recently-viewed"
-          underline
-          transform="uppercase"
-          style={{
-            fontSize: "13px",
-            fontFamily: "Inter",
-            fontWeight: "normal",
-            color: "#8A94A6",
-            lineHeight: "16px",
-            height: "16px",
-          }}
-        >
-          View More
-        </Text>
-      </span>
-      <div
-        style={{
-          overflowY: "hidden",
-          width: "100%",
-          paddingBottom: "37px",
-        }}
-        className="no-scrollbar"
-      >
-        <div
-          style={{
-            display: "flex",
-            gap: "12px",
-            paddingLeft: "20px",
-            paddingRight: "20px",
-            minWidth: "min-content",
-          }}
-        >
-          {Array(4)
-            .fill(1)
-            .map((_, index) => (
-              <div style={{ position: "relative" }} key={index}>
-                <Image
-                  src="https://picsum.photos/1200"
-                  width={196}
-                  height={156}
-                  styles={{
-                    image: {
+      {snapshot && !snapshot?.empty && (
+        <>
+          <span
+            style={{
+              display: "flex",
+              paddingBottom: "15px",
+              justifyContent: "space-between",
+              paddingLeft: "20px",
+              paddingRight: "20px",
+              alignContent: "center",
+            }}
+          >
+            <Text
+              transform="uppercase"
+              style={{
+                fontSize: "13px",
+                fontFamily: "Inter",
+                fontWeight: "bold",
+                color: "#4E5D78",
+                height: "16px",
+                lineHeight: "16px",
+              }}
+            >
+              Recently Viewed
+            </Text>
+            <Text
+              component={Link}
+              to="/recently-viewed"
+              underline
+              transform="uppercase"
+              style={{
+                fontSize: "13px",
+                fontFamily: "Inter",
+                fontWeight: "normal",
+                color: "#8A94A6",
+                lineHeight: "16px",
+                height: "16px",
+              }}
+            >
+              View More
+            </Text>
+          </span>
+          <div
+            style={{
+              overflowY: "hidden",
+              width: "100%",
+              paddingBottom: "37px",
+            }}
+            className="no-scrollbar"
+          >
+            <div
+              style={{
+                display: "flex",
+                gap: "12px",
+                paddingLeft: "20px",
+                paddingRight: "20px",
+                minWidth: "min-content",
+              }}
+            >
+              {artworks.map((artwork, index) => (
+                <div style={{ position: "relative" }} key={index}>
+                  <Image
+                    src={getImageURL(artwork.image_id)}
+                    width={196}
+                    height={156}
+                    styles={{
+                      image: {
+                        borderRadius: "8px",
+                      },
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: 196,
+                      height: 156,
                       borderRadius: "8px",
-                    },
-                  }}
-                />
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: 196,
-                    height: 156,
-                    borderRadius: "8px",
-                    opacity: 0.2,
-                    backgroundColor: "#000",
-                  }}
-                />
-              </div>
-            ))}
-        </div>
-      </div>
+                      opacity: 0.2,
+                      backgroundColor: "#000",
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 };
