@@ -8,9 +8,24 @@ import {
   Transition,
 } from "@mantine/core";
 import { useWindowScroll } from "@mantine/hooks";
-import React from "react";
+import { getAuth } from "firebase/auth";
+import {
+  query,
+  collection,
+  getFirestore,
+  orderBy,
+  limit,
+} from "firebase/firestore";
+import React, { useEffect, useMemo, useState } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useCollection } from "react-firebase-hooks/firestore";
 import { useNavigate } from "react-router-dom";
+import { Artwork } from "./Artwork";
 import { BackIcon } from "./BackIcon";
+import { fetchArtwork } from "./fetchArtwork";
+import { app } from "./firebaseConfig";
+import { getArtistName } from "./getArtistName";
+import { getImageURL } from "./getImageURL";
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   ActionIcon: {
@@ -22,6 +37,36 @@ export function RecentlyViewed() {
   const nav = useNavigate();
   const { classes } = useStyles();
   const [scroll, scrollTo] = useWindowScroll();
+
+  const [user] = useAuthState(getAuth(app));
+
+  const [snapshot, loading, error] = useCollection<any>(
+    (user?.uid &&
+      query(
+        collection(getFirestore(app), `/users/${user.uid}/history`),
+        orderBy("lastAccessed", "desc"),
+        limit(10)
+      )) ||
+      undefined
+  );
+  const ids = useMemo(
+    () => snapshot?.docs.map((doc) => doc.id) || [],
+    [snapshot]
+  );
+  const [artworks, setArtworks] = useState<Artwork[]>([]);
+  useEffect(() => {
+    if (ids) {
+      Promise.allSettled(ids.map(fetchArtwork))
+        .then((e) =>
+          // filter success result, and map to their values
+          e.filter((e) => e.status === "fulfilled").map((e: any) => e.value)
+        )
+        .then(setArtworks);
+    }
+  }, [ids]);
+  const toArtworkDetail = (id: number) => () => {
+    nav(`/artwork/${id}`);
+  };
 
   return (
     <>
@@ -79,94 +124,96 @@ export function RecentlyViewed() {
           Recently Viewed
         </Text>
         <div style={{ paddingBottom: 120 }}>
-          {Array(10)
-            .fill(1)
-            .map(() => (
-              <>
+          {artworks.map((artwork) => (
+            <div key={artwork.id} onClickCapture={toArtworkDetail(artwork.id)}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  paddingTop: "25px",
+                  paddingBottom: "23px",
+                  // borderBottom: "1px solid #F1F2F4",
+                }}
+              >
                 <div
                   style={{
                     display: "flex",
+                    flexDirection: "column",
                     justifyContent: "space-between",
-                    paddingTop: "25px",
-                    paddingBottom: "23px",
-                    // borderBottom: "1px solid #F1F2F4",
+                    marginRight: 14,
                   }}
                 >
+                  <Text
+                    style={{
+                      fontSize: "13px",
+                      fontFamily: "Inter",
+                      fontWeight: "normal",
+                      color: "#00865A",
+                      minHeight: "16px",
+                      lineHeight: "16px",
+                    }}
+                    lineClamp={1}
+                  >
+                    {artwork.style_title || artwork.artwork_type_title}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: "18px",
+                      fontFamily: "SFProDisplay",
+                      fontWeight: "bold",
+                      color: "#000000",
+                      minHeight: "21px",
+                      lineHeight: "20px",
+                    }}
+                    lineClamp={2}
+                  >
+                    {artwork.title}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: "13px",
+                      fontFamily: "Inter",
+                      fontWeight: "normal",
+                      color: "#8A94A6",
+                      minHeight: "16px",
+                      lineHeight: "16px",
+                    }}
+                    lineClamp={1}
+                  >
+                    {getArtistName(artwork.artist_display)}
+                  </Text>
+                </div>
+                <div style={{ position: "relative" }}>
+                  <Image
+                    width={97}
+                    height={93}
+                    src={getImageURL(artwork.image_id)}
+                    radius={8}
+                  />
                   <div
                     style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: 97,
+                      height: 93,
+                      borderRadius: "8px",
+                      opacity: 0.2,
+                      backgroundColor: "#000",
                     }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: "13px",
-                        fontFamily: "Inter",
-                        fontWeight: "normal",
-                        color: "#00865A",
-                        minHeight: "16px",
-                        lineHeight: "16px",
-                      }}
-                    >
-                      modern and contemporary art
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: "18px",
-                        fontFamily: "SFProDisplay",
-                        fontWeight: "bold",
-                        color: "#000000",
-                        minHeight: "21px",
-                        lineHeight: "20px",
-                      }}
-                    >
-                      Untitled (Painting)
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: "13px",
-                        fontFamily: "Inter",
-                        fontWeight: "normal",
-                        color: "#8A94A6",
-                        minHeight: "16px",
-                        lineHeight: "16px",
-                      }}
-                    >
-                      Mark Rothko (Marcus Rothkowitz)
-                    </Text>
-                  </div>
-                  <div style={{ position: "relative" }}>
-                    <Image
-                      width={97}
-                      height={93}
-                      src="https://picsum.photos/1200"
-                      radius={8}
-                    />
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        width: 97,
-                        height: 93,
-                        borderRadius: "8px",
-                        opacity: 0.2,
-                        backgroundColor: "#000",
-                      }}
-                    />
-                  </div>
+                  />
                 </div>
-                <hr
-                  style={{
-                    margin: 0,
-                    border: "none",
-                    height: "1px",
-                    backgroundColor: "#F1F2F4",
-                  }}
-                />
-              </>
-            ))}
+              </div>
+              <hr
+                style={{
+                  margin: 0,
+                  border: "none",
+                  height: "1px",
+                  backgroundColor: "#F1F2F4",
+                }}
+              />
+            </div>
+          ))}
         </div>
       </Container>
     </>
