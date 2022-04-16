@@ -195,12 +195,14 @@ export function AboutArtist() {
               color: "#283A5B",
               paddingBottom: 120,
             }}
-          sx={{
-            "& p > a":{
-              color: "#283A5B !important",
-            }
-          }}
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(artistResult.description) }}
+            sx={{
+              "& p > a": {
+                color: "#283A5B !important",
+              },
+            }}
+            dangerouslySetInnerHTML={{
+              __html: sanitizeHtml(artistResult.description),
+            }}
           >
             {/* {artistResult && artistResult.description} */}
           </Text>
@@ -250,7 +252,7 @@ const NoInformationIcon = ({ ...props }) => (
       id="No_Content_Icon"
       d="M17.833,2A14.112,14.112,0,0,0,4,16.375v86.25A14.112,14.112,0,0,0,17.833,117H73.167A14.112,14.112,0,0,0,87,102.625V40.913a14.664,14.664,0,0,0-4.051-10.161L59.333,6.212A13.574,13.574,0,0,0,49.553,2ZM24.75,59.5a7.193,7.193,0,0,0,0,14.375h41.5a7.193,7.193,0,0,0,0-14.375Z"
       transform="translate(-4 -2)"
-      fill-rule="evenodd"
+      fillRule="evenodd"
     />
   </svg>
 );

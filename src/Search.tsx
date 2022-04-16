@@ -299,7 +299,7 @@ export function Search() {
                   "leisure",
                   "modern and contemporary art",
                 ].map((value, i) => (
-                  <TagButton popular={i === 0} to="/search-result">
+                  <TagButton popular={i === 0} to={`/search-result?term=${value}`} key={i}>
                     {value}
                   </TagButton>
                 ))}
