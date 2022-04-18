@@ -137,6 +137,11 @@ export function ArtworkDetail() {
         likedArtworks: string[];
       }>)
   );
+  const [artworkData, artworkDataLoading] = useDocumentData(
+    doc(getFirestore(app), `/artworks/${id}`) as DocumentReference<{
+      arURL: string;
+    }>
+  );
 
   const [show, setShow] = useState(false);
   const copyToClipboard = () => {
@@ -500,34 +505,40 @@ export function ArtworkDetail() {
           </div>
         </div>
       </BottomSheet>
-      <Affix position={{ bottom: 30, right: 22 }} zIndex={2}>
-        <ActionIcon
-          className={classes.ActionIcon}
-          radius={9999}
-          size={70}
-          style={{
-            backgroundColor: "#111112",
-          }}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="22.239"
-            height="24.342"
-            viewBox="0 0 22.239 24.342"
+      {!artworkDataLoading && artworkData && (
+        <Affix position={{ bottom: 30, right: 22 }} zIndex={2}>
+          <ActionIcon
+            className={classes.ActionIcon}
+            radius={9999}
+            size={70}
+            style={{
+              backgroundColor: "#111112",
+            }}
+            id="view in 3d"
+            component="a"
+            target="_blank"
+            href={artworkData.arURL}
           >
-            <path
-              id="AR_Icon"
-              d="M16.222,11.556l-2.444,1.222m0,0-2.444-1.222m2.444,1.222v3.056m9.778-7.944L21.111,9.111m2.444-1.222L21.111,6.667m2.444,1.222v3.056M16.222,4.222,13.778,3,11.333,4.222M4,7.889,6.444,6.667M4,7.889,6.444,9.111M4,7.889v3.056M13.778,25l-2.444-1.222M13.778,25l2.444-1.222M13.778,25V21.944m-7.333-.611L4,20.111V17.056m17.111,4.278,2.444-1.222V17.056"
-              transform="translate(-2.658 -2)"
-              fill="none"
-              stroke="#fff"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-            />
-          </svg>
-        </ActionIcon>
-      </Affix>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="22.239"
+              height="24.342"
+              viewBox="0 0 22.239 24.342"
+            >
+              <path
+                id="AR_Icon"
+                d="M16.222,11.556l-2.444,1.222m0,0-2.444-1.222m2.444,1.222v3.056m9.778-7.944L21.111,9.111m2.444-1.222L21.111,6.667m2.444,1.222v3.056M16.222,4.222,13.778,3,11.333,4.222M4,7.889,6.444,6.667M4,7.889,6.444,9.111M4,7.889v3.056M13.778,25l-2.444-1.222M13.778,25l2.444-1.222M13.778,25V21.944m-7.333-.611L4,20.111V17.056m17.111,4.278,2.444-1.222V17.056"
+                transform="translate(-2.658 -2)"
+                fill="none"
+                stroke="#fff"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+              />
+            </svg>
+          </ActionIcon>
+        </Affix>
+      )}
       {!loading && result && (
         <>
           <div
