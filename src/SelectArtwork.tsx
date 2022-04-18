@@ -216,7 +216,7 @@ export function SelectArtwork() {
   );
 }
 type ArtworkCheckBox = CheckboxProps & React.RefAttributes<HTMLInputElement>;
-const ArtworkCheckBox = forwardRef<HTMLImageElement>(
+const ArtworkCheckBox = forwardRef<HTMLImageElement, ArtworkCheckBox>(
   ({ src, alt, ...props }: ArtworkCheckBox, _ref) => {
     const ref = React.useRef<any>();
     return (
