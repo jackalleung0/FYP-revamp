@@ -48,6 +48,7 @@ export function DiscoverCard(props: any): JSX.Element {
           lineHeight: "16px",
           color: "#00865A",
         }}
+        lineClamp={1}
       >
         {tag}
       </Text>
@@ -64,6 +65,7 @@ export function DiscoverCard(props: any): JSX.Element {
         {title}
       </Text>
       <Text
+        lineClamp={1}
         style={{
           paddingTop: "9px",
           fontSize: "13px",
