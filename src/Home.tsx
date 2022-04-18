@@ -185,14 +185,15 @@ const LatestArtwork = ({ onLoadChange }: any) => {
   const artworkDate = useMemo(() => {
     if (!result) return {};
     return result.reduce((acc, cur) => {
+      const key = dayjs(cur.last_updated).format("D MMM")
       // push cur to existing arr if key exists
-      if (acc[cur.last_updated]) {
-        acc[cur.last_updated].push(cur);
+      if (acc[key]) {
+        acc[key].push(cur);
         return acc;
 
         // create new key if not exists
       } else {
-        acc[cur.last_updated] = [cur];
+        acc[key] = [cur];
         return acc;
       }
     }, {} as { [key: string]: Artwork[] });
@@ -252,7 +253,7 @@ const LatestArtwork = ({ onLoadChange }: any) => {
               }}
             >
               {/* 19 MAR */}
-              {dayjs(key).format("D MMM")}
+              {key}
             </Text>
             <div>
               {artworkDate[key].map((artwork, index) => (
