@@ -185,7 +185,7 @@ const LatestArtwork = ({ onLoadChange }: any) => {
   const artworkDate = useMemo(() => {
     if (!result) return {};
     return result.reduce((acc, cur) => {
-      const key = dayjs(cur.last_updated).format("D MMM")
+      const key = dayjs(cur.last_updated).format("D MMM");
       // push cur to existing arr if key exists
       if (acc[key]) {
         acc[key].push(cur);
@@ -798,11 +798,22 @@ const TrendingTags = () => (
           minWidth: "min-content",
         }}
       >
-        <TagButton to="/search-result" popular>
-          oil in canvas
-        </TagButton>
-        {["painting", "women", "painting", "women"].map((e, index) => (
-          <TagButton to={`/search-result?term=${e}`} key={index}>
+        {[
+          "oil in canvas",
+          "painting",
+          "women",
+          "Post-Impressionism",
+          "domestic scenes",
+          "interiors",
+          "abstract figure",
+          "leisure",
+          "modern and contemporary art",
+        ].map((e, index) => (
+          <TagButton
+            to={`/search-result?term=${e}`}
+            key={index}
+            popular={index === 0}
+          >
             {e}
           </TagButton>
         ))}
