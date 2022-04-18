@@ -6,10 +6,11 @@ import {
   createStyles,
   Affix,
   Transition,
+  LoadingOverlay,
 } from "@mantine/core";
 import { useWindowScroll } from "@mantine/hooks";
 import axios from "axios";
-import React from "react";
+import React, { forwardRef, useMemo } from "react";
 import { useAsync } from "react-async-hook";
 import {
   useLocation,
@@ -21,6 +22,7 @@ import { BackIcon } from "./BackIcon";
 import { getArtistName } from "./getArtistName";
 import { getImageURL } from "./getImageURL";
 import { searchArtworkBySearchTerm } from "./searchArtworkBySearchTerm";
+import { useRefCallback } from "./useRefCallback";
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   ActionIcon: {
@@ -49,8 +51,17 @@ export function SearchByTag() {
     searchParams.get("term") || "",
   ]);
   console.log(result);
+
+  const [ref, loaded] = useRefCallback();
+
   return (
     <div>
+      <LoadingOverlay
+        visible={!loaded}
+        overlayOpacity={1}
+        overlayColor="#FFF"
+        loaderProps={{ color: "#111112" }}
+      />
       {result && result.length > 0 && (
         <Affix position={{ bottom: 30, right: 22 }}>
           <Transition mounted={true} transition="slide-left" duration={300}>
@@ -119,6 +130,7 @@ export function SearchByTag() {
                     key={index}
                     {...{ title, id }}
                     artist={getArtistName(artist_display)}
+                    ref={(el: HTMLImageElement) => ref(el, index)}
                   />
                 )
               )}
@@ -152,7 +164,10 @@ export function SearchByTag() {
     </div>
   );
 }
-const MasImage = ({ src, title, id, artist }: any) => {
+const MasImage = forwardRef<
+  HTMLImageElement,
+  { artist: string; title: string; src: string }
+>(({ src, title, id, artist }: any, ref) => {
   const nav = useNavigate();
   return (
     <div
@@ -162,7 +177,7 @@ const MasImage = ({ src, title, id, artist }: any) => {
       }}
       onClickCapture={() => nav(`/artwork/${id}`)}
     >
-      <Image radius={12} src={src} />
+      <Image radius={12} src={src} imageRef={ref} />
       <Text
         style={{
           paddingTop: 11,
@@ -189,4 +204,4 @@ const MasImage = ({ src, title, id, artist }: any) => {
       </Text>
     </div>
   );
-};
+});
