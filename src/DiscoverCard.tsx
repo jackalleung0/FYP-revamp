@@ -1,5 +1,5 @@
 import { Text, Image } from "@mantine/core";
-import React from "react";
+import React, { forwardRef } from "react";
 import { getImageURL } from "./getImageURL";
 
 const defaultValue = {
@@ -9,12 +9,16 @@ const defaultValue = {
   src: "https://picsum.photos/1200",
 };
 
-export function DiscoverCard(props: any): JSX.Element {
-  // @ts-expect-error 2525
-  const { title, tag, author, src, onClickCapture } = {
-    ...defaultValue,
-    ...props,
-  };
+export const DiscoverCard = forwardRef<
+  HTMLImageElement,
+  {
+    title: string;
+    tag: string;
+    author: string;
+    src: string;
+    onClickCapture: () => void;
+  }
+>(({ title, tag, author, src, onClickCapture }, ref) => {
   return (
     <div style={{ position: "relative" }} onClickCapture={onClickCapture}>
       <Image
@@ -26,6 +30,7 @@ export function DiscoverCard(props: any): JSX.Element {
             borderRadius: "8px",
           },
         }}
+        imageRef={ref}
       />
       <div
         style={{
@@ -79,4 +84,4 @@ export function DiscoverCard(props: any): JSX.Element {
       </Text>
     </div>
   );
-}
+});

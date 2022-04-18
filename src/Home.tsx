@@ -11,12 +11,19 @@ import {
   UnstyledButton,
   LoadingOverlay,
 } from "@mantine/core";
-import React, { useEffect, useMemo, useState } from "react";
+import React, {
+  createRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { ArrowUpIcon, HeartIcon } from "@heroicons/react/outline";
 import { RecommendedCard } from "./components/RecommendedCard";
 import { Link, useNavigate } from "react-router-dom";
 import { TagButton } from "./TagButton";
-import { useWindowScroll } from "@mantine/hooks";
+import { useSetState, useWindowScroll } from "@mantine/hooks";
 import { DiscoverCard } from "./DiscoverCard";
 import * as dayjs from "dayjs";
 const useStyles = createStyles((theme, _params, getRef) => ({
@@ -52,6 +59,7 @@ import { getArtistName } from "./getArtistName";
 import { useAsync } from "react-async-hook";
 import { fetchArtwork } from "./fetchArtwork";
 import { Artwork } from "./Artwork";
+import { useOnLoadImages } from "./hooks/useOnLoadImages";
 export function Home() {
   const { classes } = useStyles();
   const nav = useNavigate();
@@ -61,8 +69,30 @@ export function Home() {
     await signOut(auth);
     nav("/", { replace: true });
   };
+
+  const setDoneLoading = (key: string) => () =>
+    _setDoneLoading({ [key]: true });
+  const [doneLoading, _setDoneLoading] = useSetState({
+    // TrendingTags: false,
+    RecommendedForYou: false,
+    NewDiscover: false,
+    RecentlyViewed: false,
+    LatestArtwork: false,
+  });
+  console.log(doneLoading);
+  const allDoneLoading = useMemo(
+    () => Object.values(doneLoading).every((entry) => entry === true),
+    [doneLoading]
+  );
+
   return (
     <div>
+      <LoadingOverlay
+        visible={!allDoneLoading}
+        overlayOpacity={1}
+        overlayColor="#FFF"
+        loaderProps={{ color: "#111112" }}
+      />
       <Affix position={{ bottom: 30, right: 22 }} id="searchbutton">
         <Transition mounted={true} transition="slide-left" duration={300}>
           {(transitionStyles) => (
@@ -140,14 +170,14 @@ export function Home() {
         </Text>
       </Container>
       <TrendingTags />
-      <RecommendedForYou />
-      <NewDiscover />
-      <RecentlyViewed />
-      <LatestArtwork />
+      <RecommendedForYou onLoadChange={setDoneLoading("RecommendedForYou")} />
+      <NewDiscover onLoadChange={setDoneLoading("NewDiscover")} />
+      <RecentlyViewed onLoadChange={setDoneLoading("RecentlyViewed")} />
+      <LatestArtwork onLoadChange={setDoneLoading("LatestArtwork")} />
     </div>
   );
 }
-const LatestArtwork = () => {
+const LatestArtwork = ({ onLoadChange }: any) => {
   const { result, loading } = useAsync(getLatestImage, []);
 
   // group by date,
@@ -172,7 +202,15 @@ const LatestArtwork = () => {
   const toArtwork = (id: any) => () => {
     nav(`/artwork/${id}`);
   };
-  console.log(artworkDate);
+
+  const [setRef, loaded] = useRefCallback();
+  console.log(loaded);
+  useEffect(() => {
+    if (loaded && !loading) {
+      onLoadChange();
+    }
+  }, [loaded, loading]);
+
   return (
     <>
       <Container
@@ -217,7 +255,7 @@ const LatestArtwork = () => {
               {dayjs(key).format("D MMM")}
             </Text>
             <div>
-              {artworkDate[key].map((artwork) => (
+              {artworkDate[key].map((artwork, index) => (
                 <div key={artwork.id} onClick={toArtwork(artwork.id)}>
                   <div
                     style={{
@@ -267,6 +305,7 @@ const LatestArtwork = () => {
                         root: { paddingBottom: "24px" },
                       }}
                       src={getImageURL(artwork.image_id)}
+                      imageRef={(el: HTMLImageElement) => setRef(el, index)}
                     />
                     <div
                       style={{
@@ -295,12 +334,20 @@ const getLatestImage = async () => {
   return (await instance.get<{ data: Artwork[] }>(`/artworks`)).data.data;
 };
 
-const NewDiscover = () => {
+const NewDiscover = ({ onLoadChange }: any) => {
   // currently, get the latest image from api
   const { result, loading } = useAsync(getLatestImage, []);
 
   const nav = useNavigate();
-  const toArtwork = (id) => () => nav(`/artwork/${id}`);
+  const toArtwork = (id: any) => () => nav(`/artwork/${id}`);
+
+  const [setRef, loaded] = useRefCallback();
+  console.log(loaded);
+  useEffect(() => {
+    if (loaded && !loading) {
+      onLoadChange();
+    }
+  }, [loaded, loading]);
 
   return (
     <>
@@ -346,6 +393,7 @@ const NewDiscover = () => {
                 src={getImageURL(artwork.image_id)}
                 tag={artwork.style_title || artwork.artwork_type_title}
                 onClickCapture={toArtwork(artwork.id)}
+                ref={(el: HTMLImageElement) => setRef(el, index)}
               />
             ))}
         </div>
@@ -353,8 +401,8 @@ const NewDiscover = () => {
     </>
   );
 };
-const RecentlyViewed = () => {
-  const [user] = useAuthState(getAuth(app));
+const RecentlyViewed = ({ onLoadChange }: any) => {
+  const [user, authLoading] = useAuthState(getAuth(app));
 
   const [snapshot, loading, error] = useCollection<any>(
     (user?.uid &&
@@ -386,6 +434,14 @@ const RecentlyViewed = () => {
   const toArtwork = (id: any) => () => {
     nav(`/artwork/${id}`);
   };
+
+  const [setRef, loaded] = useRefCallback();
+  console.log(loaded);
+  useEffect(() => {
+    if (loaded && !authLoading && !loading) {
+      onLoadChange();
+    }
+  }, [loaded, authLoading, loading]);
 
   return (
     <>
@@ -463,6 +519,7 @@ const RecentlyViewed = () => {
                         borderRadius: "8px",
                       },
                     }}
+                    imageRef={(el: HTMLImageElement) => setRef(el, index)}
                   />
                   <div
                     style={{
@@ -574,7 +631,39 @@ const getRecommendArtworks = async (values: any) => {
   // });
 };
 
-const RecommendedForYou = () => {
+const useRefCallback: () => [
+  (node: HTMLImageElement, index: number) => void,
+  boolean
+] = () => {
+  const imagesRef = useRef<HTMLImageElement[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const updateStatus = (images: HTMLImageElement[]) => {
+    setLoaded(
+      images
+        .filter(Boolean)
+        .map((image) => image.complete)
+        .every((item) => item === true)
+    );
+  };
+  const setRef = useCallback((node: HTMLImageElement, index: number) => {
+    if (node) {
+      // Check if a node is actually passed. Otherwise node would be null.
+      // You can now do what you need to, addEventListeners, measure, etc.
+      node.addEventListener("load", () => updateStatus(imagesRef.current), {
+        once: true,
+      });
+      node.addEventListener("error", () => updateStatus(imagesRef.current), {
+        once: true,
+      });
+    }
+
+    // Save a reference to the node
+    imagesRef.current[index] = node;
+  }, []);
+  return [setRef, loaded];
+};
+
+const RecommendedForYou = ({ onLoadChange }: any) => {
   const auth = getAuth(app);
   const [user] = useAuthState(auth);
 
@@ -600,9 +689,13 @@ const RecommendedForYou = () => {
   );
   const { result, loading } = useAsync(getRecommendArtworks, [values]);
 
-  // useEffect(() => {
-  //   if (!values) return;
-  // }, [values]);
+  const [setRef, loaded] = useRefCallback();
+  console.log(loaded);
+  useEffect(() => {
+    if (loaded && !userDocLoading && !loading) {
+      onLoadChange();
+    }
+  }, [loaded, userDocLoading, loading]);
 
   return (
     <>
@@ -643,10 +736,15 @@ const RecommendedForYou = () => {
             }}
           >
             {result &&
-              result.map(({ id, ...props }) => (
-                <RecommendedCard key={id} {...props} id={id} />
+              result.map(({ id, ...props }, index) => (
+                <RecommendedCard
+                  key={id}
+                  {...props}
+                  id={id}
+                  ref={(el: HTMLImageElement) => setRef(el, index)}
+                />
               ))}
-            {loading && (
+            {/* {loading && (
               <div style={{ height: 385, width: "100%", position: "relative" }}>
                 <LoadingOverlay
                   zIndex={2}
@@ -656,7 +754,7 @@ const RecommendedForYou = () => {
                   overlayColor="#c5c5c5"
                 />
               </div>
-            )}
+            )} */}
           </div>
         </div>
       )}
