@@ -11,12 +11,7 @@ import {
   UnstyledButton,
   LoadingOverlay,
 } from "@mantine/core";
-import React, {
-  createRef,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { createRef, useEffect, useMemo, useState } from "react";
 import { ArrowUpIcon, HeartIcon } from "@heroicons/react/outline";
 import { RecommendedCard } from "./components/RecommendedCard";
 import { Link, useNavigate } from "react-router-dom";
@@ -438,10 +433,10 @@ const RecentlyViewed = ({ onLoadChange }: any) => {
   const [setRef, loaded] = useRefCallback();
   console.log(loaded);
   useEffect(() => {
-    if (loaded && !authLoading && !loading) {
+    if ((loaded || ids.length === 0) && !authLoading && !loading) {
       onLoadChange();
     }
-  }, [loaded, authLoading, loading]);
+  }, [loaded, authLoading, loading, ids]);
 
   return (
     <>
