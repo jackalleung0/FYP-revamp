@@ -4,12 +4,13 @@ import {
   Container,
   createStyles,
   Image,
+  LoadingOverlay,
   Text,
   Title,
 } from "@mantine/core";
 import axios from "axios";
 import { doc, getFirestore } from "firebase/firestore";
-import React from "react";
+import React, { useMemo } from "react";
 import { useAsync } from "react-async-hook";
 import {
   useDocumentDataOnce,
@@ -21,6 +22,7 @@ import { BackIcon } from "./BackIcon";
 import { app } from "./firebaseConfig";
 import { getImageURL } from "./getImageURL";
 import { ShareIcon } from "./ShareIcon";
+import { useRefCallback } from "./useRefCallback";
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   ActionIcon: {
@@ -153,7 +155,6 @@ const titlePadd = 20;
 const hrmarg = 32;
 export function AboutArtwork() {
   let { id } = useParams<{ id: string }>();
-  console.log(id);
   const { classes } = useStyles();
   const nav = useNavigate();
   const { result, loading } = useAsync(getArtworkDetails, [id || ""]);
@@ -161,8 +162,22 @@ export function AboutArtwork() {
     useDocumentDataOnce(
       (id && doc(getFirestore(app), `/artworks/${id}`)) || undefined
     );
+
+  const [ref, loaded] = useRefCallback();
+
+  const allDoneLoading = useMemo(
+    () => !loading && !_loading && loaded,
+    [loading, _loading, loaded]
+  );
+
   return (
     <div>
+      <LoadingOverlay
+        visible={!allDoneLoading}
+        overlayOpacity={1}
+        overlayColor="#FFF"
+        loaderProps={{ color: "#111112" }}
+      ></LoadingOverlay>
       <div
         style={{
           position: "sticky",
@@ -196,6 +211,7 @@ export function AboutArtwork() {
           className={classes.Image}
           style={{ margin: "36px 40px" }}
           src={result && getImageURL(result.image_id)}
+          imageRef={(el) => ref(el as any, 0)}
         />
       </Center>
       <Container
