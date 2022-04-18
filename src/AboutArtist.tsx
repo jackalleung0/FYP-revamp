@@ -6,6 +6,7 @@ import {
   Title,
   Text,
   Affix,
+  LoadingOverlay,
 } from "@mantine/core";
 import axios from "axios";
 import React, { useState } from "react";
@@ -94,14 +95,23 @@ export function AboutArtist() {
   const nav = useNavigate();
   // const [haveInformation, setHaveInformation] = useState(true);
   let { id } = useParams<{ id: string }>();
-  const { result } = useAsync(getArtworkDetails, [id || ""]);
-  const { result: artistResult } = useAsync(getArtistsInfo, [
-    (result?.artist_id && String(result?.artist_id)) || "",
+  const { result, loading: detailsLoading } = useAsync(getArtworkDetails, [
+    id || "",
   ]);
+  const { result: artistResult, loading: artistsLoading } = useAsync(
+    getArtistsInfo,
+    [(result?.artist_id && String(result?.artist_id)) || ""]
+  );
   console.log(artistResult);
   // console.log(result);
   return (
     <div>
+      <LoadingOverlay
+        visible={detailsLoading || artistsLoading}
+        overlayOpacity={1}
+        overlayColor="#FFF"
+        loaderProps={{ color: "#111112" }}
+      />
       <div
         style={{
           position: "sticky",
