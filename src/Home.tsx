@@ -18,7 +18,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { TagButton } from "./TagButton";
 import { useSetState, useWindowScroll } from "@mantine/hooks";
 import { DiscoverCard } from "./DiscoverCard";
-import * as dayjs from "dayjs";
+import dayjs from "dayjs";
 const useStyles = createStyles((theme, _params, getRef) => ({
   userAvatar: {
     boxShadow: theme.shadows.xl,
