@@ -65,6 +65,7 @@ export const RecommendedCard = forwardRef<HTMLImageElement>(
                 lineHeight: "28px",
                 color: "#FFF",
               }}
+              lineClamp={2}
             >
               {title}
             </Text>
