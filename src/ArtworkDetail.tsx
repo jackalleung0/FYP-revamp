@@ -28,7 +28,7 @@ import React, { useState } from "react";
 import { useAsync } from "react-async-hook";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useDocumentData } from "react-firebase-hooks/firestore";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { BottomSheet } from "react-spring-bottom-sheet";
 import StarRatingComponent from "react-star-rating-component";
 import { BackIcon } from "./BackIcon";
@@ -109,6 +109,18 @@ export function ArtworkDetail() {
   );
   const auth = getAuth(app);
   const [user] = useAuthState(auth);
+
+  const location = useLocation();
+  React.useEffect(() => {
+    // update user's history when visit this page
+    // "/artwork/27992";
+    console.log(location);
+    if (!user) return;
+    setDoc(doc(getFirestore(app), `/users/${user.uid}/history/${id}`), {
+      lastAccessed: new Date(),
+    });
+    console.log("updated history")
+  }, [location, user]);
 
   const [values, userDocLoading, __, snapshot] = useDocumentData(
     user &&
