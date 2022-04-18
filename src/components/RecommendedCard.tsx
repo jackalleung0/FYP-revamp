@@ -103,11 +103,12 @@ export const RecommendedCard = forwardRef<HTMLImageElement>(
               fontSize: "14px",
               lineHeight: "24px",
             }}
+            lineClamp={1}
           >
             {artist}
           </Text>
           <svg
-            style={{ marginRight: "21px" }}
+            style={{ marginRight: "21px", flexShrink: 0 }}
             xmlns="http://www.w3.org/2000/svg"
             width="17"
             height="15"
