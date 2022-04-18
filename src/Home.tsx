@@ -604,7 +604,7 @@ const getRecommendArtworks = async (values: any) => {
         "title",
         "timestamp",
       ],
-      limit: 31,
+      limit: 15,
     })
     .then(({ data }) => data.data)
     .then((recommendedArtworks) => {
