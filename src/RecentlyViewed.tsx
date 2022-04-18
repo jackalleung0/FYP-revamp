@@ -6,6 +6,7 @@ import {
   createStyles,
   Affix,
   Transition,
+  LoadingOverlay,
 } from "@mantine/core";
 import { useWindowScroll } from "@mantine/hooks";
 import { getAuth } from "firebase/auth";
@@ -26,6 +27,7 @@ import { fetchArtwork } from "./fetchArtwork";
 import { app } from "./firebaseConfig";
 import { getArtistName } from "./getArtistName";
 import { getImageURL } from "./getImageURL";
+import { useRefCallback } from "./useRefCallback";
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   ActionIcon: {
@@ -38,7 +40,7 @@ export function RecentlyViewed() {
   const { classes } = useStyles();
   const [scroll, scrollTo] = useWindowScroll();
 
-  const [user] = useAuthState(getAuth(app));
+  const [user, authLoading] = useAuthState(getAuth(app));
 
   const [snapshot, loading, error] = useCollection<any>(
     (user?.uid &&
@@ -68,6 +70,13 @@ export function RecentlyViewed() {
     nav(`/artwork/${id}`);
   };
 
+  const [ref, loaded] = useRefCallback();
+
+  const allDoneLoading = useMemo(
+    () => !loading && !authLoading && loaded,
+    [loading, authLoading, loaded]
+  );
+
   return (
     <>
       <Container
@@ -78,6 +87,13 @@ export function RecentlyViewed() {
           position: "relative",
         }}
       >
+        <LoadingOverlay
+          style={{ height: "100vh" }}
+          visible={!allDoneLoading}
+          overlayOpacity={1}
+          overlayColor="#FFF"
+          loaderProps={{ color: "#111112" }}
+        />
         <Affix position={{ bottom: 30, right: 22 }}>
           <Transition mounted={true} transition="slide-left" duration={300}>
             {(transitionStyles) => (
@@ -124,7 +140,7 @@ export function RecentlyViewed() {
           Recently Viewed
         </Text>
         <div style={{ paddingBottom: 120 }}>
-          {artworks.map((artwork) => (
+          {artworks.map((artwork, index) => (
             <div key={artwork.id} onClickCapture={toArtworkDetail(artwork.id)}>
               <div
                 style={{
@@ -189,6 +205,7 @@ export function RecentlyViewed() {
                     height={93}
                     src={getImageURL(artwork.image_id)}
                     radius={8}
+                    imageRef={(el) => ref(el as any, index)}
                   />
                   <div
                     style={{
