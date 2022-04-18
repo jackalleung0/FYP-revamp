@@ -82,6 +82,7 @@ export function Home() {
   return (
     <div>
       <LoadingOverlay
+        style={{ height: "100vh", width: "100%", position: "fixed", top: 0 }}
         visible={!allDoneLoading}
         overlayOpacity={1}
         overlayColor="#FFF"
