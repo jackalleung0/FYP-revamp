@@ -18,6 +18,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { TagButton } from "./TagButton";
 import { useWindowScroll } from "@mantine/hooks";
 import { DiscoverCard } from "./DiscoverCard";
+import * as dayjs from "dayjs";
 const useStyles = createStyles((theme, _params, getRef) => ({
   userAvatar: {
     boxShadow: theme.shadows.xl,
@@ -147,6 +148,28 @@ export function Home() {
   );
 }
 const LatestArtwork = () => {
+  const { result, loading } = useAsync(getLatestImage, []);
+
+  // group by date,
+
+  const artworkDate = useMemo(() => {
+    if (!result) return {};
+    return result.reduce((acc, cur) => {
+      // push cur to existing arr if key exists
+      if (acc[cur.last_updated]) {
+        acc[cur.last_updated].push(cur);
+        return acc;
+
+        // create new key if not exists
+      } else {
+        acc[cur.last_updated] = [cur];
+        return acc;
+      }
+    }, {} as { [key: string]: Artwork[] });
+  }, [result]);
+
+  console.log(result);
+
   return (
     <>
       <Container
@@ -171,91 +194,94 @@ const LatestArtwork = () => {
           Latest Artwork
         </Text>
         {/* TODO: fix when there are >1 days */}
-        <div style={{ display: "flex" }}>
-          <Text
-            align="center"
-            style={{
-              fontSize: "15px",
-              fontFamily: "Inter",
-              fontWeight: "normal",
-              color: "#000000",
-              lineHeight: "18px",
+        {Object.keys(artworkDate).map((key) => (
+          <div style={{ display: "flex" }} key={key}>
+            <Text
+              align="center"
+              style={{
+                fontSize: "15px",
+                fontFamily: "Inter",
+                fontWeight: "normal",
+                color: "#000000",
+                lineHeight: "18px",
 
-              marginTop: "3px",
-              width: "34px",
-              height: "37px",
-              paddingRight: "12px",
-            }}
-          >
-            19 MAR
-          </Text>
-          <div>
-            {["Nude under a Pine Tree", "Apples"].map((title) => (
-              <div key={title}>
-                <div
-                  style={{
-                    paddingLeft: "14px",
-                    marginBottom: "16px",
-
-                    borderLeft: "1px solid #8A94A6",
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: "18px",
-                      fontFamily: "SFProDisplay",
-                      fontWeight: "bold",
-                      color: "#000000",
-                      height: "21px",
-                      lineHeight: "20px",
-
-                      paddingBottom: "4px",
-                    }}
-                  >
-                    {title}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: "14px",
-                      fontFamily: "Inter",
-                      fontWeight: "100",
-                      color: "#8A94A6",
-                      height: "18px",
-                      lineHeight: "18px",
-                    }}
-                  >
-                    2022-03-19 12:08
-                  </Text>
-                </div>
-                <div style={{ position: "relative" }}>
-                  <Image
-                    width={289}
-                    height={210}
-                    styles={{
-                      image: {
-                        borderRadius: "8px",
-                      },
-                      root: { paddingBottom: "24px" },
-                    }}
-                    src="https://picsum.photos/1200"
-                  />
+                marginTop: "3px",
+                width: "34px",
+                height: "37px",
+                paddingRight: "12px",
+              }}
+            >
+              {/* 19 MAR */}
+              {dayjs(key).format("D MMM")}
+            </Text>
+            <div>
+              {artworkDate[key].map((artwork) => (
+                <div key={artwork.id}>
                   <div
                     style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: 289,
-                      height: 210,
-                      borderRadius: "8px",
-                      opacity: 0.2,
-                      backgroundColor: "#000",
+                      paddingLeft: "14px",
+                      marginBottom: "16px",
+
+                      borderLeft: "1px solid #8A94A6",
                     }}
-                  />
+                  >
+                    <Text
+                      style={{
+                        fontSize: "18px",
+                        fontFamily: "SFProDisplay",
+                        fontWeight: "bold",
+                        color: "#000000",
+                        height: "21px",
+                        lineHeight: "20px",
+
+                        paddingBottom: "4px",
+                      }}
+                    >
+                      {artwork.title}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: "14px",
+                        fontFamily: "Inter",
+                        fontWeight: "100",
+                        color: "#8A94A6",
+                        height: "18px",
+                        lineHeight: "18px",
+                      }}
+                    >
+                      2022-03-19 12:08
+                    </Text>
+                  </div>
+                  <div style={{ position: "relative" }}>
+                    <Image
+                      width={289}
+                      height={210}
+                      styles={{
+                        image: {
+                          borderRadius: "8px",
+                        },
+                        root: { paddingBottom: "24px" },
+                      }}
+                      src="https://picsum.photos/1200"
+                    />
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: 289,
+                        height: 210,
+                        borderRadius: "8px",
+                        opacity: 0.2,
+                        backgroundColor: "#000",
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        ))}
       </Container>
     </>
   );
@@ -268,8 +294,6 @@ const getLatestImage = async () => {
 const NewDiscover = () => {
   // currently, get the latest image from api
   const { result, loading } = useAsync(getLatestImage, []);
-
-  console.log(result);
 
   return (
     <>
