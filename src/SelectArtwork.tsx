@@ -19,7 +19,7 @@ import {
   getFirestore,
   setDoc,
 } from "firebase/firestore";
-import React, { useEffect } from "react";
+import React, { forwardRef, useEffect, useMemo } from "react";
 import { useAsync } from "react-async-hook";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useDocumentDataOnce } from "react-firebase-hooks/firestore";
@@ -28,6 +28,7 @@ import { BackIcon } from "./BackIcon";
 import { app } from "./firebaseConfig";
 import { useOnLoadImages } from "./hooks/useOnLoadImages";
 import { UserProfile } from "./types";
+import { useRefCallback } from "./useRefCallback";
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   ActionIcon: {
@@ -72,6 +73,10 @@ export function SelectArtwork() {
 
   const auth = getAuth(app);
   const [user] = useAuthState(auth);
+
+  const [setRef, loaded] = useRefCallback();
+
+  const isAllLoaded = useMemo(() => loaded && !loading, [loaded, loading]);
 
   const [value, docLoading, error, snapshot, reload] =
     useDocumentDataOnce<UserProfile>(
@@ -195,13 +200,15 @@ export function SelectArtwork() {
                 onClick={toggleArtwork(String(id))}
                 onChange={() => {}}
                 checked={selectedArtwork.includes(String(id))}
+                ref={(el: HTMLImageElement) => setRef(el, index)}
               />
             ))}
         </SimpleGrid>
       </div>
       <LoadingOverlay
-        visible={!imagesLoaded}
-        overlayOpacity={0.6}
+        style={{ height: "100vh" }}
+        visible={!isAllLoaded}
+        overlayOpacity={1}
         overlayColor="#FFF"
         loaderProps={{ color: "#111112" }}
       />
@@ -209,89 +216,92 @@ export function SelectArtwork() {
   );
 }
 type ArtworkCheckBox = CheckboxProps & React.RefAttributes<HTMLInputElement>;
-function ArtworkCheckBox({ src, alt, ...props }: ArtworkCheckBox): JSX.Element {
-  const ref = React.useRef<any>();
-  return (
-    <div
-      style={{
-        position: "relative",
-        width: "165px",
-        height: "144px",
-      }}
-      onClick={() => ref?.current?.click()}
-    >
-      <div style={{ position: "relative" }}>
-        <Image
-          width={165}
-          height={144}
-          radius={8}
-          withPlaceholder
-          src={src ? src : undefined}
-          alt={alt}
-        />
+const ArtworkCheckBox = forwardRef<HTMLImageElement>(
+  ({ src, alt, ...props }: ArtworkCheckBox, _ref) => {
+    const ref = React.useRef<any>();
+    return (
+      <div
+        style={{
+          position: "relative",
+          width: "165px",
+          height: "144px",
+        }}
+        onClick={() => ref?.current?.click()}
+      >
+        <div style={{ position: "relative" }}>
+          <Image
+            width={165}
+            height={144}
+            radius={8}
+            withPlaceholder
+            src={src ? src : undefined}
+            alt={alt}
+            imageRef={_ref}
+          />
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: 165,
+              height: 144,
+              borderRadius: "8px",
+              opacity: 0.2,
+              backgroundColor: "#000",
+            }}
+          />
+        </div>
         <div
           style={{
             position: "absolute",
-            top: 0,
-            left: 0,
-            width: 165,
-            height: 144,
+            width: "165px",
+            height: "144px",
+            top: "0",
+            opacity: 0,
             borderRadius: "8px",
-            opacity: 0.2,
-            backgroundColor: "#000",
+            ...(props.checked
+              ? { opacity: 0.5, backgroundColor: "#CFF8EB" }
+              : {}),
+          }}
+        />
+        <Checkbox
+          radius={100}
+          icon={CheckIcon}
+          {...props}
+          checked={props.checked || false}
+          ref={ref}
+          onClick={(ev) => {
+            ev.stopPropagation();
+            props.onClick && props.onClick(ev);
+          }}
+          style={{
+            position: "absolute",
+            right: "8px",
+            top: "8px",
+          }}
+          styles={{
+            root: {
+              width: "30px",
+              height: "30px",
+            },
+            inner: {
+              width: "30px",
+              height: "30px",
+            },
+            input: {
+              border: 0,
+              width: "30px",
+              height: "30px",
+              "&:checked": {
+                background: "#CFF8EB",
+              },
+            },
           }}
         />
       </div>
-      <div
-        style={{
-          position: "absolute",
-          width: "165px",
-          height: "144px",
-          top: "0",
-          opacity: 0,
-          borderRadius: "8px",
-          ...(props.checked
-            ? { opacity: 0.5, backgroundColor: "#CFF8EB" }
-            : {}),
-        }}
-      />
-      <Checkbox
-        radius={100}
-        icon={CheckIcon}
-        {...props}
-        checked={props.checked || false}
-        ref={ref}
-        onClick={(ev) => {
-          ev.stopPropagation();
-          props.onClick && props.onClick(ev);
-        }}
-        style={{
-          position: "absolute",
-          right: "8px",
-          top: "8px",
-        }}
-        styles={{
-          root: {
-            width: "30px",
-            height: "30px",
-          },
-          inner: {
-            width: "30px",
-            height: "30px",
-          },
-          input: {
-            border: 0,
-            width: "30px",
-            height: "30px",
-            "&:checked": {
-              background: "#CFF8EB",
-            },
-          },
-        }}
-      />
-    </div>
-  );
-}
+    );
+  }
+);
 
 function CheckIcon({
   indeterminate,
