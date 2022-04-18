@@ -168,8 +168,11 @@ const LatestArtwork = () => {
     }, {} as { [key: string]: Artwork[] });
   }, [result]);
 
-  console.log(result);
-
+  const nav = useNavigate();
+  const toArtwork = (id: any) => () => {
+    nav(`/artwork/${id}`);
+  };
+  console.log(artworkDate);
   return (
     <>
       <Container
@@ -193,7 +196,6 @@ const LatestArtwork = () => {
         >
           Latest Artwork
         </Text>
-        {/* TODO: fix when there are >1 days */}
         {Object.keys(artworkDate).map((key) => (
           <div style={{ display: "flex" }} key={key}>
             <Text
@@ -216,7 +218,7 @@ const LatestArtwork = () => {
             </Text>
             <div>
               {artworkDate[key].map((artwork) => (
-                <div key={artwork.id}>
+                <div key={artwork.id} onClick={toArtwork(artwork.id)}>
                   <div
                     style={{
                       paddingLeft: "14px",
@@ -234,8 +236,9 @@ const LatestArtwork = () => {
                         height: "21px",
                         lineHeight: "20px",
 
-                        paddingBottom: "4px",
+                        marginBottom: "4px",
                       }}
+                      lineClamp={1}
                     >
                       {artwork.title}
                     </Text>
@@ -249,7 +252,8 @@ const LatestArtwork = () => {
                         lineHeight: "18px",
                       }}
                     >
-                      2022-03-19 12:08
+                      {/* 2022-03-19 12:08 */}
+                      {dayjs(artwork.last_updated).format("YYYY-MM-DD HH:mm")}
                     </Text>
                   </div>
                   <div style={{ position: "relative" }}>
@@ -262,7 +266,7 @@ const LatestArtwork = () => {
                         },
                         root: { paddingBottom: "24px" },
                       }}
-                      src="https://picsum.photos/1200"
+                      src={getImageURL(artwork.image_id)}
                     />
                     <div
                       style={{
@@ -294,6 +298,9 @@ const getLatestImage = async () => {
 const NewDiscover = () => {
   // currently, get the latest image from api
   const { result, loading } = useAsync(getLatestImage, []);
+
+  const nav = useNavigate();
+  const toArtwork = (id) => () => nav(`/artwork/${id}`);
 
   return (
     <>
@@ -338,6 +345,7 @@ const NewDiscover = () => {
                 author={getArtistName(artwork.artist_display)}
                 src={getImageURL(artwork.image_id)}
                 tag={artwork.style_title || artwork.artwork_type_title}
+                onClickCapture={toArtwork(artwork.id)}
               />
             ))}
         </div>
@@ -374,6 +382,10 @@ const RecentlyViewed = () => {
         .then(setArtworks);
     }
   }, [ids]);
+  const nav = useNavigate();
+  const toArtwork = (id: any) => () => {
+    nav(`/artwork/${id}`);
+  };
 
   return (
     <>
@@ -437,7 +449,11 @@ const RecentlyViewed = () => {
               }}
             >
               {artworks.map((artwork, index) => (
-                <div style={{ position: "relative" }} key={index}>
+                <div
+                  style={{ position: "relative" }}
+                  key={index}
+                  onClick={toArtwork(artwork.id)}
+                >
                   <Image
                     src={getImageURL(artwork.image_id)}
                     width={196}
