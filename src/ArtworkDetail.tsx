@@ -119,7 +119,7 @@ export function ArtworkDetail() {
     setDoc(doc(getFirestore(app), `/users/${user.uid}/history/${id}`), {
       lastAccessed: new Date(),
     });
-    console.log("updated history")
+    console.log("updated history");
   }, [location, user]);
 
   const [values, userDocLoading, __, snapshot] = useDocumentData(
@@ -598,6 +598,8 @@ export function ArtworkDetail() {
                 fontWeight: "bold",
                 color: "#000000",
                 lineHeight: "28px",
+                paddingRight: 28 + 22,
+                paddingBottom: 6,
               }}
             >
               {result.title}
@@ -613,7 +615,7 @@ export function ArtworkDetail() {
                 fontFamily: "Inter",
                 fontWeight: "100",
                 color: "#4E5D78",
-                height: "17px",
+                // height: "17px",
                 lineHeight: "20px",
               }}
             >
