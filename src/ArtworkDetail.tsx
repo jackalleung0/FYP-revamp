@@ -8,6 +8,7 @@ import {
   Container,
   createStyles,
   Image,
+  LoadingOverlay,
   Text,
   Title,
   UnstyledButton,
@@ -131,7 +132,8 @@ export function ArtworkDetail() {
         rating: number;
       }>)
   );
-  const [userProfile] = useDocumentData(
+
+  const [userProfile, userLoading] = useDocumentData(
     user &&
       (doc(getFirestore(app), `users/${user.uid}`) as DocumentReference<{
         likedArtworks: string[];
@@ -353,490 +355,507 @@ export function ArtworkDetail() {
     (id && userProfile && (userProfile.likedArtworks || []).includes(id)) ||
     false;
 
+  const allDoneLoading =
+    !artworkDataLoading &&
+    !userLoading &&
+    !userDocLoading &&
+    !loading &&
+    !otherArtworkLoading;
+
   return (
     <div>
-      <BottomSheet
-        open={show}
-        onDismiss={() => setShow(false)}
-        defaultSnap={({ maxHeight }) => maxHeight * 0.95}
-        expandOnContentDrag={false}
-      >
-        <div className="flex flex-col">
-          <Text
-            align="center"
-            style={{
-              fontFamily: "Inter",
-              fontSize: 18,
-              lineHeight: "28px",
-              height: 22,
-              fontWeight: "bold",
-              paddingTop: 3,
-            }}
-          >
-            Share Options
-          </Text>
-
-          <div
-            style={{
-              display: "flex",
-              gap: 25 - 6 + 2,
-              paddingLeft: 30 - 1 - 1,
-              paddingRight: 30 - 1 - 1,
-              paddingTop: 48,
-              width: "max-content",
-            }}
-          >
-            <UnstyledButton onClickCapture={copyToClipboard}>
-              <div
-                style={{
-                  borderRadius: 99,
-                  background: "#F1F2F4",
-                  display: "flex",
-                  alignContent: "center",
-                  justifyItems: "center",
-                  width: 60,
-                  height: 60,
-                }}
-              >
-                <LinkIcon
-                  style={{
-                    padding: 16,
-                  }}
-                />
-              </div>
-              <Text
-                align="center"
-                style={{
-                  paddingTop: 8 - 2,
-                  fontFamily: "Inter",
-                  fontWeight: "100",
-                  fontSize: 12,
-                  lineHeight: "20px",
-                  color: "#4E5D78",
-                }}
-              >
-                Copy Link
-              </Text>
-            </UnstyledButton>
-            <UnstyledButton>
-              <TwitterIcon width={60} />
-              <Text
-                align="center"
-                style={{
-                  paddingTop: 8 - 2,
-                  fontFamily: "Inter",
-                  fontWeight: "100",
-                  fontSize: 12,
-                  lineHeight: "20px",
-                  color: "#4E5D78",
-                }}
-              >
-                Twitter
-              </Text>
-            </UnstyledButton>
-            <UnstyledButton>
-              <WhatsAppIcon />
-              <Text
-                align="center"
-                style={{
-                  paddingTop: 8 - 2,
-                  fontFamily: "Inter",
-                  fontWeight: "100",
-                  fontSize: 12,
-                  lineHeight: "20px",
-                  color: "#4E5D78",
-                  width: 60,
-                }}
-              >
-                WhatsApp
-              </Text>
-            </UnstyledButton>
-            <UnstyledButton>
-              <TelegramIcon />
-              <Text
-                align="center"
-                style={{
-                  paddingTop: 8 - 2,
-                  fontFamily: "Inter",
-                  fontWeight: "100",
-                  fontSize: 12,
-                  lineHeight: "20px",
-                  color: "#4E5D78",
-                }}
-              >
-                Telegram
-              </Text>
-            </UnstyledButton>
-          </div>
-
-          <div
-            style={{
-              marginLeft: 30,
-              marginRight: 30,
-              marginTop: 48 - 5,
-              marginBottom: 48 - 34,
-            }}
-          >
-            <Button
-              onClickCapture={() => setShow(false)}
-              fullWidth
-              variant="outline"
-              style={{
-                color: "#4E5D78",
-                fontFamily: "Inter",
-                fontWeight: "normal",
-                fontSize: "16px",
-                lineHeight: "24px",
-              }}
-              radius="xl"
-              styles={{
-                inner: { padding: 12 },
-                root: {
-                  height: "unset",
-                  "&:hover": {
-                    backgroundColor: "transparent",
-                  },
-                  borderColor: "#E1E4E8",
-                },
-              }}
-            >
-              Cancel
-            </Button>
-          </div>
-        </div>
-      </BottomSheet>
-      {!artworkDataLoading && artworkData && (
-        <Affix position={{ bottom: 30, right: 22 }} zIndex={2}>
-          <ActionIcon
-            className={classes.ActionIcon}
-            radius={9999}
-            size={70}
-            style={{
-              backgroundColor: "#111112",
-            }}
-            id="view in 3d"
-            component="a"
-            target="_blank"
-            href={artworkData.arURL}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="22.675"
-              height="24.338"
-              viewBox="0 0 22.675 24.338"
-            >
-              <path
-                id="AR_Icon"
-                d="M16.5,11.556,14,12.778m0,0-2.5-1.222M14,12.778v3.056M24,7.889,21.5,9.111M24,7.889,21.5,6.667M24,7.889v3.056M16.5,4.222,14,3,11.5,4.222M4,7.889,6.5,6.667M4,7.889,6.5,9.111M4,7.889v3.056M14,25l-2.5-1.222M14,25l2.5-1.222M14,25V21.944m-7.5-.611L4,20.111V17.056m17.5,4.278L24,20.111V17.056"
-                transform="translate(-2.663 -2)"
-                fill="none"
-                stroke="#fff"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-              />
-            </svg>
-          </ActionIcon>
-        </Affix>
-      )}
-      {!loading && result && (
-        <>
-          <div
-            style={{
-              position: "sticky",
-              top: 10,
-              paddingLeft: 20,
-              paddingRight: 20,
-              paddingBottom: 34,
-            }}
-            id="header-bar"
-          >
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <BackIcon onClick={() => nav(-1)} />
-
-              <div style={{ display: "flex", gap: 32 }}>
-                <CommentIcon />
-                <ShareIcon onClickCapture={() => setShow(true)} />
-              </div>
-            </div>
-          </div>
-          <Center style={{ backgroundColor: "#F1F2F4" }}>
-            <Image
-              width={335}
-              height={263}
-              withPlaceholder
-              className={classes.Image}
-              style={{ margin: "68px 20px" }}
-              src={getImageURL(result.image_id)}
-            />
-          </Center>
-          <Container
-            style={{
-              paddingLeft: 20,
-              paddingRight: 20,
-              paddingTop: 33,
-            }}
-          >
-            <div
-              style={{ float: "right", paddingTop: 0, position: "relative" }}
-              onClickCapture={handleLikeArtwork}
-            >
-              {userLikedArtwork ? (
-                <SolidHeartIcon
-                  style={{
-                    width: 28,
-                    height: 26,
-                    right: -1,
-                    position: "absolute",
-                    color: "#DD2727",
-                  }}
-                />
-              ) : (
-                <OutlineHeartIcon
-                  style={{
-                    width: 28,
-                    height: 26,
-                    right: -1,
-                    position: "absolute",
-                  }}
-                />
-              )}
-            </div>
-            <Title
-              style={{
-                fontSize: "24px",
-                fontFamily: "SFProDisplay",
-                fontWeight: "bold",
-                color: "#000000",
-                lineHeight: "28px",
-                paddingRight: 28 + 22,
-                paddingBottom: 6,
-              }}
-            >
-              {result.title}
-            </Title>
-
+      <div style={{ display: allDoneLoading ? "block" : "none" }}>
+        <BottomSheet
+          open={show}
+          onDismiss={() => setShow(false)}
+          defaultSnap={({ maxHeight }) => maxHeight * 0.95}
+          expandOnContentDrag={false}
+        >
+          <div className="flex flex-col">
             <Text
-              component={Link}
-              to="about-artist"
+              align="center"
               style={{
-                paddingTop: 4,
-
-                fontSize: "14px",
                 fontFamily: "Inter",
-                fontWeight: "100",
-                color: "#4E5D78",
-                // height: "17px",
-                lineHeight: "20px",
+                fontSize: 18,
+                lineHeight: "28px",
+                height: 22,
+                fontWeight: "bold",
+                paddingTop: 3,
               }}
             >
-              {getArtistName(result.artist_display)}
+              Share Options
             </Text>
-          </Container>
-          <Container
-            style={{
-              paddingLeft: 17,
-              paddingRight: 17,
-            }}
-          >
+
             <div
               style={{
                 display: "flex",
-                paddingTop: 23,
-                gap: 8,
-                position: "relative",
+                gap: 25 - 6 + 2,
+                paddingLeft: 30 - 1 - 1,
+                paddingRight: 30 - 1 - 1,
+                paddingTop: 48,
+                width: "max-content",
               }}
             >
-              <StarRatingComponent
-                name="rating"
-                value={values?.rating || 0}
-                editing={!!values?.rating}
-                renderStarIcon={() => <StarIcon className={classes.Star} />}
-                onStarClick={handleStarClick}
-                starColor={"#000"}
-                emptyStarColor={"#E1E4E8"}
-              />
+              <UnstyledButton onClickCapture={copyToClipboard}>
+                <div
+                  style={{
+                    borderRadius: 99,
+                    background: "#F1F2F4",
+                    display: "flex",
+                    alignContent: "center",
+                    justifyItems: "center",
+                    width: 60,
+                    height: 60,
+                  }}
+                >
+                  <LinkIcon
+                    style={{
+                      padding: 16,
+                    }}
+                  />
+                </div>
+                <Text
+                  align="center"
+                  style={{
+                    paddingTop: 8 - 2,
+                    fontFamily: "Inter",
+                    fontWeight: "100",
+                    fontSize: 12,
+                    lineHeight: "20px",
+                    color: "#4E5D78",
+                  }}
+                >
+                  Copy Link
+                </Text>
+              </UnstyledButton>
+              <UnstyledButton>
+                <TwitterIcon width={60} />
+                <Text
+                  align="center"
+                  style={{
+                    paddingTop: 8 - 2,
+                    fontFamily: "Inter",
+                    fontWeight: "100",
+                    fontSize: 12,
+                    lineHeight: "20px",
+                    color: "#4E5D78",
+                  }}
+                >
+                  Twitter
+                </Text>
+              </UnstyledButton>
+              <UnstyledButton>
+                <WhatsAppIcon />
+                <Text
+                  align="center"
+                  style={{
+                    paddingTop: 8 - 2,
+                    fontFamily: "Inter",
+                    fontWeight: "100",
+                    fontSize: 12,
+                    lineHeight: "20px",
+                    color: "#4E5D78",
+                    width: 60,
+                  }}
+                >
+                  WhatsApp
+                </Text>
+              </UnstyledButton>
+              <UnstyledButton>
+                <TelegramIcon />
+                <Text
+                  align="center"
+                  style={{
+                    paddingTop: 8 - 2,
+                    fontFamily: "Inter",
+                    fontWeight: "100",
+                    fontSize: 12,
+                    lineHeight: "20px",
+                    color: "#4E5D78",
+                  }}
+                >
+                  Telegram
+                </Text>
+              </UnstyledButton>
             </div>
-          </Container>
-          <Container
-            style={{
-              paddingLeft: 20,
-              paddingRight: 20,
-              paddingTop: 0,
-            }}
-          >
-            <hr
-              style={{
-                marginTop: 32 - 9,
 
-                flexGrow: 1,
-                border: "none",
-                height: "1px",
-                backgroundColor: "#F1F2F4",
+            <div
+              style={{
+                marginLeft: 30,
+                marginRight: 30,
+                marginTop: 48 - 5,
+                marginBottom: 48 - 34,
               }}
-            />
-          </Container>
-          <Container
-            style={{
-              paddingLeft: 20,
-              paddingRight: 20,
-              paddingTop: 17,
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <Title
+            >
+              <Button
+                onClickCapture={() => setShow(false)}
+                fullWidth
+                variant="outline"
                 style={{
-                  fontSize: "13px",
-                  fontFamily: "Inter",
-                  fontWeight: "bold",
                   color: "#4E5D78",
-                  height: "16px",
-                  lineHeight: "16px",
-                  width: "max-content",
-                }}
-              >
-                ABOUT ARTWORK
-              </Title>
-              <Text
-                component={Link}
-                to="about"
-                underline
-                transform="uppercase"
-                style={{
-                  fontSize: "13px",
                   fontFamily: "Inter",
                   fontWeight: "normal",
-                  color: "#8A94A6",
-                  lineHeight: "16px",
-                  height: "16px",
+                  fontSize: "16px",
+                  lineHeight: "24px",
+                }}
+                radius="xl"
+                styles={{
+                  inner: { padding: 12 },
+                  root: {
+                    height: "unset",
+                    "&:hover": {
+                      backgroundColor: "transparent",
+                    },
+                    borderColor: "#E1E4E8",
+                  },
                 }}
               >
-                View More
-              </Text>
+                Cancel
+              </Button>
             </div>
-            <Text
+          </div>
+        </BottomSheet>
+        {!artworkDataLoading && artworkData && !!values && (
+          <Affix position={{ bottom: 30, right: 22 }} zIndex={2}>
+            <ActionIcon
+              className={classes.ActionIcon}
+              radius={9999}
+              size={70}
               style={{
-                paddingTop: 15,
-                fontSize: "15px",
-                fontFamily: "Inter",
-                fontWeight: "100",
-                color: "#283A5B",
-                lineHeight: "20px",
+                backgroundColor: "#111112",
+              }}
+              id="view in 3d"
+              component="a"
+              target="_blank"
+              href={artworkData.arURL}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="22.675"
+                height="24.338"
+                viewBox="0 0 22.675 24.338"
+              >
+                <path
+                  id="AR_Icon"
+                  d="M16.5,11.556,14,12.778m0,0-2.5-1.222M14,12.778v3.056M24,7.889,21.5,9.111M24,7.889,21.5,6.667M24,7.889v3.056M16.5,4.222,14,3,11.5,4.222M4,7.889,6.5,6.667M4,7.889,6.5,9.111M4,7.889v3.056M14,25l-2.5-1.222M14,25l2.5-1.222M14,25V21.944m-7.5-.611L4,20.111V17.056m17.5,4.278L24,20.111V17.056"
+                  transform="translate(-2.663 -2)"
+                  fill="none"
+                  stroke="#fff"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                />
+              </svg>
+            </ActionIcon>
+          </Affix>
+        )}
+        {!loading && result && (
+          <>
+            <div
+              style={{
+                position: "sticky",
+                top: 10,
+                paddingLeft: 20,
+                paddingRight: 20,
+                paddingBottom: 34,
+              }}
+              id="header-bar"
+            >
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <BackIcon onClick={() => nav(-1)} />
+
+                <div style={{ display: "flex", gap: 32 }}>
+                  <CommentIcon />
+                  <ShareIcon onClickCapture={() => setShow(true)} />
+                </div>
+              </div>
+            </div>
+            <Center style={{ backgroundColor: "#F1F2F4" }}>
+              <Image
+                width={335}
+                height={263}
+                withPlaceholder
+                className={classes.Image}
+                style={{ margin: "68px 20px" }}
+                src={getImageURL(result.image_id)}
+              />
+            </Center>
+            <Container
+              style={{
+                paddingLeft: 20,
+                paddingRight: 20,
+                paddingTop: 33,
               }}
             >
-              {result.thumbnail.alt_text}
-            </Text>
-            <hr
-              style={{
-                marginTop: 32,
-
-                flexGrow: 1,
-                border: "none",
-                height: "1px",
-                backgroundColor: "#F1F2F4",
-              }}
-            />
-          </Container>
-          <Container
-            style={{
-              paddingLeft: 20,
-              paddingRight: 20,
-              paddingTop: 17,
-            }}
-          >
-            <div>
-              <Text
+              <div
+                style={{ float: "right", paddingTop: 0, position: "relative" }}
+                onClickCapture={handleLikeArtwork}
+              >
+                {userLikedArtwork ? (
+                  <SolidHeartIcon
+                    style={{
+                      width: 28,
+                      height: 26,
+                      right: -1,
+                      position: "absolute",
+                      color: "#DD2727",
+                    }}
+                  />
+                ) : (
+                  <OutlineHeartIcon
+                    style={{
+                      width: 28,
+                      height: 26,
+                      right: -1,
+                      position: "absolute",
+                    }}
+                  />
+                )}
+              </div>
+              <Title
                 style={{
-                  fontSize: "13px",
-                  fontFamily: "Inter",
+                  fontSize: "24px",
+                  fontFamily: "SFProDisplay",
                   fontWeight: "bold",
-                  color: "#4E5D78",
-                  height: "16px",
-                  lineHeight: "16px",
-                  paddingBottom: "15px",
+                  color: "#000000",
+                  lineHeight: "28px",
+                  paddingRight: 28 + 22,
+                  paddingBottom: 6,
                 }}
               >
-                RELATED TAGS
+                {result.title}
+              </Title>
+
+              <Text
+                component={Link}
+                to="about-artist"
+                style={{
+                  paddingTop: 4,
+
+                  fontSize: "14px",
+                  fontFamily: "Inter",
+                  fontWeight: "100",
+                  color: "#4E5D78",
+                  // height: "17px",
+                  lineHeight: "20px",
+                }}
+              >
+                {getArtistName(result.artist_display)}
               </Text>
+            </Container>
+            <Container
+              style={{
+                paddingLeft: 17,
+                paddingRight: 17,
+              }}
+            >
               <div
                 style={{
                   display: "flex",
-                  gap: "16px 6px",
-                  minWidth: "min-content",
-                  flexWrap: "wrap",
+                  paddingTop: 23,
+                  gap: 8,
+                  position: "relative",
                 }}
               >
-                {result.term_titles.map((value, i) => (
-                  <TagButton
-                    popular={i === 0}
-                    to={`/search-result?term=${value}`}
-                    key={i}
-                  >
-                    {value}
-                  </TagButton>
-                ))}
+                <StarRatingComponent
+                  name="rating"
+                  value={values?.rating || 0}
+                  editing={!!values?.rating}
+                  renderStarIcon={() => <StarIcon className={classes.Star} />}
+                  onStarClick={handleStarClick}
+                  starColor={"#000"}
+                  emptyStarColor={"#E1E4E8"}
+                />
               </div>
-            </div>
-            <hr
+            </Container>
+            <Container
               style={{
-                marginTop: 32,
-
-                flexGrow: 1,
-                border: "none",
-                height: "1px",
-                backgroundColor: "#F1F2F4",
-              }}
-            />
-          </Container>
-          <Text
-            transform="uppercase"
-            style={{
-              marginLeft: "20px",
-              marginTop: "25px",
-              fontSize: "13px",
-              fontFamily: "Inter",
-              fontWeight: "bold",
-              color: "#4E5D78",
-              height: "16px",
-              lineHeight: "16px",
-              paddingBottom: "15px",
-            }}
-          >
-            OTHER ARTWORKS
-          </Text>
-          <div
-            style={{
-              overflowY: "hidden",
-              width: "100%",
-              paddingBottom: 120,
-            }}
-            className="no-scrollbar"
-          >
-            <div
-              style={{
-                display: "flex",
-                gap: "16px",
-                paddingLeft: "20px",
-                paddingRight: "20px",
-                minWidth: "min-content",
+                paddingLeft: 20,
+                paddingRight: 20,
+                paddingTop: 0,
               }}
             >
-              {!otherArtworkLoading &&
-                recommendArtworks &&
-                recommendArtworks.map((a: any) => (
-                  <DiscoverCard
-                    onClickCapture={toArtwork(a.id)}
-                    key={a.id}
-                    src={getImageURL(a.image_id)}
-                    title={a.title}
-                    tag={a?.term_titles?.length > 0 ? a.term_titles[0] : ""}
-                    author={getArtistName(a.artist_display)}
-                  />
-                ))}
+              <hr
+                style={{
+                  marginTop: 32 - 9,
+
+                  flexGrow: 1,
+                  border: "none",
+                  height: "1px",
+                  backgroundColor: "#F1F2F4",
+                }}
+              />
+            </Container>
+            <Container
+              style={{
+                paddingLeft: 20,
+                paddingRight: 20,
+                paddingTop: 17,
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <Title
+                  style={{
+                    fontSize: "13px",
+                    fontFamily: "Inter",
+                    fontWeight: "bold",
+                    color: "#4E5D78",
+                    height: "16px",
+                    lineHeight: "16px",
+                    width: "max-content",
+                  }}
+                >
+                  ABOUT ARTWORK
+                </Title>
+                <Text
+                  component={Link}
+                  to="about"
+                  underline
+                  transform="uppercase"
+                  style={{
+                    fontSize: "13px",
+                    fontFamily: "Inter",
+                    fontWeight: "normal",
+                    color: "#8A94A6",
+                    lineHeight: "16px",
+                    height: "16px",
+                  }}
+                >
+                  View More
+                </Text>
+              </div>
+              <Text
+                style={{
+                  paddingTop: 15,
+                  fontSize: "15px",
+                  fontFamily: "Inter",
+                  fontWeight: "100",
+                  color: "#283A5B",
+                  lineHeight: "20px",
+                }}
+              >
+                {result.thumbnail.alt_text}
+              </Text>
+              <hr
+                style={{
+                  marginTop: 32,
+
+                  flexGrow: 1,
+                  border: "none",
+                  height: "1px",
+                  backgroundColor: "#F1F2F4",
+                }}
+              />
+            </Container>
+            <Container
+              style={{
+                paddingLeft: 20,
+                paddingRight: 20,
+                paddingTop: 17,
+              }}
+            >
+              <div>
+                <Text
+                  style={{
+                    fontSize: "13px",
+                    fontFamily: "Inter",
+                    fontWeight: "bold",
+                    color: "#4E5D78",
+                    height: "16px",
+                    lineHeight: "16px",
+                    paddingBottom: "15px",
+                  }}
+                >
+                  RELATED TAGS
+                </Text>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "16px 6px",
+                    minWidth: "min-content",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {result.term_titles.map((value, i) => (
+                    <TagButton
+                      popular={i === 0}
+                      to={`/search-result?term=${value}`}
+                      key={i}
+                    >
+                      {value}
+                    </TagButton>
+                  ))}
+                </div>
+              </div>
+              <hr
+                style={{
+                  marginTop: 32,
+
+                  flexGrow: 1,
+                  border: "none",
+                  height: "1px",
+                  backgroundColor: "#F1F2F4",
+                }}
+              />
+            </Container>
+            <Text
+              transform="uppercase"
+              style={{
+                marginLeft: "20px",
+                marginTop: "25px",
+                fontSize: "13px",
+                fontFamily: "Inter",
+                fontWeight: "bold",
+                color: "#4E5D78",
+                height: "16px",
+                lineHeight: "16px",
+                paddingBottom: "15px",
+              }}
+            >
+              OTHER ARTWORKS
+            </Text>
+            <div
+              style={{
+                overflowY: "hidden",
+                width: "100%",
+                paddingBottom: 120,
+              }}
+              className="no-scrollbar"
+            >
+              <div
+                style={{
+                  display: "flex",
+                  gap: "16px",
+                  paddingLeft: "20px",
+                  paddingRight: "20px",
+                  minWidth: "min-content",
+                }}
+              >
+                {!otherArtworkLoading &&
+                  recommendArtworks &&
+                  recommendArtworks.map((a: any) => (
+                    <DiscoverCard
+                      onClickCapture={toArtwork(a.id)}
+                      key={a.id}
+                      src={getImageURL(a.image_id)}
+                      title={a.title}
+                      tag={a?.term_titles?.length > 0 ? a.term_titles[0] : ""}
+                      author={getArtistName(a.artist_display)}
+                    />
+                  ))}
+              </div>
             </div>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </div>
+      <LoadingOverlay
+        zIndex={201}
+        style={{ height: "100vh", width: "100%", position: "fixed", top: 0 }}
+        visible={!allDoneLoading}
+        overlayOpacity={1}
+        overlayColor="#FFF"
+        loaderProps={{ color: "#111112" }}
+      />
     </div>
   );
 }
