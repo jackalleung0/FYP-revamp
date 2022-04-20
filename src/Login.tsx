@@ -62,10 +62,10 @@ export function Login() {
         style={{
           paddingLeft: "20px",
           paddingRight: "20px",
-          paddingTop: "10px",
+          height: "100vh",
         }}
       >
-        <BackIcon onClick={() => nav(-1)} />
+        <BackIcon onClick={() => nav(-1)} style={{ paddingTop: "10px" }} />
         <Text
           style={{
             marginTop: "40px",
