@@ -180,6 +180,10 @@ export function ArtworkDetail() {
     });
   };
 
+  const toHome = () => {
+    nav("/home", { replace: true });
+  };
+
   const handleStarClick = async (r: number) => {
     // if (!user) return;
     // await updateDoc(doc(getFirestore(app), `users/${user.uid}/ratings/${id}`), {
@@ -816,7 +820,7 @@ export function ArtworkDetail() {
               style={{
                 overflowY: "hidden",
                 width: "100%",
-                paddingBottom: 120,
+                paddingBottom: 55,
               }}
               className="no-scrollbar"
             >
@@ -843,6 +847,22 @@ export function ArtworkDetail() {
                   ))}
               </div>
             </div>
+            <Text
+              underline
+              align="center"
+              style={{
+                width: "100vw",
+                fontSize: "12px",
+                fontFamily: "Inter",
+                fontWeight: 100,
+                color: "#4E5D78",
+                height: "15px",
+                paddingBottom: 50,
+              }}
+              onClick={toHome}
+            >
+              Back to Home
+            </Text>
           </>
         )}
       </div>
