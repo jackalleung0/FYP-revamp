@@ -7,11 +7,13 @@ import {
   Affix,
   Transition,
   LoadingOverlay,
+  Loader,
 } from "@mantine/core";
 import { useWindowScroll } from "@mantine/hooks";
 import axios from "axios";
-import React, { forwardRef, useMemo } from "react";
+import React, { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async-hook";
+import InfiniteScroll from "react-infinite-scroll-component";
 import {
   useLocation,
   useNavigate,
@@ -21,7 +23,6 @@ import {
 import { BackIcon } from "./BackIcon";
 import { getArtistName } from "./getArtistName";
 import { getImageURL } from "./getImageURL";
-import { searchArtworkBySearchTerm } from "./searchArtworkBySearchTerm";
 import { useRefCallback } from "./useRefCallback";
 
 const useStyles = createStyles((theme, _params, getRef) => ({
@@ -35,6 +36,34 @@ export const instance = axios.create({
   timeout: 10000,
 });
 
+export const searchArtworkBySearchTerm = async (
+  term: string,
+  from: number,
+  limit = 10
+) => {
+  if (!term) return [];
+  const result = await instance.get("artworks/search", {
+    params: {
+      limit,
+      from,
+      // just put all the author in the search list, and let the search do its thing
+      // the array is for readability
+      q: term,
+      fields: [
+        "image_id",
+        "title",
+        "thumbnail",
+        "id",
+        "artist_display",
+        "term_titles",
+      ].join(","),
+    },
+  });
+  console.log(result.data.pagination);
+  return result.data; // ensure there are image_id for search result
+};
+import Masonry, { MasonryOptions } from "react-masonry-component";
+
 export function SearchByTag() {
   const nav = useNavigate();
   const [scroll, scrollTo] = useWindowScroll();
@@ -47,25 +76,65 @@ export function SearchByTag() {
   //     .map((width) => `https://picsum.photos/300/${width}`);
   // }, []);
   const [searchParams] = useSearchParams();
-  const { result, loading: resultLoading } = useAsync(
-    searchArtworkBySearchTerm,
-    [searchParams.get("term") || ""]
-  );
+  // const { result, loading: resultLoading } = useAsync(
+  //   searchArtworkBySearchTerm,
+  //   [searchParams.get("term") || ""]
+  // );
 
-  const [ref, imageLoaded] = useRefCallback();
+  // const [ref, imageLoaded] = useRefCallback();
 
-  const loading = resultLoading || (result?.length > 0 && !imageLoaded);
+  // const loading = resultLoading || (result?.length > 0 && !imageLoaded);
+
+  const [result, setResult] = React.useState<any[]>([]);
+  const [totalResult, setTotalResult] = useState<number>();
+  // const [hasMore, setHasMore] = useState(true);
+  const [doneFirstLoading, setDoneFirstLoading] = useState(false);
+  const [{ total_pages, current_page }, setPagination] = useState({
+    total_pages: 0,
+    current_page: 0,
+  });
+  const loadFunc = async () => {
+    const r = await searchArtworkBySearchTerm(
+      searchParams.get("term") || "",
+      result.length
+    );
+    setDoneFirstLoading(true);
+    setTotalResult(r.pagination.total);
+    setResult((e) => [...e, ...r.data]);
+    // setHasMore(r.pagination.total_pages >= r.pagination.current_page);
+
+    setPagination(r.pagination);
+    // console.log({
+    //   hasMore,
+    //   t: r.pagination.total_pages,
+    //   c: r.pagination.current_page,
+    // });
+  };
+
+  useEffect(() => {
+    if (result.length === 0) {
+      loadFunc();
+    }
+  }, []);
+
+  const masonryOptions: MasonryOptions = {
+    transitionDuration: 0,
+    horizontalOrder: true,
+    gutter: 15,
+    columnWidth: 160,
+  };
+
   return (
     <div>
-      <LoadingOverlay
+      {/* <LoadingOverlay
         zIndex={201}
         visible={loading}
         overlayOpacity={1}
         overlayColor="#FFF"
         loaderProps={{ color: "#111112" }}
-      />
-      <div style={{ display: !loading ? "block" : "none" }}>
-        {!resultLoading && result.length > 0 && (
+      /> */}
+      <div>
+        {result.length > 0 && (
           <Affix position={{ bottom: 30, right: 22 }}>
             <Transition mounted={true} transition="slide-left" duration={300}>
               {(transitionStyles) => (
@@ -100,12 +169,17 @@ export function SearchByTag() {
         )}
         <Container
           style={{
-            paddingTop: 10,
             paddingLeft: 20,
             paddingRight: 20,
           }}
         >
-          <BackIcon onClick={() => nav(-1)} />
+          <div
+            style={{
+              marginTop: 10,
+            }}
+          >
+            <BackIcon onClick={() => nav(-1)} />
+          </div>
 
           {result && result.length > 0 && (
             <>
@@ -122,29 +196,77 @@ export function SearchByTag() {
                   paddingBottom: "36px",
                 }}
               >
-                See {result && result.length} results for{" "}
+                See {totalResult} results for{" "}
                 {searchParams.get("term") || "oil in canvas"}
               </Text>
-              <div style={{ columnCount: 2, columnGap: "15px" }}>
-                {result.map(
-                  (
-                    { image_id, title, artist_display, id }: any,
-                    index: any
-                  ) => (
-                    <MasImage
-                      src={getImageURL(image_id)}
-                      key={index}
-                      {...{ title, id }}
-                      artist={getArtistName(artist_display)}
-                      ref={(el: HTMLImageElement) => ref(el, index)}
+              <InfiniteScroll
+                dataLength={result.length} //This is important field to render the next data
+                next={loadFunc}
+                hasMore={total_pages > current_page}
+                loader={
+                  <div
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                      paddingTop: 40,
+                      paddingBottom: 60,
+                    }}
+                  >
+                    <Loader
+                      sx={(theme) => ({
+                        stroke: "#111112",
+                      })}
                     />
-                  )
-                )}
-              </div>
+                  </div>
+                }
+                endMessage={<></>}
+              >
+                <Masonry
+                  className={""} // default ''
+                  elementType={"div"} // default 'div'
+                  options={masonryOptions} // default {}
+                  disableImagesLoaded={false} // default false
+                  updateOnEachImageLoad={false} // default false and works only if disableImagesLoaded is false
+                >
+                  {result
+                    .filter((e) => !!e.image_id)
+                    .map(
+                      (
+                        { image_id, title, artist_display, id }: any,
+                        index: any
+                      ) => (
+                        <MasImage
+                          src={getImageURL(image_id)}
+                          key={index}
+                          {...{ title, id }}
+                          artist={getArtistName(artist_display)}
+                          // ref={(el: HTMLImageElement) => ref(el, index)}
+                        />
+                      )
+                    )}
+                </Masonry>
+              </InfiniteScroll>
             </>
           )}
         </Container>
-        {!resultLoading && result.length <= 0 && (
+        {!(total_pages > current_page) && result.length > 0 && (
+          <Text
+            align="center"
+            style={{
+              fontSize: "12px",
+              fontFamily: "Inter",
+              fontWeight: 100,
+              color: "#4E5D78",
+              height: "15px",
+              paddingTop: 40,
+              marginBottom: 50,
+            }}
+          >
+            No More Result
+          </Text>
+        )}
+        {doneFirstLoading && result.length <= 0 && (
           <div
             style={{
               display: "flex",
@@ -180,6 +302,7 @@ const MasImage = forwardRef<
     <div
       style={{
         marginBottom: "23px",
+        width: 160,
         display: "inline-block",
       }}
       onClickCapture={() => nav(`/artwork/${id}`)}
