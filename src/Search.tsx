@@ -41,8 +41,8 @@ import { getArtistName } from "./getArtistName";
 export function Search() {
   const { classes } = useStyles();
 
-  const isFocus = true;
-  // const [isFocus, setIsFocus] = React.useState(false);
+  // const isFocus = true;
+  const [isFocus, setIsFocus] = React.useState(false);
 
   const nav = useNavigate();
   let [searchParams, setSearchParams] = useSearchParams();
