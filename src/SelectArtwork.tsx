@@ -6,6 +6,7 @@ import {
   Container,
   createStyles,
   Image,
+  Loader,
   LoadingOverlay,
   SimpleGrid,
   Text,
@@ -19,7 +20,7 @@ import {
   getFirestore,
   setDoc,
 } from "firebase/firestore";
-import React, { forwardRef, useEffect, useMemo } from "react";
+import React, { forwardRef, useEffect, useMemo, useRef } from "react";
 import { useAsync } from "react-async-hook";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useDocumentDataOnce } from "react-firebase-hooks/firestore";
@@ -29,6 +30,8 @@ import { app } from "./firebaseConfig";
 import { useOnLoadImages } from "./hooks/useOnLoadImages";
 import { UserProfile } from "./types";
 import { useRefCallback } from "./useRefCallback";
+import { useIntersection } from "@mantine/hooks";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   ActionIcon: {
@@ -41,14 +44,15 @@ const instance = axios.create({
   timeout: 10000,
 });
 
-const fetchArtworks = async () =>
+const fetchArtworks = async (from?: number) =>
   instance
     .get("artworks/search", {
       params: {
         fields: ["id", "title", "image_id"].join(",").replaceAll(" ", ""),
+        from,
       },
     })
-    .then(({ data }) => data.data);
+    .then(({ data }) => data.data.filter((e) => !!e.image_id));
 
 export function SelectArtwork() {
   const { classes } = useStyles();
@@ -69,14 +73,27 @@ export function SelectArtwork() {
   const imagesLoaded = useOnLoadImages(wrapperRef);
   const nav = useNavigate();
 
-  const { loading, result } = useAsync(fetchArtworks, []);
+  useEffect(() => {
+    loadFunc();
+  }, []);
+
+  const [images, setImages] = React.useState<any[]>([]);
+  // React.useEffect(() => {
+  //   if (result) {
+  //     setImages((e) => [...e, result]);
+  //   }
+  // }, [result]);
+  const loadFunc = async () => {
+    const result = await fetchArtworks(images.length);
+    setImages((e) => [...e, ...result]);
+    // console.log("done");
+  };
 
   const auth = getAuth(app);
   const [user] = useAuthState(auth);
 
-  const [setRef, loaded] = useRefCallback();
-
-  const isAllLoaded = useMemo(() => loaded && !loading, [loaded, loading]);
+  const isAllLoaded = true;
+  // const isAllLoaded = useMemo(() => loaded, [loaded]);
 
   const [value, docLoading, error, snapshot, reload] =
     useDocumentDataOnce<UserProfile>(
@@ -88,7 +105,6 @@ export function SelectArtwork() {
     );
 
   useEffect(() => {
-    console.log(value);
     if (value) {
       setSelectedArtwork(value.likedArtworks);
     }
@@ -122,6 +138,15 @@ export function SelectArtwork() {
         height: "100%",
       }}
     >
+      <LoadingOverlay
+        // make the z-index 1+ of that the Affix component
+        zIndex={201}
+        style={{ height: "100vh" }}
+        visible={!isAllLoaded}
+        overlayOpacity={1}
+        overlayColor="#FFF"
+        loaderProps={{ color: "#111112" }}
+      />
       <Affix position={{ bottom: 30, right: 22 }}>
         <Transition mounted={true} transition="slide-left" duration={300}>
           {(transitionStyles) =>
@@ -167,6 +192,7 @@ export function SelectArtwork() {
         }}
       >
         <BackIcon onClick={() => nav(-1)} />
+
         <Text
           style={{
             marginTop: "40px",
@@ -190,9 +216,38 @@ export function SelectArtwork() {
           position: "relative",
         }}
       >
-        <SimpleGrid cols={2} spacing={13} ref={wrapperRef}>
-          {!loading &&
-            result.map(({ image_id, id, title }: any, index: any) => (
+        <InfiniteScroll
+          dataLength={images.length} //This is important field to render the next data
+          next={loadFunc}
+          hasMore={true}
+          loader={
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                paddingTop: 40,
+                paddingBottom: 60,
+              }}
+            >
+              <Loader
+                sx={(theme) => ({
+                  stroke: "#111112",
+                  // "&:hover": {
+                  //   backgroundColor: theme.colors.gray[1],
+                  // },
+                })}
+              />
+            </div>
+          }
+          endMessage={
+            <p style={{ textAlign: "center" }}>
+              <b>Yay! You have seen it all</b>
+            </p>
+          }
+        >
+          <SimpleGrid cols={2} spacing={13} ref={wrapperRef}>
+            {images.map(({ image_id, id, title }: any, index: any) => (
               <ArtworkCheckBox
                 key={index}
                 src={`https://www.artic.edu/iiif/2/${image_id}/full/843,/0/default.jpg`}
@@ -200,20 +255,12 @@ export function SelectArtwork() {
                 onClick={toggleArtwork(String(id))}
                 onChange={() => {}}
                 checked={selectedArtwork.includes(String(id))}
-                ref={(el: HTMLImageElement) => setRef(el, index)}
+                // ref={(el: HTMLImageElement) => setRef(el, index)}
               />
             ))}
-        </SimpleGrid>
+          </SimpleGrid>
+        </InfiniteScroll>
       </div>
-      <LoadingOverlay
-      // make the z-index 1+ of that the Affix component
-        zIndex={201}
-        style={{ height: "100vh" }}
-        visible={!isAllLoaded}
-        overlayOpacity={1}
-        overlayColor="#FFF"
-        loaderProps={{ color: "#111112" }}
-      />
     </Container>
   );
 }
