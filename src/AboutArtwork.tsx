@@ -177,6 +177,7 @@ export function AboutArtwork() {
         overlayOpacity={1}
         overlayColor="#FFF"
         loaderProps={{ color: "#111112" }}
+        style={{height:"100vh"}}
       ></LoadingOverlay>
       <div
         style={{
