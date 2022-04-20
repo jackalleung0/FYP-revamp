@@ -82,6 +82,7 @@ export function Home() {
   return (
     <div>
       <LoadingOverlay
+        zIndex={201}
         style={{ height: "100vh", width: "100%", position: "fixed", top: 0 }}
         visible={!allDoneLoading}
         overlayOpacity={1}
@@ -124,51 +125,53 @@ export function Home() {
         </Transition>
       </Affix>
 
-      <Container
-        style={{
-          paddingLeft: "20px",
-          paddingRight: "20px",
-        }}
-      >
-        <div
+      <div style={{ display: allDoneLoading ? "block" : "none" }}>
+        <Container
           style={{
-            display: "flex",
-            justifyContent: "space-between",
-            paddingTop: "14px",
+            paddingLeft: "20px",
+            paddingRight: "20px",
           }}
         >
-          {currentUser?.photoURL ? (
-            <Avatar
-              component={UnstyledButton}
-              onClickCapture={logout}
-              src={currentUser?.photoURL}
-              className={classes.userAvatar}
-            />
-          ) : (
-            <UserAvatar className={classes.userAvatar} />
-          )}
-          <Bell style={{ paddingTop: "8px", paddingRight: "2px" }} />
-        </div>
-        <Text
-          style={{
-            marginTop: "19px",
-            fontSize: "32px",
-            fontFamily: "SFProDisplay",
-            fontWeight: "bold",
-            color: "#000000",
-            height: "72px",
-            lineHeight: "34px",
-          }}
-        >
-          Welcome to <br />
-          AR Art Gallery
-        </Text>
-      </Container>
-      <TrendingTags />
-      <RecommendedForYou onLoadChange={setDoneLoading("RecommendedForYou")} />
-      <NewDiscover onLoadChange={setDoneLoading("NewDiscover")} />
-      <RecentlyViewed onLoadChange={setDoneLoading("RecentlyViewed")} />
-      <LatestArtwork onLoadChange={setDoneLoading("LatestArtwork")} />
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              paddingTop: "14px",
+            }}
+          >
+            {currentUser?.photoURL ? (
+              <Avatar
+                component={UnstyledButton}
+                onClickCapture={logout}
+                src={currentUser?.photoURL}
+                className={classes.userAvatar}
+              />
+            ) : (
+              <UserAvatar className={classes.userAvatar} />
+            )}
+            <Bell style={{ paddingTop: "8px", paddingRight: "2px" }} />
+          </div>
+          <Text
+            style={{
+              marginTop: "19px",
+              fontSize: "32px",
+              fontFamily: "SFProDisplay",
+              fontWeight: "bold",
+              color: "#000000",
+              height: "72px",
+              lineHeight: "34px",
+            }}
+          >
+            Welcome to <br />
+            AR Art Gallery
+          </Text>
+        </Container>
+        <TrendingTags />
+        <RecommendedForYou onLoadChange={setDoneLoading("RecommendedForYou")} />
+        <NewDiscover onLoadChange={setDoneLoading("NewDiscover")} />
+        <RecentlyViewed onLoadChange={setDoneLoading("RecentlyViewed")} />
+        <LatestArtwork onLoadChange={setDoneLoading("LatestArtwork")} />
+      </div>
     </div>
   );
 }
