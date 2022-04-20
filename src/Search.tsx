@@ -56,6 +56,10 @@ export function Search() {
   const { result } = useAsync(searchArtworkBySearchTerm, [debouncedTerm, 20]);
   console.log(result);
 
+  const toArtwork = (id: string) => () => {
+    nav(`/artwork/${id}`);
+  };
+
   return (
     <div style={{ position: "relative" }}>
       <Affix position={{ bottom: 30, right: 22 }}>
@@ -214,6 +218,7 @@ export function Search() {
                 result.map((artwork: any) => (
                   <>
                     <div
+                      onClick={toArtwork(artwork.id)}
                       style={{
                         display: "flex",
                         gap: 18,
