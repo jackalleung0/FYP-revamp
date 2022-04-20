@@ -350,7 +350,11 @@ const LatestArtwork = ({ onLoadChange }: any) => {
 };
 
 const getLatestImage = async () => {
-  return (await instance.get<{ data: Artwork[] }>(`/artworks`)).data.data;
+  return (
+    await instance.get<{ data: Artwork[] }>(`/artworks`, {
+      params: { limit: 10 },
+    })
+  ).data.data;
 };
 
 const NewDiscover = ({ onLoadChange }: any) => {
@@ -362,7 +366,8 @@ const NewDiscover = ({ onLoadChange }: any) => {
   }>(
     query(
       collection(getFirestore(app), "/artworks"),
-      orderBy("numberOfLikes", "desc")
+      orderBy("numberOfLikes", "desc"),
+      limit(10)
     ) as CollectionReference<{ numberOfLikes: number }>
   );
   const [setRef, loaded] = useRefCallback();
@@ -655,7 +660,7 @@ const getRecommendArtworks = async (values: any) => {
         "title",
         "timestamp",
       ],
-      limit: 15,
+      limit: 10,
     })
     .then(({ data }) => data.data)
     .then((recommendedArtworks) => {
