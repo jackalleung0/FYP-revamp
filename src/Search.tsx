@@ -51,6 +51,7 @@ export function Search() {
       term: "",
     },
   });
+  const isSearchMode = isFocus || !!form.values.term;
 
   const [debouncedTerm] = useDebouncedValue(form.values.term, 200);
   const { result } = useAsync(searchArtworkBySearchTerm, [debouncedTerm, 20]);
@@ -63,7 +64,11 @@ export function Search() {
   return (
     <div style={{ position: "relative" }}>
       <Affix position={{ bottom: 30, right: 22 }}>
-        <Transition mounted={!isFocus} transition="slide-left" duration={300}>
+        <Transition
+          mounted={!isSearchMode}
+          transition="slide-left"
+          duration={300}
+        >
           {(transitionStyles) => (
             <ActionIcon
               className={classes.ActionIcon}
@@ -95,13 +100,13 @@ export function Search() {
       </Affix>
       <Container
         style={{
-          paddingTop: isFocus ? 14 : 10,
+          paddingTop: isSearchMode ? 14 : 10,
           paddingLeft: "20px",
           paddingRight: "20px",
         }}
       >
         <Transition
-          mounted={!isFocus}
+          mounted={!isSearchMode}
           transition="fade"
           duration={400}
           timingFunction="ease"
@@ -135,7 +140,7 @@ export function Search() {
           })}
         >
           <TextInput
-            placeholder={isFocus ? "" : "Search artworks & artists..."}
+            placeholder={isSearchMode ? "" : "Search artworks & artists..."}
             icon={<SearchIcon />}
             onFocus={() => setIsFocus(true)}
             onBlur={() => setIsFocus(false)}
@@ -169,7 +174,7 @@ export function Search() {
             }}
           />
           <Transition
-            mounted={isFocus}
+            mounted={isSearchMode}
             transition="fade"
             duration={400}
             timingFunction="ease"
@@ -186,23 +191,29 @@ export function Search() {
                     paddingRight: 0,
                   },
                 }}
-                style={{
-                  color: "#4E5D78",
-                  fontFamily: "Inter",
-                  fontSize: "14px",
-                  fontWeight: "normal",
-                  ...styles,
+                onClick={() => {
+                  form.setFieldValue('term', '');
+                  // console.log((form.values.term = ""))
                 }}
-                component={Text}
               >
-                Cancel
+                <Text
+                  style={{
+                    color: "#4E5D78",
+                    fontFamily: "Inter",
+                    fontSize: "14px",
+                    fontWeight: "normal",
+                    ...styles,
+                  }}
+                >
+                  Cancel
+                </Text>
               </Button>
             )}
           </Transition>
         </form>
 
         <Transition
-          mounted={isFocus}
+          mounted={isSearchMode}
           transition="fade"
           duration={400}
           timingFunction="ease"
@@ -277,7 +288,7 @@ export function Search() {
         </Transition>
 
         <Transition
-          mounted={!isFocus}
+          mounted={!isSearchMode}
           transition="fade"
           duration={400}
           timingFunction="ease"
