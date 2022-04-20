@@ -11,7 +11,13 @@ import {
   UnstyledButton,
   LoadingOverlay,
 } from "@mantine/core";
-import React, { createRef, useEffect, useMemo, useState } from "react";
+import React, {
+  createRef,
+  forwardRef,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { ArrowUpIcon, HeartIcon } from "@heroicons/react/outline";
 import { RecommendedCard } from "./components/RecommendedCard";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -34,11 +40,13 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import {
   useCollection,
   useCollectionData,
+  useCollectionOnce,
   useDocumentData,
   useDocumentOnce,
 } from "react-firebase-hooks/firestore";
 import {
   collection,
+  CollectionReference,
   doc,
   DocumentReference,
   getFirestore,
@@ -346,19 +354,29 @@ const getLatestImage = async () => {
 };
 
 const NewDiscover = ({ onLoadChange }: any) => {
-  // currently, get the latest image from api
-  const { result, loading } = useAsync(getLatestImage, []);
-
   const nav = useNavigate();
   const toArtwork = (id: any) => () => nav(`/artwork/${id}`);
 
+  const [snapshot, loading, error] = useCollectionOnce<{
+    numberOfLikes: number;
+  }>(
+    query(
+      collection(getFirestore(app), "/artworks"),
+      orderBy("numberOfLikes", "desc")
+    ) as CollectionReference<{ numberOfLikes: number }>
+  );
   const [setRef, loaded] = useRefCallback();
-  console.log(loaded);
   useEffect(() => {
     if (loaded && !loading) {
       onLoadChange();
     }
   }, [loaded, loading]);
+
+  // useEffect(() => {
+  //   if (!loading) {
+  //     onLoadChange();
+  //   }
+  // }, [loading]);
 
   return (
     <>
@@ -395,23 +413,46 @@ const NewDiscover = ({ onLoadChange }: any) => {
             minWidth: "min-content",
           }}
         >
-          {result &&
-            result.map((artwork, index) => (
-              <DiscoverCard
-                key={index}
-                title={artwork.title}
-                author={getArtistName(artwork.artist_display)}
-                src={getImageURL(artwork.image_id)}
-                tag={artwork.style_title || artwork.artwork_type_title}
-                onClickCapture={toArtwork(artwork.id)}
+          {snapshot?.docs.map((snapshot, index) => {
+            return (
+              <NewDiscoverCard
+                key={snapshot.id}
+                id={snapshot.id}
+                onClickCapture={toArtwork(snapshot.id)}
                 ref={(el: HTMLImageElement) => setRef(el, index)}
               />
-            ))}
+            );
+          })}
         </div>
       </div>
     </>
   );
 };
+const getArtworkById = async (id: string) => {
+  return (await instance.get(`/artworks/${id}`)).data.data;
+};
+
+const NewDiscoverCard = forwardRef<
+  HTMLImageElement,
+  { id: string; onClickCapture: () => void }
+>(({ id, onClickCapture }, ref) => {
+  // currently, get the latest image from api
+  const { result, loading } = useAsync(getArtworkById, [id]);
+
+  return (
+    (!loading && !!result && (
+      <DiscoverCard
+        title={result.title}
+        author={getArtistName(result.artist_display)}
+        src={getImageURL(result.image_id)}
+        tag={result.style_title || result.artwork_type_title}
+        onClickCapture={onClickCapture}
+        ref={ref}
+      />
+    )) || <></>
+  );
+});
+
 const RecentlyViewed = ({ onLoadChange }: any) => {
   const [user, authLoading] = useAuthState(getAuth(app));
 
