@@ -206,6 +206,8 @@ export function SelectArtwork() {
         </SimpleGrid>
       </div>
       <LoadingOverlay
+      // make the z-index 1+ of that the Affix component
+        zIndex={201}
         style={{ height: "100vh" }}
         visible={!isAllLoaded}
         overlayOpacity={1}
