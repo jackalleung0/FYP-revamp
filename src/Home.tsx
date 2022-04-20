@@ -14,7 +14,7 @@ import {
 import React, { createRef, useEffect, useMemo, useState } from "react";
 import { ArrowUpIcon, HeartIcon } from "@heroicons/react/outline";
 import { RecommendedCard } from "./components/RecommendedCard";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { TagButton } from "./TagButton";
 import { useSetState, useWindowScroll } from "@mantine/hooks";
 import { DiscoverCard } from "./DiscoverCard";
@@ -67,13 +67,23 @@ export function Home() {
   const setDoneLoading = (key: string) => () =>
     _setDoneLoading({ [key]: true });
   const [doneLoading, _setDoneLoading] = useSetState({
-    // TrendingTags: false,
     RecommendedForYou: false,
     NewDiscover: false,
     RecentlyViewed: false,
     LatestArtwork: false,
   });
-  console.log(doneLoading);
+
+  const location = useLocation();
+  useEffect(() => {
+    // set all status as false when there are location change (i.e. have page push / pop event)
+    _setDoneLoading({
+      RecommendedForYou: false,
+      NewDiscover: false,
+      RecentlyViewed: false,
+      LatestArtwork: false,
+    });
+  }, [location]);
+
   const allDoneLoading = useMemo(
     () => Object.values(doneLoading).every((entry) => entry === true),
     [doneLoading]
@@ -89,41 +99,43 @@ export function Home() {
         overlayColor="#FFF"
         loaderProps={{ color: "#111112" }}
       />
-      <Affix position={{ bottom: 30, right: 22 }} id="searchbutton">
-        <Transition mounted={true} transition="slide-left" duration={300}>
-          {(transitionStyles) => (
-            <ActionIcon
-              component={Link}
-              to="/search"
-              className={classes.ActionIcon}
-              radius={9999}
-              size={70}
-              style={{
-                backgroundColor: "#111112",
-                ...transitionStyles,
-              }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="22.414"
-                height="22.414"
-                viewBox="0 0 22.414 22.414"
+      {allDoneLoading && (
+        <Affix position={{ bottom: 30, right: 22 }} id="searchbutton">
+          <Transition mounted={true} transition="slide-left" duration={300}>
+            {(transitionStyles) => (
+              <ActionIcon
+                component={Link}
+                to="/search"
+                className={classes.ActionIcon}
+                radius={9999}
+                size={70}
+                style={{
+                  backgroundColor: "#111112",
+                  ...transitionStyles,
+                }}
               >
-                <path
-                  id="Search_Icon"
-                  d="M23,23l-6.667-6.667m2.222-5.556A7.778,7.778,0,1,1,10.778,3,7.778,7.778,0,0,1,18.556,10.778Z"
-                  transform="translate(-2 -2)"
-                  fill="none"
-                  stroke="#fff"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                />
-              </svg>
-            </ActionIcon>
-          )}
-        </Transition>
-      </Affix>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="22.414"
+                  height="22.414"
+                  viewBox="0 0 22.414 22.414"
+                >
+                  <path
+                    id="Search_Icon"
+                    d="M23,23l-6.667-6.667m2.222-5.556A7.778,7.778,0,1,1,10.778,3,7.778,7.778,0,0,1,18.556,10.778Z"
+                    transform="translate(-2 -2)"
+                    fill="none"
+                    stroke="#fff"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                  />
+                </svg>
+              </ActionIcon>
+            )}
+          </Transition>
+        </Affix>
+      )}
 
       <div style={{ display: allDoneLoading ? "block" : "none" }}>
         <Container
