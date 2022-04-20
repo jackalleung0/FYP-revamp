@@ -52,7 +52,7 @@ const fetchArtworks = async (from?: number) =>
         from,
       },
     })
-    .then(({ data }) => data.data.filter((e) => !!e.image_id));
+    .then(({ data }) => data.data.filter((e: any) => !!e.image_id));
 
 export function SelectArtwork() {
   const { classes } = useStyles();
