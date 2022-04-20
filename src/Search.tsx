@@ -41,7 +41,8 @@ import { getArtistName } from "./getArtistName";
 export function Search() {
   const { classes } = useStyles();
 
-  const [isFocus, setIsFocus] = React.useState(false);
+  const isFocus = true;
+  // const [isFocus, setIsFocus] = React.useState(false);
 
   const nav = useNavigate();
   let [searchParams, setSearchParams] = useSearchParams();
@@ -235,6 +236,7 @@ export function Search() {
                             fontWeight: "normal",
                             color: "#111112",
                             height: 20,
+                            paddingBottom: 4,
                           }}
                           lineClamp={1}
                         >
@@ -242,14 +244,14 @@ export function Search() {
                         </Text>
                         <Text
                           style={{
-                            paddingTop: 4,
                             fontSize: "12px",
                             fontFamily: "Inter",
                             fontWeight: "100",
                             color: "#8A94A6",
                             height: 15,
+                            paddingBottom: 4,
                           }}
-                           lineClamp={1}
+                          lineClamp={1}
                         >
                           {getArtistName(artwork.artist_display)}
                         </Text>
