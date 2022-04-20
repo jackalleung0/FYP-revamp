@@ -553,18 +553,16 @@ export function ArtworkDetail() {
           <>
             <div
               style={{
-                position: "sticky",
-                top: 10,
+                paddingTop: 10,
                 paddingLeft: 20,
                 paddingRight: 20,
-                paddingBottom: 34,
               }}
               id="header-bar"
             >
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <BackIcon onClick={() => nav(-1)} />
 
-                <div style={{ display: "flex", gap: 32 }}>
+                <div style={{ display: "flex", gap: 32, paddingBottom: 24 }}>
                   <CommentIcon />
                   <ShareIcon onClickCapture={() => setShow(true)} />
                 </div>
