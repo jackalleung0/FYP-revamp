@@ -25,6 +25,7 @@ import {
   increment,
   setDoc,
 } from "firebase/firestore";
+import CopyToClipboard from "react-copy-to-clipboard";
 import React, { useMemo, useState } from "react";
 import { useAsync } from "react-async-hook";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -46,6 +47,11 @@ import { TelegramIcon } from "./TelegramIcon";
 import { TwitterIcon } from "./TwitterIcon";
 import { WhatsAppIcon } from "./WhatsAppIcon";
 import { fetchArtwork } from "./fetchArtwork";
+import {
+  TelegramShareButton,
+  TwitterShareButton,
+  WhatsappShareButton,
+} from "react-share";
 
 const rating_weight = 0.8;
 
@@ -375,6 +381,11 @@ export function ArtworkDetail() {
     [result]
   );
 
+  const shareLink = React.useMemo(
+    () => `https://arartgallery.site/artwork/${id}`,
+    [id]
+  );
+
   return (
     <div>
       <div style={{ display: allDoneLoading ? "block" : "none" }}>
@@ -409,39 +420,41 @@ export function ArtworkDetail() {
                 width: "max-content",
               }}
             >
-              <UnstyledButton onClickCapture={copyToClipboard}>
-                <div
-                  style={{
-                    borderRadius: 99,
-                    background: "#F1F2F4",
-                    display: "flex",
-                    alignContent: "center",
-                    justifyItems: "center",
-                    width: 60,
-                    height: 60,
-                  }}
-                >
-                  <LinkIcon
+              <CopyToClipboard text={shareLink} onCopy={copyToClipboard}>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <div
                     style={{
-                      padding: 16,
+                      borderRadius: 99,
+                      background: "#F1F2F4",
+                      display: "flex",
+                      alignContent: "center",
+                      justifyItems: "center",
+                      width: 60,
+                      height: 60,
                     }}
-                  />
+                  >
+                    <LinkIcon
+                      style={{
+                        padding: 16,
+                      }}
+                    />
+                  </div>
+                  <Text
+                    align="center"
+                    style={{
+                      paddingTop: 8 - 2,
+                      fontFamily: "Inter",
+                      fontWeight: "100",
+                      fontSize: 12,
+                      lineHeight: "20px",
+                      color: "#4E5D78",
+                    }}
+                  >
+                    Copy Link
+                  </Text>
                 </div>
-                <Text
-                  align="center"
-                  style={{
-                    paddingTop: 8 - 2,
-                    fontFamily: "Inter",
-                    fontWeight: "100",
-                    fontSize: 12,
-                    lineHeight: "20px",
-                    color: "#4E5D78",
-                  }}
-                >
-                  Copy Link
-                </Text>
-              </UnstyledButton>
-              <UnstyledButton>
+              </CopyToClipboard>
+              <TwitterShareButton url={shareLink}>
                 <TwitterIcon width={60} />
                 <Text
                   align="center"
@@ -456,8 +469,8 @@ export function ArtworkDetail() {
                 >
                   Twitter
                 </Text>
-              </UnstyledButton>
-              <UnstyledButton>
+              </TwitterShareButton>
+              <WhatsappShareButton url={shareLink}>
                 <WhatsAppIcon />
                 <Text
                   align="center"
@@ -473,8 +486,8 @@ export function ArtworkDetail() {
                 >
                   WhatsApp
                 </Text>
-              </UnstyledButton>
-              <UnstyledButton>
+              </WhatsappShareButton>
+              <TelegramShareButton url={shareLink}>
                 <TelegramIcon />
                 <Text
                   align="center"
@@ -489,7 +502,7 @@ export function ArtworkDetail() {
                 >
                   Telegram
                 </Text>
-              </UnstyledButton>
+              </TelegramShareButton>
             </div>
 
             <div
