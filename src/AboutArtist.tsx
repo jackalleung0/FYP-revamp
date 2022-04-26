@@ -94,7 +94,7 @@ export function AboutArtist() {
   console.log(artistResult);
   // console.log(result);
   return (
-    <div>
+    <div style={{ height: "100vh" }}>
       <LoadingOverlay
         visible={detailsLoading || artistsLoading}
         overlayOpacity={1}
