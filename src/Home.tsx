@@ -401,7 +401,7 @@ const NewDiscover = ({ onLoadChange }: any) => {
           paddingBottom: "15px",
         }}
       >
-        New Discover
+        most popular
       </Text>
       <div
         style={{
