@@ -1,31 +1,14 @@
 import {
-  Container,
-  Text,
-  Image,
-  ActionIcon,
-  createStyles,
-  Affix,
-  Transition,
-  LoadingOverlay,
-  Loader,
+  ActionIcon, Affix, Container, createStyles, Image, Loader, Text, Transition
 } from "@mantine/core";
 import { useWindowScroll } from "@mantine/hooks";
 import { getAuth } from "firebase/auth";
 import {
-  query,
-  collection,
-  getFirestore,
-  orderBy,
-  limit,
-  getDocs,
-  DocumentData,
-  QuerySnapshot,
-  QueryDocumentSnapshot,
-  startAfter,
+  collection, DocumentData, getDocs, getFirestore, limit, orderBy, query, Query, QueryDocumentSnapshot,
+  startAfter
 } from "firebase/firestore";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { useCollection } from "react-firebase-hooks/firestore";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useNavigate } from "react-router-dom";
 import { Artwork } from "./Artwork";
@@ -65,26 +48,30 @@ export function RecentlyViewed() {
   const [hasMore, setHasMore] = useState(true);
   const loadFunc = async () => {
     if (!user) return;
+    let newRef: Query<DocumentData>;
     if (snapshot.length === 0) {
-      const newRef = query(
+      newRef = query(
         collection(getFirestore(app), `/users/${user.uid}/history`),
         orderBy("lastAccessed", "desc"),
         limit(10)
       );
-      const newSnapshot = await getDocs(newRef);
-      setSnapshots((e) => [...e, ...newSnapshot.docs]);
     } else {
-      const newRef = query(
+      newRef = query(
         collection(getFirestore(app), `/users/${user.uid}/history`),
         orderBy("lastAccessed", "desc"),
         startAfter(snapshot[snapshot.length - 1]),
         limit(10)
       );
-      const newSnapshot = await getDocs(newRef);
-      if (newSnapshot.size !== 10) {
-        setHasMore(false);
-      }
-      setSnapshots((e) => [...e, ...newSnapshot.docs]);
+    }
+    const newSnapshot = await getDocs(newRef);
+    // filter possibly duplicate artwork by id
+    setSnapshots((e) =>
+      [...e, ...newSnapshot.docs].filter(
+        (e, index, arr) => index === arr.findIndex((b) => b.id === e.id)
+      )
+    );
+    if (newSnapshot.size !== 10) {
+      setHasMore(false);
     }
   };
   useEffect(() => {
