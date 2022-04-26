@@ -64,6 +64,7 @@ import { fetchArtwork } from "./fetchArtwork";
 import { Artwork } from "./Artwork";
 import { useOnLoadImages } from "./hooks/useOnLoadImages";
 import { useRefCallback } from "./useRefCallback";
+import { getArtworkDetails } from "./getArtworkDetails";
 export function Home() {
   const { classes } = useStyles();
   const nav = useNavigate();
@@ -789,64 +790,76 @@ const RecommendedForYou = ({ onLoadChange }: any) => {
   );
 };
 
-const TrendingTags = () => (
-  <>
-    <Text
-      style={{
-        marginLeft: "20px",
-        marginTop: "27px",
-        fontSize: "13px",
-        fontFamily: "Inter",
-        fontWeight: "bold",
-        color: "#4E5D78",
-        height: "16px",
-        lineHeight: "16px",
-        paddingBottom: "15px",
-      }}
-    >
-      TRENDING TAGS
-    </Text>
-    <div
-      style={{
-        overflowY: "hidden",
-        width: "100%",
-      }}
-      className="no-scrollbar"
-    >
-      <div
+const TrendingTags = () => {
+  const [snapshot, loading, error] = useCollectionOnce<{
+    numberOfLikes: number;
+  }>(
+    query(
+      collection(getFirestore(app), "/artworks"),
+      orderBy("numberOfLikes", "desc"),
+      // get the first (most) liked document
+      limit(1)
+    ) as CollectionReference<{ numberOfLikes: number }>
+  );
+  const id = snapshot?.docs[0].id;
+  const { result } = useAsync(getArtworkDetails, [id || ""]);
+  const tags = useMemo(
+    () =>
+      (result?.term_titles &&
+        result?.term_titles.filter((_, index) => index < 10)) ||
+      [],
+    [result]
+  );
+
+  return (
+    <>
+      <Text
         style={{
-          flexGrow: 1,
-          display: "flex",
-          gap: "6px",
-          paddingLeft: "20px",
-          paddingRight: "20px",
-          height: "34px",
-          minWidth: "min-content",
+          marginLeft: "20px",
+          marginTop: "27px",
+          fontSize: "13px",
+          fontFamily: "Inter",
+          fontWeight: "bold",
+          color: "#4E5D78",
+          height: "16px",
+          lineHeight: "16px",
+          paddingBottom: "15px",
         }}
       >
-        {[
-          "oil in canvas",
-          "painting",
-          "women",
-          "Post-Impressionism",
-          "domestic scenes",
-          "interiors",
-          "abstract figure",
-          "leisure",
-          "modern and contemporary art",
-        ].map((e, index) => (
-          <TagButton
-            to={`/search-result?term=${e}`}
-            key={index}
-            popular={index === 0}
-          >
-            {e}
-          </TagButton>
-        ))}
+        TRENDING TAGS
+      </Text>
+      <div
+        style={{
+          overflowY: "hidden",
+          width: "100%",
+        }}
+        className="no-scrollbar"
+      >
+        <div
+          style={{
+            flexGrow: 1,
+            display: "flex",
+            gap: "6px",
+            paddingLeft: "20px",
+            paddingRight: "20px",
+            height: "34px",
+            minWidth: "min-content",
+          }}
+        >
+          {tags.map((e, index) => (
+            <TagButton
+              to={`/search-result?term=${e}`}
+              key={index}
+              popular={index === 0}
+            >
+              {e}
+            </TagButton>
+          ))}
+        </div>
       </div>
-    </div>
-  </>
-);
+    </>
+  );
+};
 const Bell = ({ ...props }) => {
   return (
     <svg

@@ -12,12 +12,12 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useAsync } from "react-async-hook";
 import { useNavigate, useParams } from "react-router-dom";
-import { Artwork } from "./Artwork";
 import { BackIcon } from "./BackIcon";
 import { CommentIcon } from "./CommentIcon";
 import { getArtistName } from "./getArtistName";
 import { ShareIcon } from "./ShareIcon";
 import sanitizeHtml from "sanitize-html";
+import { getArtworkDetails } from "./getArtworkDetails";
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   ActionIcon: {
@@ -28,21 +28,10 @@ const useStyles = createStyles((theme, _params, getRef) => ({
   },
 }));
 
-const instance = axios.create({
+export const instance = axios.create({
   baseURL: "https://api.artic.edu/api/v1",
   timeout: 10000,
 });
-
-const getArtworkDetails = async (id: string) => {
-  const fields = ["artist_display", "artist_id"].join(",").replaceAll(" ", "");
-
-  const { data } = await instance.get<{ data: Artwork }>(`/artworks/${id}`, {
-    params: {
-      fields: fields,
-    },
-  });
-  return data.data;
-};
 
 function sanitizeLinks(description: any) {
   return description

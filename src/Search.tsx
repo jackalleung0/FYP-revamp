@@ -10,7 +10,7 @@ import {
   Image,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   useNavigate,
   Link,
@@ -37,6 +37,17 @@ import { searchArtworkBySearchTerm } from "./searchArtworkBySearchTerm";
 import { useAsync } from "react-async-hook";
 import { getImageURL } from "./getImageURL";
 import { getArtistName } from "./getArtistName";
+import {
+  query,
+  collection,
+  getFirestore,
+  orderBy,
+  limit,
+  CollectionReference,
+} from "firebase/firestore";
+import { useCollectionOnce } from "react-firebase-hooks/firestore";
+import { app } from "./firebaseConfig";
+import { getArtworkDetails } from "./getArtworkDetails";
 
 export function Search() {
   const { classes } = useStyles();
@@ -60,6 +71,26 @@ export function Search() {
   const toArtwork = (id: string) => () => {
     nav(`/artwork/${id}`);
   };
+
+  const [snapshot, loading, error] = useCollectionOnce<{
+    numberOfLikes: number;
+  }>(
+    query(
+      collection(getFirestore(app), "/artworks"),
+      orderBy("numberOfLikes", "desc"),
+      // get the first (most) liked document
+      limit(1)
+    ) as CollectionReference<{ numberOfLikes: number }>
+  );
+  const id = snapshot?.docs[0].id;
+  const { result: fav_artwork } = useAsync(getArtworkDetails, [id || ""]);
+  const tags = useMemo(
+    () =>
+      (fav_artwork?.term_titles &&
+        fav_artwork?.term_titles.filter((_, index) => index < 10)) ||
+      [],
+    [fav_artwork]
+  );
 
   return (
     <div style={{ position: "relative" }}>
@@ -192,7 +223,7 @@ export function Search() {
                   },
                 }}
                 onClick={() => {
-                  form.setFieldValue('term', '');
+                  form.setFieldValue("term", "");
                   // console.log((form.values.term = ""))
                 }}
               >
@@ -318,17 +349,7 @@ export function Search() {
                   flexWrap: "wrap",
                 }}
               >
-                {[
-                  "oil in canvas",
-                  "painting",
-                  "women",
-                  "Post-Impressionism",
-                  "domestic scenes",
-                  "interiors",
-                  "abstract figure",
-                  "leisure",
-                  "modern and contemporary art",
-                ].map((value, i) => (
+                {tags.map((value, i) => (
                   <TagButton
                     popular={i === 0}
                     to={`/search-result?term=${value}`}
