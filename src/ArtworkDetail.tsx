@@ -25,7 +25,7 @@ import {
   increment,
   setDoc,
 } from "firebase/firestore";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useAsync } from "react-async-hook";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useDocumentData } from "react-firebase-hooks/firestore";
@@ -365,6 +365,15 @@ export function ArtworkDetail() {
     !userDocLoading &&
     !loading &&
     !otherArtworkLoading;
+  const joinedTerms = useMemo(
+    () =>
+      (result &&
+        [result.style_title, result.artwork_type_title, ...result.term_titles]
+          .filter(Boolean)
+          .filter((tag, index, arr) => arr.indexOf(tag) === index)) ||
+      [],
+    [result]
+  );
 
   return (
     <div>
@@ -779,7 +788,18 @@ export function ArtworkDetail() {
                     flexWrap: "wrap",
                   }}
                 >
-                  {result.term_titles.map((value, i) => (
+                  {/* {[result.style_title || result.artwork_type_title].map(
+                    (value, i) => (
+                      <TagButton
+                        popular={i === 0}
+                        to={`/search-result?term=${value}`}
+                        key={i}
+                      >
+                        {value}
+                      </TagButton>
+                    )
+                  )} */}
+                  {joinedTerms.map((value, i) => (
                     <TagButton
                       popular={i === 0}
                       to={`/search-result?term=${value}`}
