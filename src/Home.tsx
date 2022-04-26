@@ -25,6 +25,7 @@ import { TagButton } from "./TagButton";
 import { useSetState, useWindowScroll } from "@mantine/hooks";
 import { DiscoverCard } from "./DiscoverCard";
 import dayjs from "dayjs";
+
 const useStyles = createStyles((theme, _params, getRef) => ({
   userAvatar: {
     boxShadow: theme.shadows.xl,
@@ -42,6 +43,7 @@ import {
   useCollectionData,
   useCollectionOnce,
   useDocumentData,
+  useDocumentDataOnce,
   useDocumentOnce,
 } from "react-firebase-hooks/firestore";
 import {
@@ -702,7 +704,8 @@ const RecommendedForYou = ({ onLoadChange }: any) => {
   //   }[]
   // >([]);
 
-  const [values, userDocLoading, __, snapshot] = useDocumentData<{
+  // prevent the artworks from reloading when an artwork is liked
+  const [values, userDocLoading, __, snapshot] = useDocumentDataOnce<{
     preferenceTags: { [key: string]: number };
     likedArtworks: string[];
   }>(
@@ -715,7 +718,6 @@ const RecommendedForYou = ({ onLoadChange }: any) => {
   const { result, loading } = useAsync(getRecommendArtworks, [values]);
 
   const [setRef, loaded] = useRefCallback();
-  console.log(loaded);
   useEffect(() => {
     if (loaded && !userDocLoading && !loading) {
       onLoadChange();

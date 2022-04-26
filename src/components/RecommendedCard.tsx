@@ -1,6 +1,17 @@
 import { createStyles, Text, Image } from "@mantine/core";
-import React, { createRef, forwardRef, useRef } from "react";
+import React, { createRef, forwardRef, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { HeartIcon as SolidHeartIcon, StarIcon } from "@heroicons/react/solid";
+import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/outline";
+import { useDocumentData } from "react-firebase-hooks/firestore";
+import { doc, getFirestore, DocumentReference } from "firebase/firestore";
+import { app } from "../firebaseConfig";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { getAuth } from "firebase/auth";
+import { Artwork } from "../Artwork";
+import { handleLikeArtwork } from "./handleLikeArtwork";
+import axios from "axios";
+import { useAsync } from "react-async-hook";
 
 const style = createStyles((theme, _params, getRef) => ({
   root: {
@@ -13,6 +24,30 @@ export const RecommendedCard = forwardRef<HTMLImageElement>(
     const { classes } = style();
     const nav = useNavigate();
 
+    const [user] = useAuthState(getAuth(app));
+    const [userProfile, userLoading] = useDocumentData(
+      user &&
+        (doc(getFirestore(app), `users/${user.uid}`) as DocumentReference<{
+          likedArtworks: string[];
+        }>)
+    );
+    const userLikedArtwork = useMemo(
+      () =>
+        (id &&
+          userProfile &&
+          (userProfile.likedArtworks || []).includes(String(id))) ||
+        false,
+      [userProfile, id]
+    );
+
+    const toggleHeart: React.MouseEventHandler<SVGSVGElement> = (e) => {
+      e.stopPropagation();
+
+      handleLikeArtwork({
+        artworkID: String(id),
+      });
+    };
+
     return (
       <div
         style={{
@@ -20,7 +55,7 @@ export const RecommendedCard = forwardRef<HTMLImageElement>(
           borderRadius: "12px",
         }}
         className={classes.root}
-        onClickCapture={() => nav(`/artwork/${id}`)}
+        onClick={() => nav(`/artwork/${id}`)}
       >
         <div style={{ position: "relative" }}>
           <Image
@@ -108,25 +143,28 @@ export const RecommendedCard = forwardRef<HTMLImageElement>(
           >
             {artist}
           </Text>
-          <svg
-            style={{ marginRight: "21px", flexShrink: 0 }}
-            xmlns="http://www.w3.org/2000/svg"
-            width="17"
-            height="15"
-            viewBox="0 0 17 15"
-          >
-            <path
-              id="Path_4"
-              data-name="Path 4"
-              d="M4.1,6.115a3.849,3.849,0,0,0,0,5.385L10.5,18l6.4-6.5a3.849,3.849,0,0,0,0-5.385,3.71,3.71,0,0,0-5.3,0L10.5,7.23,9.4,6.115a3.71,3.71,0,0,0-5.3,0Z"
-              transform="translate(-2 -4)"
-              fill="none"
-              stroke="#111112"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
+          {userLikedArtwork ? (
+            <SolidHeartIcon
+              style={{
+                width: 17 + 5,
+                height: 15 + 5,
+                color: "#DD2727",
+                marginRight: "21px",
+                flexShrink: 0,
+              }}
+              onClickCapture={toggleHeart}
             />
-          </svg>
+          ) : (
+            <OutlineHeartIcon
+              style={{
+                width: 17 + 5,
+                height: 15 + 5,
+                marginRight: "21px",
+                flexShrink: 0,
+              }}
+              onClickCapture={toggleHeart}
+            />
+          )}
         </div>
       </div>
     );
