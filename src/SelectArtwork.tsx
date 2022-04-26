@@ -48,7 +48,9 @@ const fetchArtworks = async (from?: number) =>
   instance
     .get("artworks/search", {
       params: {
-        fields: ["id", "title", "image_id"].join(",").replaceAll(" ", ""),
+        fields: ["id", "title", "image_id", "term_titles"]
+          .join(",")
+          .replaceAll(" ", ""),
         from,
       },
     })
@@ -78,22 +80,15 @@ export function SelectArtwork() {
   }, []);
 
   const [images, setImages] = React.useState<any[]>([]);
-  // React.useEffect(() => {
-  //   if (result) {
-  //     setImages((e) => [...e, result]);
-  //   }
-  // }, [result]);
+
   const loadFunc = async () => {
     const result = await fetchArtworks(images.length);
     setImages((e) => [...e, ...result]);
-    // console.log("done");
   };
 
-  const auth = getAuth(app);
-  const [user] = useAuthState(auth);
+  const [user] = useAuthState(getAuth(app));
 
   const isAllLoaded = true;
-  // const isAllLoaded = useMemo(() => loaded, [loaded]);
 
   const [value, docLoading, error, snapshot, reload] =
     useDocumentDataOnce<UserProfile>(
@@ -104,15 +99,33 @@ export function SelectArtwork() {
         ) as DocumentReference<UserProfile>)
     );
 
-  useEffect(() => {
-    if (value) {
-      setSelectedArtwork(value.likedArtworks);
-    }
-  }, [value, docLoading]);
-
   const [selectedArtwork, setSelectedArtwork] = React.useState<string[]>([]);
 
   const addToFavorite = (likedArtworks: string[]) => async () => {
+    console.log(likedArtworks);
+    // TODO: calculate the points of the artwork
+
+    console.log(images);
+    // get all liked artworks's tags (term_titles)
+    const acc_term_titles: string[] = likedArtworks
+      .map((id) => images.find((e) => String(e.id) === id).term_titles)
+      .reduce((acc, cur) => [...acc, ...cur], [] as string[]);
+
+    const preferencePayload =
+      acc_term_titles.reduce(
+        (acc, cur) => {
+          const i = Object.keys(acc).indexOf(cur);
+          if (i > -1) {
+            acc[cur] = (acc[cur] || 0) + 10;
+          } else {
+            acc[cur] = 10;
+          }
+          return acc;
+        },
+        { ...(value?.preferenceTags || {}) } as {
+          [key: string]: number;
+        }
+      ) || {};
     if (!snapshot) {
       console.error("there are no user snapshot");
       return;
@@ -121,7 +134,10 @@ export function SelectArtwork() {
     await setDoc(
       snapshot.ref,
       // unset the gettingStartedSteps, to prevent user get directed to this page again
-      { likedArtworks, skipGettingStarted: true },
+      {
+        skipGettingStarted: true,
+        preferenceTags: preferencePayload,
+      },
       { merge: true }
     );
 
