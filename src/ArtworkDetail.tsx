@@ -26,7 +26,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import CopyToClipboard from "react-copy-to-clipboard";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async-hook";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useDocumentData } from "react-firebase-hooks/firestore";
@@ -105,6 +105,7 @@ const getRelatedArtwork = async (artistName: string, currentID: string) => {
 export function ArtworkDetail() {
   const { classes } = useStyles();
   const nav = useNavigate();
+  const hist = useLocation();
   let { id } = useParams<{ id: string }>();
   const toArtwork = (id: string) => () => {
     nav(`/artwork/${id}`);
@@ -115,7 +116,13 @@ export function ArtworkDetail() {
     [getArtistName(result?.artist_display || ""), id || ""]
   );
   const auth = getAuth(app);
-  const [user] = useAuthState(auth);
+  const [user, authLoading] = useAuthState(auth);
+  useEffect(() => {
+    console.log(hist);
+    if (!authLoading && !user) {
+      nav(`/login?redirect=${hist.pathname}`, { replace: true });
+    }
+  }, [authLoading, user]);
 
   const location = useLocation();
   React.useEffect(() => {

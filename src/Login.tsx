@@ -8,10 +8,10 @@ import {
 } from "@mantine/core";
 import { getAuth } from "firebase/auth";
 import { doc, getFirestore } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuthState, useSignInWithGoogle } from "react-firebase-hooks/auth";
 import { useDocumentData } from "react-firebase-hooks/firestore";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { BackIcon } from "./BackIcon";
 import { app } from "./firebaseConfig";
 function EyeIcon({ reveal, size }: { reveal: boolean; size: number }) {
@@ -33,8 +33,16 @@ function EyeIcon({ reveal, size }: { reveal: boolean; size: number }) {
 }
 
 const auth = getAuth(app);
+
+function useQuery() {
+  const { search } = useLocation();
+
+  return useMemo(() => new URLSearchParams(search), [search]);
+}
+
 export function Login() {
   const nav = useNavigate();
+  const query = useQuery();
   const [signInWithGoogle] = useSignInWithGoogle(auth);
   const [pressedSignIn, setPressedSignIn] = useState(false);
   const login = (method: "Google") => async () => {
@@ -50,6 +58,11 @@ export function Login() {
   );
   useEffect(() => {
     if (!pressedSignIn || userDocLoading) return;
+    const redirect = query.get("redirect");
+    if (!!redirect) {
+      nav(redirect);
+      return;
+    }
     if (values && values.skipGettingStarted) {
       nav("/home");
     } else {
