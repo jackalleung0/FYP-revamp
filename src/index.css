@@ -64,7 +64,7 @@ code {
 }
 
 [data-rsbs-header]:before {
-  height: 8px !important;
+  height: 6px !important;
   border-radius: 99px !important;
   width: 35px !important;
 }
