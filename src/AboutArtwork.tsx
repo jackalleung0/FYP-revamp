@@ -192,8 +192,8 @@ export function AboutArtwork() {
       <div style={{ display: allDoneLoading ? "block" : "none" }}>
         <div
           style={{
-            position: "sticky",
-            top: 10,
+            // position: "sticky",
+            paddingTop: 10,
             paddingLeft: 20,
             paddingRight: 20,
             paddingBottom: 34,
