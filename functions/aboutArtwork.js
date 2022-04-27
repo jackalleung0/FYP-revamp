@@ -1,7 +1,6 @@
 const axios = require("axios");
 
-function buildHTML({ title, url, alt, id }) {
-  console.log({ title, url, alt, id });
+function buildHTML({ title, url, alt, id, description }) {
   const template = `<!DOCTYPE html>
     <html lang="en">
       <head>
@@ -12,12 +11,12 @@ function buildHTML({ title, url, alt, id }) {
         <meta property="og:image:width" content="400" />
         <meta property="og:image:height" content="300" />
         <meta property="og:image:alt" content="${alt}" />
-        <meta name="description" content="${alt}" />
+        <meta name="description" content="${description}" />
         <link rel="icon" href="/favicon.ico">
       </head>
       <body>
         <script>
-          window.location="https://revamp.arartgallery.site/artwork/${id}";
+          window.location="https://revamp.arartgallery.site/artwork/${id}/about";
         </script>
       </body>
     </html>
@@ -136,9 +135,9 @@ const express = require("express");
 const exp = express();
 
 exp.get("/:artworkID", async (req, res) => {
+  console.log(JSON.stringify(req.path));
   const { artworkID } = req.params;
 
-  // reject if there are no enough parameter
   if (!artworkID || isNaN(Number.parseInt(artworkID))) {
     console.log(`incorrect artworkID ${artworkID}`);
     return res.sendStatus(400);
@@ -155,16 +154,18 @@ exp.get("/:artworkID", async (req, res) => {
 
   if (data.length === 0) return res.status(400);
 
-  const { title, image_id, thumbnail } = data;
+  const { title, image_id, thumbnail, exhibition_history } = data;
   const htmlString = buildHTML({
     title: title,
     url: `https://www.artic.edu/iiif/2/${image_id}/full/843,/0/default.jpg`,
     alt: thumbnail?.alt_text || "",
     id: artworkID,
+    description: exhibition_history,
   });
 
   return res.status(200).send(htmlString);
 });
 
+// the shared link will look like this: https://arartgallery.site/artwork/{artworkID}
 // adapted from https://hackernoon.com/firebase-to-the-rescue-dynamic-routing-via-hosting-functions-integration-aef888ddf311
-exports.pageMetadata = exp;
+exports.aboutArtwork = exp;

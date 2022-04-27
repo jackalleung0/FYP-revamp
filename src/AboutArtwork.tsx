@@ -8,6 +8,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
+import { useToggle } from "@mantine/hooks";
 import axios from "axios";
 import { doc, getFirestore } from "firebase/firestore";
 import React, { useMemo } from "react";
@@ -22,6 +23,7 @@ import { BackIcon } from "./BackIcon";
 import { app } from "./firebaseConfig";
 import { getImageURL } from "./getImageURL";
 import { ShareIcon } from "./ShareIcon";
+import { ShareSheet } from "./ShareSheet";
 import { useRefCallback } from "./useRefCallback";
 
 const useStyles = createStyles((theme, _params, getRef) => ({
@@ -170,14 +172,22 @@ export function AboutArtwork() {
     [loading, _loading, loaded]
   );
 
+  const [show, toggle] = useToggle(false, [true, false]);
+
+  const shareLink = useMemo(
+    () => `https://arartgallery.site/aboutArtwork/${id}`,
+    [id]
+  );
+
   return (
     <div>
+      <ShareSheet {...{ show, toggle }} shareLink={shareLink} />
       <LoadingOverlay
         visible={!allDoneLoading}
         overlayOpacity={1}
         overlayColor="#FFF"
         loaderProps={{ color: "#111112" }}
-        style={{height:"100vh"}}
+        style={{ height: "100vh" }}
       ></LoadingOverlay>
       <div
         style={{
@@ -191,7 +201,7 @@ export function AboutArtwork() {
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <BackIcon onClick={() => nav(-1)} />
 
-          <ShareIcon />
+          <ShareIcon onClickCapture={toggle} />
         </div>
       </div>
       <Affix position={{ bottom: 0, left: 0, right: 0 }}>

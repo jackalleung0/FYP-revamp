@@ -1,23 +1,22 @@
 const axios = require("axios");
 
-function buildHTML({ title, url, alt, id }) {
-  console.log({ title, url, alt, id });
+function buildHTML({ title, description, id }) {
+  // <meta property="og:image" content="${url}" />
+  // <meta property="og:image:type" content="image/jpeg" />
+  // <meta property="og:image:width" content="400" />
+  // <meta property="og:image:height" content="300" />
+  // <meta property="og:image:alt" content="${alt}" />
   const template = `<!DOCTYPE html>
     <html lang="en">
       <head>
         <title>${title} | AR Art Gallery</title>
         <meta property="og:title" content="${title}" />
-        <meta property="og:image" content="${url}" />
-        <meta property="og:image:type" content="image/jpeg" />
-        <meta property="og:image:width" content="400" />
-        <meta property="og:image:height" content="300" />
-        <meta property="og:image:alt" content="${alt}" />
-        <meta name="description" content="${alt}" />
+        <meta name="description" content="${description}" />
         <link rel="icon" href="/favicon.ico">
       </head>
       <body>
         <script>
-          window.location="https://revamp.arartgallery.site/artwork/${id}";
+          window.location="https://revamp.arartgallery.site/artwork/${id}/about-artist";
         </script>
       </body>
     </html>
@@ -135,10 +134,14 @@ const instance = axios.create({
 const express = require("express");
 const exp = express();
 
-exp.get("/:artworkID", async (req, res) => {
-  const { artworkID } = req.params;
+exp.get("/:artworkID/:artistsID", async (req, res) => {
+  const { artworkID, artistsID } = req.params;
 
-  // reject if there are no enough parameter
+  if (!artistsID || isNaN(Number.parseInt(artistsID))) {
+    console.log(`incorrect artistsID ${artistsID}`);
+    return res.sendStatus(400);
+  }
+
   if (!artworkID || isNaN(Number.parseInt(artworkID))) {
     console.log(`incorrect artworkID ${artworkID}`);
     return res.sendStatus(400);
@@ -146,25 +149,25 @@ exp.get("/:artworkID", async (req, res) => {
 
   const {
     data: { data },
-  } = await instance.get(`/artworks/${artworkID}`, {
+  } = await instance.get(`/artists/${artistsID}`, {
     params: {
       ids: artworkID,
       fields: searchFields,
     },
   });
-
   if (data.length === 0) return res.status(400);
 
-  const { title, image_id, thumbnail } = data;
+  const { title, thumbnail } = data;
   const htmlString = buildHTML({
     title: title,
-    url: `https://www.artic.edu/iiif/2/${image_id}/full/843,/0/default.jpg`,
+    // url: `https://www.artic.edu/iiif/2/${image_id}/full/843,/0/default.jpg`,
     alt: thumbnail?.alt_text || "",
     id: artworkID,
   });
-
   return res.status(200).send(htmlString);
 });
 
+// the shared link will look like this: https://arartgallery.site/artwork/{artworkID}
 // adapted from https://hackernoon.com/firebase-to-the-rescue-dynamic-routing-via-hosting-functions-integration-aef888ddf311
-exports.pageMetadata = exp;
+// artwork/artists
+exports.artist = exp;

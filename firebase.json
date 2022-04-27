@@ -3,17 +3,28 @@
     {
       "target": "revamp",
       "public": "dist",
-      "ignore": [
-        "firebase.json",
-        "**/.*",
-        "**/node_modules/**"
-      ],
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "rewrites": [
+        {
+          "source": "/artworks/**",
+          "function": "artworks"
+        },
+        {
+          "source": "/artist/**",
+          "function": "artist"
+        },
+        {
+          "source": "/aboutArtwork/**",
+          "function": "aboutArtwork"
+        },
         {
           "source": "**",
           "destination": "/index.html"
         }
       ]
     }
-  ]
+  ],
+  "functions": {
+    "source": "functions"
+  }
 }

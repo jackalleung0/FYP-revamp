@@ -389,7 +389,7 @@ export function ArtworkDetail() {
   );
 
   const shareLink = React.useMemo(
-    () => `https://arartgallery.site/artwork/${id}`,
+    () => `https://arartgallery.site/artworks/${id}`,
     [id]
   );
 

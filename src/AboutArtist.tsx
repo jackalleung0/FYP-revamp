@@ -18,6 +18,8 @@ import { getArtistName } from "./getArtistName";
 import { ShareIcon } from "./ShareIcon";
 import sanitizeHtml from "sanitize-html";
 import { getArtworkDetails } from "./getArtworkDetails";
+import { useToggle } from "@mantine/hooks";
+import { ShareSheet } from "./ShareSheet";
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   ActionIcon: {
@@ -70,9 +72,10 @@ const getArtistsInfo = async (artistsId: string) => {
       })
     ).data.data[0];
 
-  const { title, description } = await getArtist(artistsId);
+  const { title, description, id: artists_id } = await getArtist(artistsId);
   const { artist_display, image_id } = await getTopResult(title);
   return {
+    artists_id,
     title: title,
     image_id: image_id,
     description: description ? sanitizeLinks(description) : "",
@@ -91,10 +94,20 @@ export function AboutArtist() {
     getArtistsInfo,
     [(result?.artist_id && String(result?.artist_id)) || ""]
   );
-  console.log(artistResult);
-  // console.log(result);
+
+  const [show, toggle] = useToggle(false, [true, false]);
+
+  const shareLink = React.useMemo(
+    () =>
+      (artistResult?.artists_id &&
+        `https://arartgallery.site/artist/${id}/${artistResult.artists_id}`) ||
+      undefined,
+    [id, artistResult]
+  );
+
   return (
     <div style={{ height: "100vh" }}>
+      <ShareSheet {...{ show, toggle }} shareLink={shareLink} />
       <LoadingOverlay
         visible={detailsLoading || artistsLoading}
         overlayOpacity={1}
@@ -113,7 +126,7 @@ export function AboutArtist() {
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <BackIcon onClick={() => nav(-1)} />
 
-          <ShareIcon />
+          <ShareIcon onClickCapture={toggle} />
         </div>
       </div>
       <Affix position={{ bottom: 0, left: 0, right: 0 }}>
@@ -255,3 +268,5 @@ const NoInformationIcon = ({ ...props }) => (
     />
   </svg>
 );
+
+
