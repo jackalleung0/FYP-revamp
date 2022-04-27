@@ -3,7 +3,7 @@ import React from "react";
 import {
   TwitterShareButton,
   WhatsappShareButton,
-  TelegramShareButton
+  TelegramShareButton,
 } from "react-share";
 import { TelegramIcon } from "./TelegramIcon";
 import { TwitterIcon } from "./TwitterIcon";
@@ -16,7 +16,7 @@ import { NotificationIcon } from "./NotificationIcon";
 
 export const ShareSheet = ({ show, toggle, shareLink }: any) => {
   const copyToClipboard = () => {
-    toggle();
+    toggle(false);
     showNotification({
       message: "Copied to clipboard",
       icon: <NotificationIcon />,
@@ -52,7 +52,7 @@ export const ShareSheet = ({ show, toggle, shareLink }: any) => {
   return (
     <BottomSheet
       open={show}
-      onDismiss={toggle}
+      onDismiss={() => toggle(false)}
       defaultSnap={({ maxHeight }) => maxHeight * 0.95}
       expandOnContentDrag={false}
     >
@@ -97,7 +97,8 @@ export const ShareSheet = ({ show, toggle, shareLink }: any) => {
                 <LinkIcon
                   style={{
                     padding: 16,
-                  }} />
+                  }}
+                />
               </div>
               <Text
                 align="center"
@@ -174,7 +175,7 @@ export const ShareSheet = ({ show, toggle, shareLink }: any) => {
           }}
         >
           <Button
-            onClickCapture={toggle}
+            onClick={() => toggle(false)}
             fullWidth
             variant="outline"
             style={{

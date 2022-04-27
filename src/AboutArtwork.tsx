@@ -11,7 +11,7 @@ import {
 import { useToggle } from "@mantine/hooks";
 import axios from "axios";
 import { doc, getFirestore } from "firebase/firestore";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useAsync } from "react-async-hook";
 import {
   useDocumentDataOnce,
@@ -172,7 +172,7 @@ export function AboutArtwork() {
     [loading, _loading, loaded]
   );
 
-  const [show, toggle] = useToggle(false, [true, false]);
+  const [show, toggle] = useState(false);
 
   const shareLink = useMemo(
     () =>

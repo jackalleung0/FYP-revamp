@@ -95,7 +95,7 @@ export function AboutArtist() {
     [(result?.artist_id && String(result?.artist_id)) || ""]
   );
 
-  const [show, toggle] = useToggle(false, [true, false]);
+  const [show, toggle] = useState(false);
 
   const shareLink = React.useMemo(
     () =>
