@@ -549,7 +549,7 @@ export function ArtworkDetail() {
           </div>
         </BottomSheet>
         {/* check if there are arURL first, then display the AR Icon if there are any */}
-        {!artworkDataLoading && artworkData?.arURL && !!values && (
+        {!artworkDataLoading && artworkData?.arURL && (
           <Affix position={{ bottom: 30, right: 22 }} zIndex={2}>
             <ActionIcon
               className={classes.ActionIcon}
