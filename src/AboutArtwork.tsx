@@ -189,63 +189,43 @@ export function AboutArtwork() {
         loaderProps={{ color: "#111112" }}
         style={{ height: "100vh" }}
       ></LoadingOverlay>
-      <div
-        style={{
-          position: "sticky",
-          top: 10,
-          paddingLeft: 20,
-          paddingRight: 20,
-          paddingBottom: 34,
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <BackIcon onClick={() => nav(-1)} />
-
-          <ShareIcon onClickCapture={toggle} />
-        </div>
-      </div>
-      <Affix position={{ bottom: 0, left: 0, right: 0 }}>
+      <div style={{ display: allDoneLoading ? "block" : "none" }}>
         <div
-          id="grad"
           style={{
-            height: 114,
-            background:
-              "linear-gradient(rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%)",
-          }}
-        />
-      </Affix>
-      <Center style={{ backgroundColor: "#F1F2F4" }}>
-        <Image
-          width={335}
-          height={228}
-          withPlaceholder
-          className={classes.Image}
-          style={{ margin: "36px 40px" }}
-          src={result && getImageURL(result.image_id)}
-          imageRef={(el) => ref(el as any, 0)}
-        />
-      </Center>
-      <Container
-        style={{
-          paddingLeft: 20,
-          paddingRight: 20,
-        }}
-      >
-        <Title
-          style={{
-            paddingTop: 33,
-            fontFamily: "Inter",
-            fontSize: 13,
-            fontWeight: "bold",
-            lineHeight: "16px",
-            height: "16px",
-            color: "#4E5D78",
+            position: "sticky",
+            top: 10,
+            paddingLeft: 20,
+            paddingRight: 20,
+            paddingBottom: 34,
           }}
         >
-          ABOUT ARTWORK
-        </Title>
-      </Container>
-      {firebaseEntry && (
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <BackIcon onClick={() => nav(-1)} />
+
+            <ShareIcon onClickCapture={toggle} />
+          </div>
+        </div>
+        <Affix position={{ bottom: 0, left: 0, right: 0 }}>
+          <div
+            id="grad"
+            style={{
+              height: 114,
+              background:
+                "linear-gradient(rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%)",
+            }}
+          />
+        </Affix>
+        <Center style={{ backgroundColor: "#F1F2F4" }}>
+          <Image
+            width={335}
+            height={228}
+            withPlaceholder
+            className={classes.Image}
+            style={{ margin: "36px 40px" }}
+            src={result && getImageURL(result.image_id)}
+            imageRef={(el) => ref(el as any, 0)}
+          />
+        </Center>
         <Container
           style={{
             paddingLeft: 20,
@@ -254,170 +234,192 @@ export function AboutArtwork() {
         >
           <Title
             style={{
-              paddingTop: 12,
-              fontFamily: "SFProDisplay",
-              fontSize: 18,
-              fontWeight: "bold",
-              lineHeight: "28px",
-              height: "21px",
-              color: "#000000",
-            }}
-          >
-            Artwork Details
-          </Title>
-          <Text
-            style={{
-              paddingTop: 27,
+              paddingTop: 33,
               fontFamily: "Inter",
-              fontSize: 15,
-              fontWeight: "100",
-              lineHeight: "20px",
-              color: "#283A5B",
-            }}
-          >
-            {firebaseEntry.description || "No information"}
-          </Text>
-          <hr
-            style={{
-              marginTop: hrmarg,
-              flexGrow: 1,
-              border: "none",
-              height: "1px",
-              backgroundColor: "#F1F2F4",
-            }}
-          />
-        </Container>
-      )}
-      {result && (
-        <Container
-          style={{
-            paddingLeft: 20,
-            paddingRight: 20,
-          }}
-        >
-          <Title
-            style={{
-              paddingTop: titlePadd,
-              fontFamily: "SFProDisplay",
-              fontSize: 18,
+              fontSize: 13,
               fontWeight: "bold",
-              lineHeight: "28px",
-              height: "21px",
-              color: "#000000",
+              lineHeight: "16px",
+              height: "16px",
+              color: "#4E5D78",
             }}
           >
-            Publication History
+            ABOUT ARTWORK
           </Title>
-          <Text
-            style={{
-              paddingTop: 27,
-              fontFamily: "Inter",
-              fontSize: 15,
-              fontWeight: "100",
-              lineHeight: "20px",
-              color: "#283A5B",
-            }}
-          >
-            {result.publication_history || "No information"}
-          </Text>
-          <hr
-            style={{
-              marginTop: hrmarg,
-              flexGrow: 1,
-              border: "none",
-              height: "1px",
-              backgroundColor: "#F1F2F4",
-            }}
-          />
         </Container>
-      )}
-      {result && (
-        <Container
-          style={{
-            paddingLeft: 20,
-            paddingRight: 20,
-          }}
-        >
-          <Title
+        {firebaseEntry && (
+          <Container
             style={{
-              paddingTop: titlePadd,
-              fontFamily: "SFProDisplay",
-              fontSize: 18,
-              fontWeight: "bold",
-              lineHeight: "28px",
-              height: "21px",
-              color: "#000000",
+              paddingLeft: 20,
+              paddingRight: 20,
             }}
           >
-            Provenance
-          </Title>
-          <Text
+            <Title
+              style={{
+                paddingTop: 12,
+                fontFamily: "SFProDisplay",
+                fontSize: 18,
+                fontWeight: "bold",
+                lineHeight: "28px",
+                height: "21px",
+                color: "#000000",
+              }}
+            >
+              Artwork Details
+            </Title>
+            <Text
+              style={{
+                paddingTop: 27,
+                fontFamily: "Inter",
+                fontSize: 15,
+                fontWeight: "100",
+                lineHeight: "20px",
+                color: "#283A5B",
+              }}
+            >
+              {firebaseEntry.description || "No information"}
+            </Text>
+            <hr
+              style={{
+                marginTop: hrmarg,
+                flexGrow: 1,
+                border: "none",
+                height: "1px",
+                backgroundColor: "#F1F2F4",
+              }}
+            />
+          </Container>
+        )}
+        {result && (
+          <Container
             style={{
-              paddingTop: 24,
-              fontFamily: "Inter",
-              fontSize: 15,
-              fontWeight: "100",
-              lineHeight: "20px",
-              color: "#283A5B",
+              paddingLeft: 20,
+              paddingRight: 20,
             }}
           >
-            {result.provenance_text || "No information"}
-          </Text>
-          <hr
+            <Title
+              style={{
+                paddingTop: titlePadd,
+                fontFamily: "SFProDisplay",
+                fontSize: 18,
+                fontWeight: "bold",
+                lineHeight: "28px",
+                height: "21px",
+                color: "#000000",
+              }}
+            >
+              Publication History
+            </Title>
+            <Text
+              style={{
+                paddingTop: 27,
+                fontFamily: "Inter",
+                fontSize: 15,
+                fontWeight: "100",
+                lineHeight: "20px",
+                color: "#283A5B",
+              }}
+            >
+              {result.publication_history || "No information"}
+            </Text>
+            <hr
+              style={{
+                marginTop: hrmarg,
+                flexGrow: 1,
+                border: "none",
+                height: "1px",
+                backgroundColor: "#F1F2F4",
+              }}
+            />
+          </Container>
+        )}
+        {result && (
+          <Container
             style={{
-              marginTop: hrmarg,
-              flexGrow: 1,
-              border: "none",
-              height: "1px",
-              backgroundColor: "#F1F2F4",
-            }}
-          />
-        </Container>
-      )}
-      {result && (
-        <Container
-          style={{
-            paddingLeft: 20,
-            paddingRight: 20,
-            paddingBottom: 120,
-          }}
-        >
-          <Title
-            style={{
-              paddingTop: titlePadd,
-              fontFamily: "SFProDisplay",
-              fontSize: 18,
-              fontWeight: "bold",
-              lineHeight: "28px",
-              height: "21px",
-              color: "#000000",
+              paddingLeft: 20,
+              paddingRight: 20,
             }}
           >
-            Exhibition History
-          </Title>
-          <Text
+            <Title
+              style={{
+                paddingTop: titlePadd,
+                fontFamily: "SFProDisplay",
+                fontSize: 18,
+                fontWeight: "bold",
+                lineHeight: "28px",
+                height: "21px",
+                color: "#000000",
+              }}
+            >
+              Provenance
+            </Title>
+            <Text
+              style={{
+                paddingTop: 24,
+                fontFamily: "Inter",
+                fontSize: 15,
+                fontWeight: "100",
+                lineHeight: "20px",
+                color: "#283A5B",
+              }}
+            >
+              {result.provenance_text || "No information"}
+            </Text>
+            <hr
+              style={{
+                marginTop: hrmarg,
+                flexGrow: 1,
+                border: "none",
+                height: "1px",
+                backgroundColor: "#F1F2F4",
+              }}
+            />
+          </Container>
+        )}
+        {result && (
+          <Container
             style={{
-              paddingTop: 24,
-              fontFamily: "Inter",
-              fontSize: 15,
-              fontWeight: "100",
-              lineHeight: "20px",
-              color: "#283A5B",
+              paddingLeft: 20,
+              paddingRight: 20,
+              paddingBottom: 120,
             }}
           >
-            {result.exhibition_history || "No information"}
-          </Text>
-          <hr
-            style={{
-              marginTop: hrmarg,
-              flexGrow: 1,
-              border: "none",
-              height: "1px",
-              backgroundColor: "#F1F2F4",
-            }}
-          />
-        </Container>
-      )}
+            <Title
+              style={{
+                paddingTop: titlePadd,
+                fontFamily: "SFProDisplay",
+                fontSize: 18,
+                fontWeight: "bold",
+                lineHeight: "28px",
+                height: "21px",
+                color: "#000000",
+              }}
+            >
+              Exhibition History
+            </Title>
+            <Text
+              style={{
+                paddingTop: 24,
+                fontFamily: "Inter",
+                fontSize: 15,
+                fontWeight: "100",
+                lineHeight: "20px",
+                color: "#283A5B",
+              }}
+            >
+              {result.exhibition_history || "No information"}
+            </Text>
+            <hr
+              style={{
+                marginTop: hrmarg,
+                flexGrow: 1,
+                border: "none",
+                height: "1px",
+                backgroundColor: "#F1F2F4",
+              }}
+            />
+          </Container>
+        )}
+      </div>
     </div>
   );
 }

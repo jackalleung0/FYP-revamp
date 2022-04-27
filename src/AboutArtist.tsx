@@ -106,148 +106,153 @@ export function AboutArtist() {
   );
 
   return (
-    <div style={{ height: "100vh" }}>
+    <div>
       <ShareSheet {...{ show, toggle }} shareLink={shareLink} />
       <LoadingOverlay
         visible={detailsLoading || artistsLoading}
         overlayOpacity={1}
         overlayColor="#FFF"
         loaderProps={{ color: "#111112" }}
+        style={{ height: "100vh" }}
       />
       <div
-        style={{
-          position: "sticky",
-          top: 10,
-          paddingLeft: 20,
-          paddingRight: 20,
-          paddingBottom: 35,
-        }}
+        style={{ display: detailsLoading || artistsLoading ? "none" : "block" }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <BackIcon onClick={() => nav(-1)} />
-
-          <ShareIcon onClickCapture={toggle} />
-        </div>
-      </div>
-      <Affix position={{ bottom: 0, left: 0, right: 0 }}>
         <div
-          id="grad"
           style={{
-            height: 114,
-            background:
-              "linear-gradient(rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%)",
+            position: "sticky",
+            top: 10,
+            paddingLeft: 20,
+            paddingRight: 20,
+            paddingBottom: 35,
           }}
-        />
-      </Affix>
+        >
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <BackIcon onClick={() => nav(-1)} />
 
-      <Container
-        style={{
-          paddingLeft: 20,
-          paddingRight: 20,
-        }}
-      >
-        <Title
-          style={{
-            fontFamily: "Inter",
-            fontSize: 13,
-            fontWeight: "bold",
-            lineHeight: "16px",
-            height: "16px",
-            color: "#4E5D78",
-          }}
-        >
-          ABOUT ARTIST
-        </Title>
-        <Title
-          style={{
-            paddingTop: 12,
-            fontFamily: "SFProDisplay",
-            fontSize: 18,
-            fontWeight: "bold",
-            lineHeight: "28px",
-            height: "21px",
-            color: "#000000",
-          }}
-        >
-          {(artistResult && artistResult.title) || ""}
-        </Title>
-        <Text
-          style={{
-            paddingTop: 6,
+            <ShareIcon onClickCapture={toggle} />
+          </div>
+        </div>
+        <Affix position={{ bottom: 0, left: 0, right: 0 }}>
+          <div
+            id="grad"
+            style={{
+              height: 114,
+              background:
+                "linear-gradient(rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%)",
+            }}
+          />
+        </Affix>
 
-            fontSize: "14px",
-            fontFamily: "Inter",
-            fontWeight: "100",
-            color: "#4E5D78",
-            height: "17px",
-            lineHeight: "20px",
+        <Container
+          style={{
+            paddingLeft: 20,
+            paddingRight: 20,
           }}
         >
-          {/* Italian, 1580-1654 */}
-          {/* Dutch, 1853-1890 */}
-          {artistResult && artistResult.artist_display.split("\n")[1]}
-        </Text>
-        <hr
-          style={{
-            marginTop: 33,
-            flexGrow: 1,
-            border: "none",
-            height: "1px",
-            backgroundColor: "#F1F2F4",
-          }}
-        />
-        {artistResult && artistResult.description ? (
+          <Title
+            style={{
+              fontFamily: "Inter",
+              fontSize: 13,
+              fontWeight: "bold",
+              lineHeight: "16px",
+              height: "16px",
+              color: "#4E5D78",
+            }}
+          >
+            ABOUT ARTIST
+          </Title>
+          <Title
+            style={{
+              paddingTop: 12,
+              fontFamily: "SFProDisplay",
+              fontSize: 18,
+              fontWeight: "bold",
+              lineHeight: "28px",
+              height: "21px",
+              color: "#000000",
+            }}
+          >
+            {(artistResult && artistResult.title) || ""}
+          </Title>
           <Text
             style={{
-              paddingTop: 24 - 15,
+              paddingTop: 6,
+
+              fontSize: "14px",
               fontFamily: "Inter",
-              fontSize: 15,
               fontWeight: "100",
+              color: "#4E5D78",
+              height: "17px",
               lineHeight: "20px",
-              color: "#283A5B",
-              paddingBottom: 120,
-            }}
-            sx={{
-              "& p > a": {
-                color: "#283A5B !important",
-              },
-            }}
-            dangerouslySetInnerHTML={{
-              __html: sanitizeHtml(artistResult.description),
             }}
           >
-            {/* {artistResult && artistResult.description} */}
+            {/* Italian, 1580-1654 */}
+            {/* Dutch, 1853-1890 */}
+            {artistResult && artistResult.artist_display.split("\n")[1]}
           </Text>
-        ) : (
-          <div
+          <hr
             style={{
-              paddingTop: 144,
-              paddingBottom: 256,
-              width: 205,
-              margin: "0 auto",
-              display: "flex",
-              flexDirection: "column",
+              marginTop: 33,
+              flexGrow: 1,
+              border: "none",
+              height: "1px",
+              backgroundColor: "#F1F2F4",
             }}
-          >
-            <NoInformationIcon style={{ margin: "0 auto" }} />
+          />
+          {artistResult && artistResult.description ? (
             <Text
               style={{
-                paddingTop: 36,
+                paddingTop: 24 - 15,
                 fontFamily: "Inter",
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: "100",
-                color: "#8A94A6",
                 lineHeight: "20px",
+                color: "#283A5B",
+                paddingBottom: 120,
               }}
-              align="center"
+              sx={{
+                "& p > a": {
+                  color: "#283A5B !important",
+                },
+              }}
+              dangerouslySetInnerHTML={{
+                __html: sanitizeHtml(artistResult.description),
+              }}
             >
-              No further information
-              <br />
-              can be provided now.
+              {/* {artistResult && artistResult.description} */}
             </Text>
-          </div>
-        )}
-      </Container>
+          ) : (
+            <div
+              style={{
+                paddingTop: 144,
+                paddingBottom: 256,
+                width: 205,
+                margin: "0 auto",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <NoInformationIcon style={{ margin: "0 auto" }} />
+              <Text
+                style={{
+                  paddingTop: 36,
+                  fontFamily: "Inter",
+                  fontSize: 16,
+                  fontWeight: "100",
+                  color: "#8A94A6",
+                  lineHeight: "20px",
+                }}
+                align="center"
+              >
+                No further information
+                <br />
+                can be provided now.
+              </Text>
+            </div>
+          )}
+        </Container>
+      </div>
     </div>
   );
 }
@@ -268,5 +273,3 @@ const NoInformationIcon = ({ ...props }) => (
     />
   </svg>
 );
-
-
