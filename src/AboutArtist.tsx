@@ -100,7 +100,7 @@ export function AboutArtist() {
   const shareLink = React.useMemo(
     () =>
       (artistResult?.artists_id &&
-        `https://arartgallery.site/artist/${id}/${artistResult.artists_id}`) ||
+        `https://us-central1-final-year-project-8ce2f.cloudfunctions.net/artist/${id}/${artistResult.artists_id}`) ||
       undefined,
     [id, artistResult]
   );
@@ -133,7 +133,7 @@ export function AboutArtist() {
             <ShareIcon onClickCapture={toggle} />
           </div>
         </div>
-        <Affix position={{ bottom: 0, left: 0, right: 0 }}>
+        <Affix position={{ bottom: 0, left: 0, right: 0 }} zIndex={2}>
           <div
             id="grad"
             style={{

@@ -389,7 +389,8 @@ export function ArtworkDetail() {
   );
 
   const shareLink = React.useMemo(
-    () => `https://arartgallery.site/artworks/${id}`,
+    () =>
+      `https://us-central1-final-year-project-8ce2f.cloudfunctions.net/artworks/${id}`,
     [id]
   );
 

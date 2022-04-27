@@ -175,7 +175,8 @@ export function AboutArtwork() {
   const [show, toggle] = useToggle(false, [true, false]);
 
   const shareLink = useMemo(
-    () => `https://arartgallery.site/aboutArtwork/${id}`,
+    () =>
+      `https://us-central1-final-year-project-8ce2f.cloudfunctions.net/aboutArtwork/${id}`,
     [id]
   );
 
@@ -205,7 +206,7 @@ export function AboutArtwork() {
             <ShareIcon onClickCapture={toggle} />
           </div>
         </div>
-        <Affix position={{ bottom: 0, left: 0, right: 0 }}>
+        <Affix position={{ bottom: 0, left: 0, right: 0 }} zIndex={2}>
           <div
             id="grad"
             style={{
