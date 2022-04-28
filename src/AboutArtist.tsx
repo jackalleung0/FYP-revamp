@@ -162,7 +162,7 @@ export function AboutArtist() {
           >
             ABOUT ARTIST
           </Title>
-          <Title
+          <Text
             style={{
               paddingTop: 12,
               fontFamily: "SFProDisplay",
@@ -172,9 +172,10 @@ export function AboutArtist() {
               height: "21px",
               color: "#000000",
             }}
+            lineClamp={1}
           >
             {(artistResult && artistResult.title) || ""}
-          </Title>
+          </Text>
           <Text
             style={{
               paddingTop: 6,
