@@ -197,7 +197,7 @@ export function AboutArtwork() {
             paddingTop: 10,
             paddingLeft: 20,
             paddingRight: 20,
-            paddingBottom: 34,
+            paddingBottom: 24 - 2,
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between" }}>
