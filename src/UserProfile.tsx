@@ -1,13 +1,10 @@
 import { CogIcon } from "@heroicons/react/outline";
-import { ChevronDownIcon } from "@heroicons/react/solid";
 import {
   Avatar,
   createStyles,
   UnstyledButton,
   Text,
   Tabs,
-  Select,
-  SelectProps,
   Loader,
   Container,
 } from "@mantine/core";
@@ -41,6 +38,7 @@ import Masonry, { MasonryOptions } from "react-masonry-component";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Artwork } from "./Artwork";
 import { BackIcon } from "./BackIcon";
+import { CustomSelect } from "./CustomSelect";
 import { app } from "./firebaseConfig";
 import { getArtistName } from "./getArtistName";
 import { getArtworkDetails } from "./getArtworkDetails";
@@ -309,28 +307,6 @@ export function UserProfile() {
     </div>
   );
 }
-
-const CustomSelect = ({
-  ...props
-}: SelectProps & React.RefAttributes<HTMLInputElement>) => {
-  return (
-    <Select
-      {...props}
-      rightSection={<ChevronDownIcon style={{ width: 20 }} />}
-      styles={{
-        input: {
-          border: 0,
-          fontSize: "14px",
-          fontFamily: "Inter",
-          fontWeight: "normal",
-          color: "#111112",
-          height: "17px",
-          lineHeight: "20px",
-        },
-      }}
-    />
-  );
-};
 
 const CustomArtworkImage = ({ id }: { id: string }) => {
   const { result, loading } = useAsync(getArtworkDetails, [id]);
