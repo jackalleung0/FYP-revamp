@@ -260,6 +260,9 @@ export function ArtworkDetail() {
     );
     await setDoc(userRatingRef, { rating: r }, { merge: true });
   };
+  const toCommentPage = () => {
+    nav(`comment`);
+  };
 
   const handleLikeArtwork = async () => {
     // const increment = increment(1);
@@ -602,7 +605,7 @@ export function ArtworkDetail() {
                 <BackIcon onClick={() => nav(-1)} />
 
                 <div style={{ display: "flex", gap: 32, paddingBottom: 24 }}>
-                  <CommentIcon />
+                  <CommentIcon onClick={toCommentPage} />
                   <ShareIcon onClickCapture={() => setShow(true)} />
                 </div>
               </div>

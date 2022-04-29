@@ -1,7 +1,8 @@
 import React from "react";
 
-export const CommentIcon = () => (
+export const CommentIcon = ({ ...props }: any) => (
   <svg
+    {...props}
     xmlns="http://www.w3.org/2000/svg"
     width="20"
     height="18"
@@ -15,6 +16,7 @@ export const CommentIcon = () => (
       stroke="#000"
       strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth="2" />
+      strokeWidth="2"
+    />
   </svg>
 );
