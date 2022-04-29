@@ -9,6 +9,7 @@ import {
   Text,
   ActionIcon,
   Affix,
+  Drawer,
 } from "@mantine/core";
 import { useToggle } from "@mantine/hooks";
 import { PencilIcon, XIcon } from "@heroicons/react/solid";
@@ -16,7 +17,9 @@ import {
   addDoc,
   collection,
   CollectionReference,
+  doc,
   DocumentData,
+  DocumentReference,
   getDocs,
   getFirestore,
   limit,
@@ -35,6 +38,11 @@ import { useForm } from "@mantine/form";
 import { useAsync } from "react-async-hook";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { getAuth } from "firebase/auth";
+import {
+  useCollection,
+  useCollectionData,
+  useDocumentDataOnce,
+} from "react-firebase-hooks/firestore";
 dayjs.extend(relativeTime);
 
 const useStyles = createStyles((theme, _params, getRef) => ({
@@ -113,6 +121,8 @@ export function ArtworkComment() {
       loadFunc();
     }
   }, [select]);
+  const [openDrawer, setOpenedDrawer] = useState(false);
+  const [drawerDocID, setDrawerDocID] = useState<string>("");
 
   return (
     <div>
@@ -134,6 +144,18 @@ export function ArtworkComment() {
           )}
         </ActionIcon>
       </Affix>
+      <Drawer
+        position="right"
+        size="100%"
+        opened={openDrawer}
+        onClose={() => setOpenedDrawer(false)}
+        withCloseButton={false}
+      >
+        <DrawerComment
+          onClose={() => setOpenedDrawer(false)}
+          id={drawerDocID}
+        />
+      </Drawer>
       <div
         style={{
           paddingTop: 10,
@@ -208,23 +230,40 @@ export function ArtworkComment() {
       )}
       {/* this is use to always put your recent submitted comment on top */}
       {tempComment.map((s, index) => (
-        <Comment comment={s} key={index} />
+        <Comment comment={s} key={index} commentOnClick={() => {}} />
       ))}
       {snapshots.map((s) => (
-        <Comment comment={s.data()} key={s.id} />
+        <Comment
+          comment={s.data()}
+          key={s.id}
+          commentOnClick={() => {
+            setOpenedDrawer(true);
+            setDrawerDocID(s.id);
+          }}
+        />
       ))}
     </div>
   );
 }
 
-function Comment({ comment }: { comment: Comment }) {
+function Comment({
+  comment,
+  commentOnClick,
+  showReplyBtn = true,
+  noBorder = false,
+}: {
+  comment: Comment;
+  commentOnClick: () => void;
+  showReplyBtn?: boolean;
+  noBorder?: boolean;
+}) {
   const { classes } = useStyles();
   return (
     <div style={{ padding: "0px 20px" }}>
       <div
         style={{
           padding: "16px 0px",
-          borderBottom: "1px solid #F1F2F4",
+          borderBottom: noBorder ? "0px" : "1px solid #F1F2F4",
         }}
       >
         <div style={{ display: "flex" }}>
@@ -304,22 +343,27 @@ function Comment({ comment }: { comment: Comment }) {
           >
             {dayjs(comment.createdAt.toDate()).fromNow()}
           </Text>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <ReplyIcon />
-            <Text
-              style={{
-                fontSize: "14px",
-                fontFamily: "SFProDisplay",
-                fontWeight: "100",
-                color: "#8A94A6",
-                // height: "16px",
-                // lineHeight: "20px",
-              }}
+          {showReplyBtn && (
+            <div
+              style={{ display: "flex", alignItems: "center", gap: 8 }}
+              onClick={(e) => commentOnClick()}
             >
-              {(!comment.numberOfDiscussion && "Reply") ||
-                comment.numberOfDiscussion}
-            </Text>
-          </div>
+              <ReplyIcon />
+              <Text
+                style={{
+                  fontSize: "14px",
+                  fontFamily: "SFProDisplay",
+                  fontWeight: "100",
+                  color: "#8A94A6",
+                  // height: "16px",
+                  // lineHeight: "20px",
+                }}
+              >
+                {(!comment.numberOfDiscussion && "Reply") ||
+                  comment.numberOfDiscussion}
+              </Text>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -361,8 +405,12 @@ const toDataURL = (url: string) =>
 
 const CommentInput = ({
   onSubmit: _onSubmit,
+  noBorder = false,
+  noBackground = false,
 }: {
   onSubmit: (a: Comment) => void;
+  noBorder?: boolean;
+  noBackground?: boolean;
 }) => {
   const form = useForm({
     initialValues: {
@@ -393,15 +441,16 @@ const CommentInput = ({
       payload
     );
 
+    console.log(ref.id);
     _onSubmit(payload);
   });
 
   return (
     <div
       style={{
-        background: "#FCFCFD",
+        background: noBackground ? "transparent" : "#FCFCFD",
         padding: "22px 20px",
-        borderBottom: "1px solid #F1F2F4",
+        borderBottom: noBorder ? "0px" : "1px solid #F1F2F4",
       }}
     >
       <form onSubmit={onSubmit}>
@@ -460,3 +509,54 @@ const SendIcon = ({ ...props }: any) => (
     />
   </svg>
 );
+
+const DrawerComment = ({
+  onClose,
+  id,
+}: {
+  onClose: () => void;
+  id: string;
+}) => {
+  const [snapshot, loading, error] = useCollection<Comment>(
+    query(
+      collection(
+        getFirestore(app),
+        `/comments/${id}/discussions`
+      ) as CollectionReference<Comment>
+    )
+  );
+  const [value] = useDocumentDataOnce<Comment>(
+    doc(getFirestore(app), `/comments/${id}`) as DocumentReference<Comment>
+  );
+  // const [values, loading, error, snapshot] = useCollectionData();
+  // console.log(values);
+  return (
+    <>
+      <div
+        style={{
+          paddingTop: 10,
+          paddingLeft: 20,
+          paddingRight: 20,
+          paddingBottom: 16,
+        }}
+        id={id}
+      >
+        <BackIcon onClick={() => onClose()} />
+      </div>
+      {value && <Comment comment={value} commentOnClick={() => {}} noBorder />}
+      <CommentInput onSubmit={() => {}} noBorder noBackground />
+      <div style={{ padding: "0 16px" }}>
+        {snapshot &&
+          snapshot.docs.map((comment) => (
+            <Comment
+              comment={comment.data()}
+              commentOnClick={() => {}}
+              key={comment.id}
+              showReplyBtn={false}
+              noBorder
+            />
+          ))}
+      </div>
+    </>
+  );
+};
