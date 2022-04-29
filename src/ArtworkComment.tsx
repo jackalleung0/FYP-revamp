@@ -639,8 +639,6 @@ const DrawerComment = ({
               comment={comment.data()}
               commentOnClick={() => {}}
               key={comment.id}
-              noBorder
-              layer2Comment
             />
           ))}
       </div>
