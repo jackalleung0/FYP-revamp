@@ -299,9 +299,57 @@ export function UserProfile() {
               style={{ width: 160 }}
             />
           </div>
-          <Text color="gray" align="center">
-            TODO
-          </Text>
+          <Container
+            style={{
+              paddingLeft: 20,
+              paddingRight: 20,
+            }}
+          >
+            <InfiniteScroll
+              dataLength={result.length} //This is important field to render the next data
+              next={() => {
+                loadFunc();
+              }}
+              hasMore={result.length % 10 === 0}
+              loader={
+                <div
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    paddingTop: 40,
+                    paddingBottom: 60,
+                  }}
+                >
+                  <Loader
+                    sx={(theme) => ({
+                      stroke: "#111112",
+                    })}
+                  />
+                </div>
+              }
+              endMessage={<></>}
+            >
+              <Masonry
+                className={""} // default ''
+                elementType={"div"} // default 'div'
+                options={masonryOptions} // default {}
+                disableImagesLoaded={false} // default false
+                updateOnEachImageLoad={false} // default false and works only if disableImagesLoaded is false
+              >
+                {result.length > 0 &&
+                  result.map((doc, index) => (
+                    <MasImage
+                      key={index}
+                      id={String(doc.id)}
+                      artist={getArtistName(doc.artist_display)}
+                      title={doc.title}
+                      src={getImageURL(doc.image_id)}
+                    />
+                  ))}
+              </Masonry>
+            </InfiniteScroll>
+          </Container>
         </Tabs.Tab>
       </Tabs>
     </div>

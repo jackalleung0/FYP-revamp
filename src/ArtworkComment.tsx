@@ -22,11 +22,13 @@ import {
   DocumentReference,
   getDocs,
   getFirestore,
+  increment,
   limit,
   orderBy,
   Query,
   query,
   QueryDocumentSnapshot,
+  setDoc,
   startAfter,
   Timestamp,
   where,
@@ -75,7 +77,9 @@ export function ArtworkComment() {
   );
   const { id } = useParams();
 
-  const [tempComment, setTempComment] = useState<Comment[]>([]);
+  const [tempComment, setTempComment] = useState<
+    { comment: Comment; id: string }[]
+  >([]);
 
   const _query = useMemo(() => {
     if (!id) {
@@ -222,21 +226,36 @@ export function ArtworkComment() {
       </div>
       {isEditMode && (
         <CommentInput
-          onSubmit={(cmt) => {
+          onSubmit={async ({ comment }) => {
             setIsEditMode(false);
-            setTempComment((e) => [...e, cmt]);
+
+            const ref = await addDoc<Comment>(
+              collection(
+                getFirestore(app),
+                "comments"
+              ) as CollectionReference<Comment>,
+              comment
+            );
+
+            setTempComment((e) => [...e, { comment, id: ref.id }]);
           }}
         />
       )}
       {/* this is use to always put your recent submitted comment on top */}
-      {tempComment.map((s, index) => (
-        <Comment comment={s} key={index} commentOnClick={() => {}} />
+      {tempComment.map(({ comment, id }, index) => (
+        <Comment
+          comment={comment}
+          key={index}
+          commentOnClick={() => {
+            setOpenedDrawer(true);
+            setDrawerDocID(id);
+          }}
+        />
       ))}
       {snapshots.map((s) => (
         <Comment
           comment={s.data()}
           key={s.id}
-          id={s.id}
           commentOnClick={() => {
             setOpenedDrawer(true);
             setDrawerDocID(s.id);
@@ -279,15 +298,13 @@ export function ArtworkComment() {
 function Comment({
   comment,
   commentOnClick,
-  showReplyBtn = true,
+  layer2Comment = false,
   noBorder = false,
-  id,
 }: {
   comment: Comment;
   commentOnClick: () => void;
-  showReplyBtn?: boolean;
+  layer2Comment?: boolean;
   noBorder?: boolean;
-  id?: string;
 }) {
   const { classes } = useStyles();
 
@@ -295,7 +312,12 @@ function Comment({
   const participated = true;
 
   return (
-    <div style={{ padding: "0px 20px" }}>
+    <div
+      style={{
+        padding: "0px 20px",
+        background: layer2Comment ? "#FCFCFD" : "transparent",
+      }}
+    >
       <div
         style={{
           padding: "16px 0px",
@@ -379,7 +401,7 @@ function Comment({
           >
             {dayjs(comment.createdAt.toDate()).fromNow()}
           </Text>
-          {showReplyBtn && (
+          {!layer2Comment && (
             <div
               style={{ display: "flex", alignItems: "center", gap: 8 }}
               onClick={(e) => commentOnClick()}
@@ -449,12 +471,10 @@ const toDataURL = (url: string) =>
 
 const CommentInput = ({
   onSubmit: _onSubmit,
-  noBorder = false,
-  noBackground = false,
+  layer2Comment = false,
 }: {
-  onSubmit: (a: Comment) => void;
-  noBorder?: boolean;
-  noBackground?: boolean;
+  onSubmit: ({ comment }: { comment: Comment }) => void;
+  layer2Comment?: boolean;
 }) => {
   const form = useForm({
     initialValues: {
@@ -480,21 +500,16 @@ const CommentInput = ({
       authorID: user.uid,
     };
 
-    const ref = await addDoc<Comment>(
-      collection(getFirestore(app), "comments") as CollectionReference<Comment>,
-      payload
-    );
-
-    console.log(ref.id);
-    _onSubmit(payload);
+    _onSubmit({ comment: payload });
+    form.setValues({ message: "" });
   });
 
   return (
     <div
       style={{
-        background: noBackground ? "transparent" : "#FCFCFD",
+        background: layer2Comment ? "#FCFCFD" : "#FCFCFD",
         padding: "22px 20px",
-        borderBottom: noBorder ? "0px" : "1px solid #F1F2F4",
+        borderBottom: layer2Comment ? "0px" : "1px solid #F1F2F4",
       }}
     >
       <form onSubmit={onSubmit}>
@@ -566,10 +581,11 @@ const DrawerComment = ({
       collection(
         getFirestore(app),
         `/comments/${id}/discussions`
-      ) as CollectionReference<Comment>
+      ) as CollectionReference<Comment>,
+      orderBy("createdAt", "desc")
     )
   );
-  const [value] = useDocumentDataOnce<Comment>(
+  const [value, _, __, ___, reload] = useDocumentDataOnce<Comment>(
     doc(getFirestore(app), `/comments/${id}`) as DocumentReference<Comment>
   );
   // const [values, loading, error, snapshot] = useCollectionData();
@@ -587,8 +603,35 @@ const DrawerComment = ({
       >
         <BackIcon onClick={() => onClose()} />
       </div>
-      {value && <Comment comment={value} commentOnClick={() => {}} noBorder />}
-      <CommentInput onSubmit={() => {}} noBorder noBackground />
+      {value && (
+        <Comment
+          comment={value}
+          commentOnClick={() => {}}
+          noBorder
+          layer2Comment
+        />
+      )}
+      <CommentInput
+        onSubmit={async ({ comment }) => {
+          await addDoc<Comment>(
+            collection(
+              getFirestore(app),
+              `/comments/${id}/discussions`
+            ) as CollectionReference<Comment>,
+            comment
+          );
+
+          await setDoc(
+            doc(getFirestore(app), `/comments/${id}`) as DocumentReference<any>,
+            { numberOfDiscussion: increment(1) },
+            { merge: true }
+          );
+
+          // setTempComment((e) => [...e, { comment, id: ref.id }]);
+          reload();
+        }}
+        layer2Comment
+      />
       <div style={{ padding: "0 16px" }}>
         {snapshot &&
           snapshot.docs.map((comment) => (
@@ -596,8 +639,8 @@ const DrawerComment = ({
               comment={comment.data()}
               commentOnClick={() => {}}
               key={comment.id}
-              showReplyBtn={false}
               noBorder
+              layer2Comment
             />
           ))}
       </div>
