@@ -71,12 +71,9 @@ export function Home() {
   const nav = useNavigate();
   const auth = getAuth(app);
   const { currentUser } = auth;
-  const logout = async () => {
-    await signOut(auth);
-    nav("/", { replace: true });
-  };
+
   const toUserProfile = () => {
-    nav("/user-profile", { replace: true });
+    nav("/user-profile");
   };
 
   const setDoneLoading = (key: string) => () =>

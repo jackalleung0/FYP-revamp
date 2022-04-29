@@ -11,7 +11,7 @@ import {
   Loader,
   Container,
 } from "@mantine/core";
-import { getAuth } from "firebase/auth";
+import { getAuth, signOut } from "firebase/auth";
 import {
   collection,
   DocumentData,
@@ -141,6 +141,12 @@ export function UserProfile() {
     setResult((resul) => [...resul, ...res]);
   }, [favouriteState, favouriteQuery, result]);
 
+  const auth = getAuth(app);
+  const logout = async () => {
+    await signOut(auth);
+    nav("/", { replace: true });
+  };
+
   return (
     <div>
       <div
@@ -155,7 +161,7 @@ export function UserProfile() {
       </div>
       <div style={{ padding: "0 20px 36px" }}>
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <CogIcon style={{ width: 18 + 2 }} />
+          <CogIcon style={{ width: 18 + 2 }} onClick={logout} />
         </div>
 
         {!authLoading && !!currentUser?.uid ? (
@@ -295,6 +301,9 @@ export function UserProfile() {
               style={{ width: 160 }}
             />
           </div>
+          <Text color="gray" align="center">
+            TODO
+          </Text>
         </Tabs.Tab>
       </Tabs>
     </div>
