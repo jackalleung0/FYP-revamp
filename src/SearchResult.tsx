@@ -2,7 +2,6 @@ import {
   Container,
   ActionIcon,
   Text,
-  Image,
   createStyles,
   Affix,
   Transition,
@@ -11,7 +10,7 @@ import {
 } from "@mantine/core";
 import { useWindowScroll } from "@mantine/hooks";
 import axios from "axios";
-import React, { forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async-hook";
 import InfiniteScroll from "react-infinite-scroll-component";
 import {
@@ -63,6 +62,7 @@ export const searchArtworkBySearchTerm = async (
   return result.data; // ensure there are image_id for search result
 };
 import Masonry, { MasonryOptions } from "react-masonry-component";
+import { MasImage } from "./MasImage";
 
 export function SearchByTag() {
   const nav = useNavigate();
@@ -293,45 +293,4 @@ export function SearchByTag() {
     </div>
   );
 }
-const MasImage = forwardRef<
-  HTMLImageElement,
-  { artist: string; title: string; src: string }
->(({ src, title, id, artist }: any, ref) => {
-  const nav = useNavigate();
-  return (
-    <div
-      style={{
-        marginBottom: "23px",
-        width: 160,
-        display: "inline-block",
-      }}
-      onClickCapture={() => nav(`/artwork/${id}`)}
-    >
-      <Image radius={12} src={src} imageRef={ref} />
-      <Text
-        style={{
-          paddingTop: 11,
-          fontFamily: "SFProDisplay",
-          fontSize: 16,
-          fontWeight: "bold",
-          lineHeight: "20px",
-        }}
-      >
-        {title}
-      </Text>
-      <Text
-        style={{
-          paddingTop: 4,
 
-          fontFamily: "Inter",
-          fontSize: 13,
-          fontWeight: "100",
-          lineHeight: "16px",
-          color: "#8A94A6",
-        }}
-      >
-        {artist}
-      </Text>
-    </div>
-  );
-});

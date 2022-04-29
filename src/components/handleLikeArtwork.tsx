@@ -177,7 +177,11 @@ export const handleLikeArtwork = async ({
         { numberOfLikes: increment(1) },
         { merge: true }
       );
-      await setDoc(artworkRating, { rating: 1 }, { merge: true });
+      await setDoc(
+        artworkRating,
+        { rating: 1, timestamp: new Date() },
+        { merge: true }
+      );
     }
 
     // newly heart artwork have a default rating of 1

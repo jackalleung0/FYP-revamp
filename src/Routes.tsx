@@ -18,6 +18,7 @@ import { Search } from "./Search";
 import { ArtworkDetail } from "./ArtworkDetail";
 import { AboutArtwork } from "./AboutArtwork";
 import { AboutArtist } from "./AboutArtist";
+import { UserProfile } from "./UserProfile";
 
 function Rout() {
   // scroll to top when there are page routing event
@@ -34,6 +35,7 @@ function Rout() {
           <Route path="/login" element={<Login />} />
           <Route path="/select-artwork" element={<SelectArtwork />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/user-profile" element={<UserProfile />} />
           <Route path="/recently-viewed" element={<RecentlyViewed />} />
           <Route path="/search-result" element={<SearchByTag />} />
           <Route path="/search" element={<Search />} />
