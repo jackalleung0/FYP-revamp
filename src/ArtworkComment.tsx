@@ -424,6 +424,7 @@ const CommentInput = ({
               fontFamily: "Inter",
               fontWeight: "100",
               lineHeight: "24px",
+              background: "transparent",
               // height:17,
 
               // borderRadius: 0,
