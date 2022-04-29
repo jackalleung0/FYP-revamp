@@ -201,6 +201,7 @@ export function ArtworkComment() {
       {isEditMode && (
         <CommentInput
           onSubmit={(cmt) => {
+            setIsEditMode(false);
             setTempComment((e) => [...e, cmt]);
           }}
         />
