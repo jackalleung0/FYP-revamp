@@ -236,12 +236,42 @@ export function ArtworkComment() {
         <Comment
           comment={s.data()}
           key={s.id}
+          id={s.id}
           commentOnClick={() => {
             setOpenedDrawer(true);
             setDrawerDocID(s.id);
           }}
         />
       ))}
+      {snapshots.length === 0 && tempComment.length === 0 && (
+        <>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+
+              paddingTop: 158,
+            }}
+          >
+            <DiscussionIcon />
+            <Text
+              style={{
+                paddingTop: 36,
+
+                fontSize: "16px",
+                fontFamily: "Inter",
+                fontWeight: "100",
+                color: "#8A94A6",
+                lineHeight: "20px",
+              }}
+              align="center"
+            >
+              Start discussion by <br /> posting the first comment.
+            </Text>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -251,13 +281,19 @@ function Comment({
   commentOnClick,
   showReplyBtn = true,
   noBorder = false,
+  id,
 }: {
   comment: Comment;
   commentOnClick: () => void;
   showReplyBtn?: boolean;
   noBorder?: boolean;
+  id?: string;
 }) {
   const { classes } = useStyles();
+
+  const [auth] = useAuthState(getAuth(app));
+  const participated = true;
+
   return (
     <div style={{ padding: "0px 20px" }}>
       <div
@@ -348,6 +384,14 @@ function Comment({
               style={{ display: "flex", alignItems: "center", gap: 8 }}
               onClick={(e) => commentOnClick()}
             >
+              {participated && comment.numberOfDiscussion > 0 && (
+                <Avatar
+                  size={24}
+                  src={auth?.photoURL}
+                  radius="xl"
+                  style={{ marginRight: 14 }}
+                />
+              )}
               <ReplyIcon />
               <Text
                 style={{
@@ -560,3 +604,26 @@ const DrawerComment = ({
     </>
   );
 };
+
+const DiscussionIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="119"
+    height="112"
+    viewBox="0 0 119 112"
+  >
+    <g id="Discussion_Icon" transform="translate(-2 -3)">
+      <path
+        id="Path_12"
+        data-name="Path 12"
+        d="M2,18.172A15.172,15.172,0,0,1,17.172,3h53.1A15.172,15.172,0,0,1,85.444,18.172V48.515A15.172,15.172,0,0,1,70.272,63.686H55.1L32.343,86.444V63.686H17.172A15.172,15.172,0,0,1,2,48.515Z"
+      />
+      <path
+        id="Path_13"
+        data-name="Path 13"
+        d="M60.692,7V22.172A30.343,30.343,0,0,1,30.349,52.515H21.459l-13.4,13.4a15.094,15.094,0,0,0,7.115,1.767H30.349L53.106,90.444V67.686H68.278A15.172,15.172,0,0,0,83.45,52.515V22.172A15.172,15.172,0,0,0,68.278,7Z"
+        transform="translate(37.551 24.556)"
+      />
+    </g>
+  </svg>
+);
