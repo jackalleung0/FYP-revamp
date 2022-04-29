@@ -71,21 +71,21 @@ export function UserProfile() {
     "oldest"
   );
   const [favouriteState, setFavouriteState] = useState<"rating" | "latest">(
-    "rating"
+    "latest"
   );
 
-  const favouriteQuery = useMemo(() => {
-    if (!currentUser || !currentUser.uid) {
-      return undefined;
-    }
+  // const favouriteQuery = useMemo(() => {
+  //   if (!currentUser || !currentUser.uid) {
+  //     return undefined;
+  //   }
 
-    return query(
-      collection(getFirestore(app), `/users/${currentUser.uid}/ratings`),
-      favouriteState === "latest"
-        ? orderBy("timestamp", "desc")
-        : orderBy("rating", "desc")
-    );
-  }, [currentUser, favouriteState]);
+  //   return query(
+  //     collection(getFirestore(app), `/users/${currentUser.uid}/ratings`),
+  //     favouriteState === "latest"
+  //       ? orderBy("timestamp", "desc")
+  //       : orderBy("rating", "desc")
+  //   );
+  // }, [currentUser, favouriteState]);
 
   const commentQuery = useMemo(() => {
     if (!currentUser || !currentUser.uid) {
@@ -108,26 +108,42 @@ export function UserProfile() {
   const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
-    if (result.length === 0) {
-      loadFunc();
-    }
+    if (!currentUser) return;
+
+    // setResult([]);
+    // setHasMore(true);
+    // setSnapshots([]);
+    loadFunc();
+
     // TODO: reset result when query changes
-  }, [favouriteQuery]);
+  }, [favouriteState, currentUser]);
 
   const loadFunc = useCallback(async () => {
     const _limit = 10;
-    if (!favouriteQuery) return;
+    if (!currentUser || !currentUser.uid) {
+      return undefined;
+    }
     let _query: Query<DocumentData>;
+    console.log(favouriteState);
 
     // add startAfter when there are snapshot
     if (snapshots.length > 0) {
       _query = query(
-        favouriteQuery,
+        collection(getFirestore(app), `/users/${currentUser.uid}/ratings`),
+        favouriteState === "latest"
+          ? orderBy("timestamp", "desc")
+          : orderBy("rating", "desc"),
         limit(_limit),
         startAfter(snapshots[snapshots.length - 1])
       );
     } else {
-      _query = query(favouriteQuery, limit(_limit));
+      _query = query(
+        collection(getFirestore(app), `/users/${currentUser.uid}/ratings`),
+        favouriteState === "latest"
+          ? orderBy("timestamp", "desc")
+          : orderBy("rating", "desc"),
+        limit(_limit)
+      );
     }
     const snapshot = await getDocs(_query);
     setSnapshots((e) => [...e, ...snapshot.docs]);
@@ -137,7 +153,7 @@ export function UserProfile() {
       .map((e) => e.status === "fulfilled" && e.value)
       .filter(Boolean) as Artwork[];
     setResult((resul) => [...resul, ...res]);
-  }, [favouriteState, favouriteQuery, result]);
+  }, [currentUser, favouriteState]);
 
   const auth = getAuth(app);
   const logout = async () => {
@@ -212,14 +228,13 @@ export function UserProfile() {
             }}
           >
             <CustomSelect
-              defaultValue="rating"
               value={favouriteState}
               onChange={(e: any) => {
                 setFavouriteState(e);
                 setResult([]);
                 setHasMore(true);
                 setSnapshots([]);
-                loadFunc();
+                // loadFunc();
               }}
               data={[
                 { value: "rating", label: "Sort By Rating" },
