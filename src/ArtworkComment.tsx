@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { BackIcon } from "./BackIcon";
 import { CustomSelect } from "./CustomSelect";
 import {
@@ -12,6 +12,30 @@ import {
 } from "@mantine/core";
 import { useToggle } from "@mantine/hooks";
 import { PencilIcon, XIcon } from "@heroicons/react/solid";
+import {
+  addDoc,
+  collection,
+  CollectionReference,
+  DocumentData,
+  getDocs,
+  getFirestore,
+  limit,
+  orderBy,
+  Query,
+  query,
+  QueryDocumentSnapshot,
+  startAfter,
+  Timestamp,
+  where,
+} from "firebase/firestore";
+import { app } from "./firebaseConfig";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { useForm } from "@mantine/form";
+import { useAsync } from "react-async-hook";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { getAuth } from "firebase/auth";
+dayjs.extend(relativeTime);
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   userAvatar: {
@@ -22,11 +46,74 @@ const useStyles = createStyles((theme, _params, getRef) => ({
   },
 }));
 
+interface Comment {
+  artworkID: string;
+  author: string;
+  createdAt: Timestamp;
+  iconURL: string;
+  message: string;
+  numberOfDiscussion: number;
+  authorID: string;
+}
+
 export function ArtworkComment() {
   const { classes } = useStyles();
   const nav = useNavigate();
   const [select, setSelect] = useState<"popular" | "latest">("popular");
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
+
+  const [snapshots, setSnapshots] = useState<QueryDocumentSnapshot<Comment>[]>(
+    []
+  );
+  const { id } = useParams();
+
+  const [tempComment, setTempComment] = useState<Comment[]>([]);
+
+  const _query = useMemo(() => {
+    if (!id) {
+      return undefined;
+    }
+    return query(
+      collection(
+        getFirestore(app),
+        `/comments`
+      ) as CollectionReference<Comment>,
+      where("artworkID", "==", id),
+
+      select === "latest"
+        ? orderBy("createdAt", "desc")
+        : orderBy("numberOfDiscussion", "desc")
+    );
+  }, [select]);
+
+  const loadFunc = useCallback(async () => {
+    const _limit = 10;
+    if (!_query) return;
+
+    let __query =
+      snapshots.length > 0
+        ? query(
+            _query,
+            limit(_limit),
+            startAfter(snapshots[snapshots.length - 1])
+          )
+        : query(_query, limit(_limit));
+
+    const snapshot = await getDocs(__query);
+    setSnapshots((e) => [...e, ...snapshot.docs]);
+  }, [_query]);
+
+  const { result } = useAsync(
+    async () => _query && (await getDocs(_query)),
+    [_query]
+  );
+
+  useEffect(() => {
+    if (snapshots.length === 0) {
+      loadFunc();
+    }
+  }, [select]);
+
   return (
     <div>
       <Affix position={{ bottom: 30, right: 22 }} zIndex={2}>
@@ -67,7 +154,13 @@ export function ArtworkComment() {
         <CustomSelect
           defaultValue="popular"
           value={select}
-          onChange={(e: "popular" | "latest") => setSelect(e)}
+          onChange={(e: "popular" | "latest") => {
+            // do not update select when is the same value
+            if (e === select) return;
+            setSelect(e);
+            setSnapshots([]);
+            setTempComment([]);
+          }}
           data={[
             { value: "popular", label: "Sort By Popular" },
             { value: "latest", label: "Sort By Latest" },
@@ -102,16 +195,28 @@ export function ArtworkComment() {
             lineHeight: "20px",
           }}
         >
-          Number of comments: {10}
+          Number of comments: {result?.size}
         </Text>
       </div>
-      {isEditMode && <CommentInput />}
-      <Comment />
+      {isEditMode && (
+        <CommentInput
+          onSubmit={(cmt) => {
+            setTempComment((e) => [...e, cmt]);
+          }}
+        />
+      )}
+      {/* this is use to always put your recent submitted comment on top */}
+      {tempComment.map((s, index) => (
+        <Comment comment={s} key={index} />
+      ))}
+      {snapshots.map((s) => (
+        <Comment comment={s.data()} key={s.id} />
+      ))}
     </div>
   );
 }
 
-function Comment() {
+function Comment({ comment }: { comment: Comment }) {
   const { classes } = useStyles();
   return (
     <div style={{ padding: "0px 20px" }}>
@@ -122,7 +227,12 @@ function Comment() {
         }}
       >
         <div style={{ display: "flex" }}>
-          <Avatar radius="xl" size={36} className={classes.userAvatar} />
+          <Avatar
+            radius="xl"
+            size={36}
+            className={classes.userAvatar}
+            src={comment.iconURL}
+          />
           <div style={{ paddingLeft: 12 }}>
             <Text
               style={{
@@ -136,7 +246,7 @@ function Comment() {
                 paddingBottom: 2,
               }}
             >
-              Filipa Gaspar
+              {comment.author}
             </Text>
             <Text
               style={{
@@ -173,8 +283,7 @@ function Comment() {
             paddingTop: 22,
           }}
         >
-          This painting keeps getting better all the time every time I take a
-          look at it.
+          {comment.message}
         </Text>
         <div
           style={{
@@ -192,7 +301,7 @@ function Comment() {
               lineHeight: "20px",
             }}
           >
-            Posted a month ago
+            {dayjs(comment.createdAt.toDate()).fromNow()}
           </Text>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <ReplyIcon />
@@ -206,7 +315,8 @@ function Comment() {
                 // lineHeight: "20px",
               }}
             >
-              2
+              {(!comment.numberOfDiscussion && "Reply") ||
+                comment.numberOfDiscussion}
             </Text>
           </div>
         </div>
@@ -235,7 +345,56 @@ const ReplyIcon = () => (
   </svg>
 );
 
-const CommentInput = () => {
+const toDataURL = (url: string) =>
+  fetch(url)
+    .then((response) => response.blob())
+    .then(
+      (blob) =>
+        new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        })
+    );
+
+const CommentInput = ({
+  onSubmit: _onSubmit,
+}: {
+  onSubmit: (a: Comment) => void;
+}) => {
+  const form = useForm({
+    initialValues: {
+      message: "",
+    },
+  });
+
+  const { id } = useParams<{ id: string }>();
+
+  const [user] = useAuthState(getAuth(app));
+
+  const onSubmit = form.onSubmit(async ({ message }) => {
+    if (!id) return;
+    if (!user) return;
+    console.log(message);
+    const payload: Comment = {
+      artworkID: id,
+      author: user.displayName || "unnamed",
+      createdAt: Timestamp.fromDate(new Date()),
+      iconURL: (user.photoURL && (await toDataURL(user.photoURL))) || "",
+      message: message,
+      numberOfDiscussion: 0,
+      authorID: user.uid,
+    };
+
+    const ref = await addDoc<Comment>(
+      collection(getFirestore(app), "comments") as CollectionReference<Comment>,
+      payload
+    );
+
+    _onSubmit(payload);
+  });
+
   return (
     <div
       style={{
@@ -244,44 +403,48 @@ const CommentInput = () => {
         borderBottom: "1px solid #F1F2F4",
       }}
     >
-      <TextInput
-        icon={<Avatar radius="xl" size={32} />}
-        placeholder="Add a comment..."
-        rightSection={<SendIcon />}
-        styles={{
-          root: {
-            borderBottom: "1px solid #8A94A6",
-          },
-          // icon: {
-          //   paddingLeft: 17,
-          //   width: "min-content",
-          // },
-          input: {
-            color: "#4E5D78",
-            fontSize: "14px",
-            fontFamily: "Inter",
-            fontWeight: "100",
-            lineHeight: "24px",
-            // height:17,
+      <form onSubmit={onSubmit}>
+        <TextInput
+          icon={<Avatar radius="xl" size={32} src={user?.photoURL} />}
+          placeholder="Add a comment..."
+          rightSection={<SendIcon onClick={onSubmit} />}
+          {...form.getInputProps("message")}
+          styles={{
+            root: {
+              borderBottom: "1px solid #8A94A6",
+            },
+            // icon: {
+            //   paddingLeft: 17,
+            //   width: "min-content",
+            // },
+            input: {
+              color: "#4E5D78",
+              fontSize: "14px",
+              fontFamily: "Inter",
+              fontWeight: "100",
+              lineHeight: "24px",
+              // height:17,
 
-            // borderRadius: 0,
-            borderWidth: 0,
-            marginBottom: 11,
-            // backgroundColor: "#F1F2F4",
+              // borderRadius: 0,
+              borderWidth: 0,
+              marginBottom: 11,
+              // backgroundColor: "#F1F2F4",
 
-            // padding: 0,
-            // borderLeft: 16,
-            // height: "50px",
-            // paddingTop: 2,
-            paddingLeft: `${32 + 16}px !important`,
-          },
-        }}
-      />
+              // padding: 0,
+              // borderLeft: 16,
+              // height: "50px",
+              // paddingTop: 2,
+              paddingLeft: `${32 + 16}px !important`,
+            },
+          }}
+        />
+      </form>
     </div>
   );
 };
-const SendIcon = () => (
+const SendIcon = ({ ...props }: any) => (
   <svg
+    {...props}
     xmlns="http://www.w3.org/2000/svg"
     width="18"
     height="18"
