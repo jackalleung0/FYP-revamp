@@ -134,10 +134,9 @@ const instance = axios.create({
 
 const express = require("express");
 const exp = express();
-
-exp.get("/:artworkID", async (req, res) => {
+const { logs } = require("./log");
+exp.get("/:artworkID", logs, async (req, res) => {
   const { artworkID } = req.params;
-
   // reject if there are no enough parameter
   if (!artworkID || isNaN(Number.parseInt(artworkID))) {
     console.log(`incorrect artworkID ${artworkID}`);

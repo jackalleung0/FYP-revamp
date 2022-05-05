@@ -100,7 +100,7 @@ export function AboutArtist() {
   const shareLink = React.useMemo(
     () =>
       (artistResult?.artists_id &&
-        `https://us-central1-final-year-project-8ce2f.cloudfunctions.net/artist/${id}/${artistResult.artists_id}`) ||
+        `https://revamp.arartgallery.site/api/artist/${id}/${artistResult.artists_id}`) ||
       undefined,
     [id, artistResult]
   );

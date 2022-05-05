@@ -6,16 +6,8 @@
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "rewrites": [
         {
-          "source": "/artworks/**",
-          "function": "artworks"
-        },
-        {
-          "source": "/artist/**",
-          "function": "artist"
-        },
-        {
-          "source": "/aboutArtwork/**",
-          "function": "aboutArtwork"
+          "source": "/api/**",
+          "function": "main"
         },
         {
           "source": "**",

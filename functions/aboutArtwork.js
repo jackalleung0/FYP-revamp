@@ -133,8 +133,8 @@ const instance = axios.create({
 
 const express = require("express");
 const exp = express();
-
-exp.get("/:artworkID", async (req, res) => {
+const { logs } = require("./log");
+exp.get("/:artworkID", logs, async (req, res) => {
   console.log(JSON.stringify(req.path));
   const { artworkID } = req.params;
 

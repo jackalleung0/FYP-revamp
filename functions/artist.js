@@ -1,5 +1,5 @@
 const axios = require("axios");
-
+const { logs } = require("./log");
 function buildHTML({ title, description, id }) {
   // <meta property="og:image" content="${url}" />
   // <meta property="og:image:type" content="image/jpeg" />
@@ -134,9 +134,8 @@ const instance = axios.create({
 const express = require("express");
 const exp = express();
 
-exp.get("/:artworkID/:artistsID", async (req, res) => {
+exp.get("/:artworkID/:artistsID", logs, async (req, res) => {
   const { artworkID, artistsID } = req.params;
-
   if (!artistsID || isNaN(Number.parseInt(artistsID))) {
     console.log(`incorrect artistsID ${artistsID}`);
     return res.sendStatus(400);
