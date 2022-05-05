@@ -15,6 +15,7 @@ import { useToggle } from "@mantine/hooks";
 import { PencilIcon, XIcon } from "@heroicons/react/solid";
 import {
   addDoc,
+  arrayUnion,
   collection,
   CollectionReference,
   doc,
@@ -64,6 +65,7 @@ interface Comment {
   message: string;
   numberOfDiscussion: number;
   authorID: string;
+  participants?: string[];
 }
 
 export function ArtworkComment() {
@@ -311,7 +313,14 @@ function Comment({
   const { classes } = useStyles();
 
   const [auth] = useAuthState(getAuth(app));
-  const participated = true;
+  const uid = auth && auth.uid;
+  const participants = comment.participants;
+  const participated = useMemo(
+    () => (auth && comment.participants?.includes(auth.uid)) || false,
+    [uid, participants]
+  );
+
+  console.log(auth.photoURL);
 
   return (
     <div
@@ -408,10 +417,10 @@ function Comment({
               style={{ display: "flex", alignItems: "center", gap: 8 }}
               onClick={(e) => commentOnClick()}
             >
-              {participated && comment.numberOfDiscussion > 0 && (
+              {auth && participated && (
                 <Avatar
                   size={24}
-                  src={auth?.photoURL}
+                  src={auth.photoURL}
                   radius="xl"
                   style={{ marginRight: 14 }}
                 />
@@ -578,6 +587,7 @@ const DrawerComment = ({
   onClose: () => void;
   id: string;
 }) => {
+  const [user] = useAuthState(getAuth(app));
   const [snapshot, loading, error] = useCollection<Comment>(
     query(
       collection(
@@ -626,9 +636,15 @@ const DrawerComment = ({
 
           await setDoc(
             doc(getFirestore(app), `/comments/${id}`) as DocumentReference<any>,
-            { numberOfDiscussion: increment(1) },
+            {
+              numberOfDiscussion: increment(1),
+              participants: arrayUnion(user?.uid),
+            },
             { merge: true }
           );
+
+          // also update parent document on participants
+          const path = "";
 
           // setTempComment((e) => [...e, { comment, id: ref.id }]);
           reload();
