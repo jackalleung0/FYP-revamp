@@ -1,4 +1,5 @@
 import { CogIcon } from "@heroicons/react/outline";
+import { User } from "firebase/auth";
 import {
   Avatar,
   createStyles,
@@ -65,95 +66,11 @@ const masonryOptions: MasonryOptions = {
 export function UserProfile() {
   const { classes } = useStyles();
   const nav = useNavigate();
-  const [currentUser, authLoading] = useAuthState(getAuth(app));
+  const [user, authLoading] = useAuthState(getAuth(app));
 
   const [commentedState, setCommentedState] = useState<"oldest" | "latest">(
     "oldest"
   );
-  const [favouriteState, setFavouriteState] = useState<"rating" | "latest">(
-    "latest"
-  );
-
-  // const favouriteQuery = useMemo(() => {
-  //   if (!currentUser || !currentUser.uid) {
-  //     return undefined;
-  //   }
-
-  //   return query(
-  //     collection(getFirestore(app), `/users/${currentUser.uid}/ratings`),
-  //     favouriteState === "latest"
-  //       ? orderBy("timestamp", "desc")
-  //       : orderBy("rating", "desc")
-  //   );
-  // }, [currentUser, favouriteState]);
-
-  const commentQuery = useMemo(() => {
-    if (!currentUser || !currentUser.uid) {
-      return undefined;
-    }
-    return query(
-      collection(getFirestore(app), `/comments`),
-      where("authorID", "==", currentUser.uid),
-      commentedState === "latest"
-        ? orderBy("createdAt", "asc")
-        : orderBy("createdAt", "asc")
-    );
-  }, [currentUser, commentedState]);
-
-  //   const [snapshot, loading, error] = useCollection();
-  const [result, setResult] = React.useState<Artwork[]>([]);
-  const [snapshots, setSnapshots] = React.useState<
-    QueryDocumentSnapshot<DocumentData>[]
-  >([]);
-  const [hasMore, setHasMore] = useState(true);
-
-  useEffect(() => {
-    if (!currentUser) return;
-
-    // setResult([]);
-    // setHasMore(true);
-    // setSnapshots([]);
-    loadFunc();
-
-    // TODO: reset result when query changes
-  }, [favouriteState, currentUser]);
-
-  const loadFunc = useCallback(async () => {
-    const _limit = 10;
-    if (!currentUser || !currentUser.uid) {
-      return undefined;
-    }
-    let _query: Query<DocumentData>;
-    console.log(favouriteState);
-
-    // add startAfter when there are snapshot
-    if (snapshots.length > 0) {
-      _query = query(
-        collection(getFirestore(app), `/users/${currentUser.uid}/ratings`),
-        favouriteState === "latest"
-          ? orderBy("timestamp", "desc")
-          : orderBy("rating", "desc"),
-        limit(_limit),
-        startAfter(snapshots[snapshots.length - 1])
-      );
-    } else {
-      _query = query(
-        collection(getFirestore(app), `/users/${currentUser.uid}/ratings`),
-        favouriteState === "latest"
-          ? orderBy("timestamp", "desc")
-          : orderBy("rating", "desc"),
-        limit(_limit)
-      );
-    }
-    const snapshot = await getDocs(_query);
-    setSnapshots((e) => [...e, ...snapshot.docs]);
-    const ids = snapshot.docs.map((e) => e.id);
-    const res = (await Promise.allSettled(ids.map(getArtworkDetails)))
-      .filter((e) => e.status === "fulfilled")
-      .map((e) => e.status === "fulfilled" && e.value)
-      .filter(Boolean) as Artwork[];
-    setResult((resul) => [...resul, ...res]);
-  }, [currentUser, favouriteState]);
 
   const auth = getAuth(app);
   const logout = async () => {
@@ -178,12 +95,12 @@ export function UserProfile() {
           <CogIcon style={{ width: 18 + 2 }} onClick={logout} />
         </div>
 
-        {!authLoading && !!currentUser?.uid ? (
+        {!authLoading && !!user?.uid ? (
           <div style={{ display: "flex", gap: 22 }}>
             <Avatar
               size={82}
               component={UnstyledButton}
-              src={currentUser?.photoURL}
+              src={user?.photoURL}
               className={classes.userAvatar}
             />
             <div style={{ paddingTop: 20 }}>
@@ -197,7 +114,7 @@ export function UserProfile() {
                   lineHeight: "28px",
                 }}
               >
-                {currentUser.displayName}
+                {user.displayName}
               </Text>
               <div style={{ height: 4 }}></div>
               <Text
@@ -210,7 +127,7 @@ export function UserProfile() {
                   lineHeight: "20px",
                 }}
               >
-                {currentUser.email}
+                {user.email}
               </Text>
             </div>
           </div>
@@ -235,160 +152,315 @@ export function UserProfile() {
             color: "#111112 !important",
             borderBottomColor: "#111112 !important",
           },
-          
         }}
       >
         <Tabs.Tab label="Favourite Collections">
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              padding: "0 20px 10px",
-            }}
-          >
-            <CustomSelect
-              value={favouriteState}
-              onChange={(e: any) => {
-                setFavouriteState(e);
-                setResult([]);
-                setHasMore(true);
-                setSnapshots([]);
-                // loadFunc();
-              }}
-              data={[
-                { value: "rating", label: "Sort By Rating" },
-                { value: "latest", label: "Sort By Latest" },
-              ]}
-              style={{ width: 160 }}
-            />
-          </div>
-          <Container
-            style={{
-              paddingLeft: 20,
-              paddingRight: 20,
-            }}
-          >
-            <InfiniteScroll
-              dataLength={result.length} //This is important field to render the next data
-              next={() => {
-                loadFunc();
-              }}
-              hasMore={result.length % 10 === 0}
-              loader={
-                <div
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "center",
-                    paddingTop: 40,
-                    paddingBottom: 60,
-                  }}
-                >
-                  <Loader
-                    sx={(theme) => ({
-                      stroke: "#111112",
-                    })}
-                  />
-                </div>
-              }
-              endMessage={<></>}
-            >
-              <Masonry
-                className={""} // default ''
-                elementType={"div"} // default 'div'
-                options={masonryOptions} // default {}
-                disableImagesLoaded={false} // default false
-                updateOnEachImageLoad={false} // default false and works only if disableImagesLoaded is false
-              >
-                {result.length > 0 &&
-                  result.map((doc, index) => (
-                    <MasImage
-                      key={index}
-                      id={String(doc.id)}
-                      artist={getArtistName(doc.artist_display)}
-                      title={doc.title}
-                      src={getImageURL(doc.image_id)}
-                    />
-                  ))}
-              </Masonry>
-            </InfiniteScroll>
-          </Container>
+          <FavouriteArtwork user={user} />
         </Tabs.Tab>
         <Tabs.Tab label="Commented Artwork">
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              padding: "0 20px 10px",
-            }}
-          >
-            <CustomSelect
-              defaultValue="rating"
-              value={commentedState}
-              onChange={(e: any) => e && setCommentedState(e)}
-              data={[
-                { value: "oldest", label: "Sort By Oldest" },
-                { value: "latest", label: "Sort By Latest" },
-              ]}
-              style={{ width: 160 }}
-            />
-          </div>
-          <Container
-            style={{
-              paddingLeft: 20,
-              paddingRight: 20,
-            }}
-          >
-            <InfiniteScroll
-              dataLength={result.length} //This is important field to render the next data
-              next={() => {
-                loadFunc();
-              }}
-              hasMore={result.length % 10 === 0}
-              loader={
-                <div
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "center",
-                    paddingTop: 40,
-                    paddingBottom: 60,
-                  }}
-                >
-                  <Loader
-                    sx={(theme) => ({
-                      stroke: "#111112",
-                    })}
-                  />
-                </div>
-              }
-              endMessage={<></>}
-            >
-              <Masonry
-                className={""} // default ''
-                elementType={"div"} // default 'div'
-                options={masonryOptions} // default {}
-                disableImagesLoaded={false} // default false
-                updateOnEachImageLoad={false} // default false and works only if disableImagesLoaded is false
-              >
-                {result.length > 0 &&
-                  result.map((doc, index) => (
-                    <MasImage
-                      key={index}
-                      id={String(doc.id)}
-                      artist={getArtistName(doc.artist_display)}
-                      title={doc.title}
-                      src={getImageURL(doc.image_id)}
-                    />
-                  ))}
-              </Masonry>
-            </InfiniteScroll>
-          </Container>
+          <CommentedArtwork user={user} />
         </Tabs.Tab>
       </Tabs>
     </div>
   );
 }
+
+const FavouriteArtwork = ({ user }: { user: User | undefined | null }) => {
+  const [favouriteState, setFavouriteState] = useState<"rating" | "latest">(
+    "latest"
+  );
+
+  const [result, setResult] = React.useState<Artwork[]>([]);
+  const [latestSnapshot, setLatestSnapshot] =
+    React.useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+  const [haveNext, setHaveNext] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+
+    loadFunc();
+
+    // TODO: reset result when query changes
+  }, [favouriteState, user]);
+
+  const loadFunc = async () => {
+    if (!user || !user.uid) {
+      return undefined;
+    }
+    const _limit = 10;
+    const path = `/users/${user.uid}/ratings`;
+    const baseQuery = query(
+      collection(getFirestore(app), path),
+      favouriteState === "latest"
+        ? orderBy("timestamp", "desc")
+        : orderBy("rating", "desc"),
+      limit(_limit)
+    );
+    let _query: Query<DocumentData> =
+      // add startAfter when there are snapshot
+      latestSnapshot ? query(baseQuery, startAfter(latestSnapshot)) : baseQuery;
+
+    const snapshot = await getDocs(_query);
+
+    // save for pagination
+    setLatestSnapshot(snapshot.docs[snapshot.docs.length - 1]);
+
+    const ids = snapshot.docs.map((e) => e.id);
+
+    // get artwork details
+    const res = (await Promise.allSettled(ids.map(getArtworkDetails)))
+      .filter((e) => e.status === "fulfilled")
+      .map((e) => e.status === "fulfilled" && e.value)
+      .filter(Boolean) as Artwork[];
+    setResult((resul) => [...resul, ...res]);
+  };
+
+  const handleSelectChange = (e: any) => {
+    if (e === favouriteState) return;
+    // update select value
+    setFavouriteState(e);
+    // reset result
+    setResult([]);
+    // reset has more data
+    setHaveNext(true);
+    // reset firebase snapshots
+    setLatestSnapshot(null);
+  };
+  return (
+    <>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          padding: "0 20px 10px",
+        }}
+      >
+        <CustomSelect
+          value={favouriteState}
+          onChange={handleSelectChange}
+          data={[
+            { value: "latest", label: "Sort By Latest" },
+            { value: "rating", label: "Sort By Rating" },
+          ]}
+          style={{ width: 160 }}
+        />
+      </div>
+      <Container
+        style={{
+          paddingLeft: 20,
+          paddingRight: 20,
+        }}
+      >
+        <InfiniteScroll
+          dataLength={result.length} //This is important field to render the next data
+          next={async () => {
+            await loadFunc();
+          }}
+          hasMore={haveNext}
+          loader={
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                paddingTop: 40,
+                paddingBottom: 60,
+              }}
+            >
+              <Loader
+                sx={(theme) => ({
+                  stroke: "#111112",
+                })}
+              />
+            </div>
+          }
+          endMessage={<></>}
+        >
+          <Masonry
+            className={""} // default ''
+            elementType={"div"} // default 'div'
+            options={masonryOptions} // default {}
+            disableImagesLoaded={false} // default false
+            updateOnEachImageLoad={false} // default false and works only if disableImagesLoaded is false
+          >
+            {result.length > 0 &&
+              result.map((doc, index) => (
+                <MasImage
+                  key={index}
+                  id={String(doc.id)}
+                  artist={getArtistName(doc.artist_display)}
+                  title={doc.title}
+                  src={getImageURL(doc.image_id)}
+                />
+              ))}
+          </Masonry>
+        </InfiniteScroll>
+      </Container>
+    </>
+  );
+};
+const CommentedArtwork = ({ user }: { user: User | undefined | null }) => {
+  const [commentedState, setCommentedState] = useState<"oldest" | "latest">(
+    "latest"
+  );
+  const [haveNext, setHaveNext] = useState(true);
+
+  // const commentQuery = useMemo(() => {
+  //   if (!user || !user.uid) {
+  //     return undefined;
+  //   }
+  //   return query(
+  //     collection(getFirestore(app), `/comments`),
+  //     where("authorID", "==", user.uid),
+  //     commentedState === "latest"
+  //       ? orderBy("createdAt", "asc")
+  //       : orderBy("createdAt", "asc")
+  //   );
+  // }, [user, commentedState]);
+
+  const [result, setResult] = React.useState<Artwork[]>([]);
+  const [latestSnapshot, setLatestSnapshot] =
+    React.useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+
+    loadFunc();
+
+    // TODO: reset result when query changes
+  }, [commentedState, user]);
+
+  const loadFunc = async () => {
+    if (!user || !user.uid) {
+      return undefined;
+    }
+    const _limit = 10;
+    const path = `/comments`;
+    const baseQuery = query(
+      collection(getFirestore(app), path),
+      where("authorID", "==", user.uid),
+      commentedState === "latest"
+        ? orderBy("createdAt", "desc")
+        : orderBy("createdAt", "asc"),
+      limit(_limit)
+    );
+    let _query: Query<DocumentData> =
+      // add startAfter when there are snapshot
+      latestSnapshot ? query(baseQuery, startAfter(latestSnapshot)) : baseQuery;
+
+    const snapshot = await getDocs(_query);
+    setHaveNext(!snapshot.empty);
+
+    // save for pagination
+    setLatestSnapshot(snapshot.docs[snapshot.docs.length - 1]);
+
+    // to unique artwork, according to select status, status: latest / oldest => use latest / oldest document
+    // as the firebase already sorted for us
+    // we just need to check the order according to doc.artworkID
+    const ids = snapshot.docs
+      .filter((doc, index, arr) => {
+        const competingDoc: string[] = arr
+          .filter((e) => e.data().artworkID === doc.data().artworkID)
+          .map((e) => e.id);
+
+        // should include itself, will be 0 if is the latest / oldest doc
+        return competingDoc.indexOf(doc.id) === 0;
+      })
+      .map((e) => e.data().artworkID);
+
+    // get artwork details
+    const res = (await Promise.allSettled(ids.map(getArtworkDetails)))
+      .filter((e) => e.status === "fulfilled")
+      .map((e) => e.status === "fulfilled" && e.value)
+      .filter(Boolean) as Artwork[];
+    setResult((resul) => [...resul, ...res]);
+  };
+
+  const handleSelectChange = (e: any) => {
+    if (e === commentedState) return;
+    // update select value
+    setCommentedState(e);
+    // reset result
+    setResult([]);
+    // reset has more data
+    setHaveNext(true);
+    // reset firebase snapshots
+    setLatestSnapshot(null);
+  };
+  return (
+    <>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          padding: "0 20px 10px",
+        }}
+      >
+        <CustomSelect
+          defaultValue="rating"
+          value={commentedState}
+          onChange={handleSelectChange}
+          data={[
+            { value: "latest", label: "Sort By Latest" },
+            { value: "oldest", label: "Sort By Oldest" },
+          ]}
+          style={{ width: 160 }}
+        />
+      </div>
+      <Container
+        style={{
+          paddingLeft: 20,
+          paddingRight: 20,
+        }}
+      >
+        <InfiniteScroll
+          dataLength={result.length} //This is important field to render the next data
+          next={async () => {
+            await loadFunc();
+          }}
+          hasMore={haveNext}
+          loader={
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                paddingTop: 40,
+                paddingBottom: 60,
+              }}
+            >
+              <Loader
+                sx={(theme) => ({
+                  stroke: "#111112",
+                })}
+              />
+            </div>
+          }
+          endMessage={<></>}
+        >
+          <Masonry
+            className={""} // default ''
+            elementType={"div"} // default 'div'
+            options={masonryOptions} // default {}
+            disableImagesLoaded={false} // default false
+            updateOnEachImageLoad={false} // default false and works only if disableImagesLoaded is false
+          >
+            {result.length > 0 &&
+              result.map((doc, index) => (
+                <MasImage
+                  key={index}
+                  id={String(doc.id)}
+                  artist={getArtistName(doc.artist_display)}
+                  title={doc.title}
+                  src={getImageURL(doc.image_id)}
+                />
+              ))}
+          </Masonry>
+        </InfiniteScroll>
+      </Container>
+    </>
+  );
+};
 
 const CustomArtworkImage = ({ id }: { id: string }) => {
   const { result, loading } = useAsync(getArtworkDetails, [id]);
