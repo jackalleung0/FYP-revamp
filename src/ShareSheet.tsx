@@ -79,6 +79,7 @@ export const ShareSheet = ({ show, toggle, shareLink }: any) => {
             paddingRight: 30 - 1 - 1,
             paddingTop: 48,
             width: "max-content",
+            margin: "0 auto",
           }}
         >
           <CopyToClipboard text={shareLink} onCopy={copyToClipboard}>
