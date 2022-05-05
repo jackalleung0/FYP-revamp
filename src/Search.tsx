@@ -48,6 +48,7 @@ import {
 import { useCollectionOnce } from "react-firebase-hooks/firestore";
 import { app } from "./firebaseConfig";
 import { getArtworkDetails } from "./getArtworkDetails";
+import { PageAnimation } from "./components/PageAnimation";
 
 export function Search() {
   const { classes } = useStyles();
@@ -101,31 +102,33 @@ export function Search() {
           duration={300}
         >
           {(transitionStyles) => (
-            <ActionIcon
-              className={classes.ActionIcon}
-              component={Link}
-              to="/home"
-              radius={9999}
-              size={70}
-              style={{
-                backgroundColor: "#111112",
-                ...transitionStyles,
-              }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
+            <PageAnimation>
+              <ActionIcon
+                className={classes.ActionIcon}
+                component={Link}
+                to="/home"
+                radius={9999}
+                size={70}
+                style={{
+                  backgroundColor: "#111112",
+                  ...transitionStyles,
+                }}
               >
-                <path
-                  id="Home_Icon"
-                  d="M12.884,2.366a1.25,1.25,0,0,0-1.768,0l-8.75,8.75a1.25,1.25,0,1,0,1.768,1.768l.366-.366V20.75A1.25,1.25,0,0,0,5.75,22h2.5A1.25,1.25,0,0,0,9.5,20.75v-2.5A1.25,1.25,0,0,1,10.75,17h2.5a1.25,1.25,0,0,1,1.25,1.25v2.5A1.25,1.25,0,0,0,15.75,22h2.5a1.25,1.25,0,0,0,1.25-1.25V12.517l.366.366a1.25,1.25,0,1,0,1.768-1.768l-8.75-8.75Z"
-                  transform="translate(-2 -2)"
-                  fill="#fff"
-                />
-              </svg>
-            </ActionIcon>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    id="Home_Icon"
+                    d="M12.884,2.366a1.25,1.25,0,0,0-1.768,0l-8.75,8.75a1.25,1.25,0,1,0,1.768,1.768l.366-.366V20.75A1.25,1.25,0,0,0,5.75,22h2.5A1.25,1.25,0,0,0,9.5,20.75v-2.5A1.25,1.25,0,0,1,10.75,17h2.5a1.25,1.25,0,0,1,1.25,1.25v2.5A1.25,1.25,0,0,0,15.75,22h2.5a1.25,1.25,0,0,0,1.25-1.25V12.517l.366.366a1.25,1.25,0,1,0,1.768-1.768l-8.75-8.75Z"
+                    transform="translate(-2 -2)"
+                    fill="#fff"
+                  />
+                </svg>
+              </ActionIcon>
+            </PageAnimation>
           )}
         </Transition>
       </Affix>

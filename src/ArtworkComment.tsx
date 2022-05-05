@@ -46,6 +46,7 @@ import {
   useCollectionData,
   useDocumentDataOnce,
 } from "react-firebase-hooks/firestore";
+import { PageAnimation } from "./components/PageAnimation";
 dayjs.extend(relativeTime);
 
 const useStyles = createStyles((theme, _params, getRef) => ({
@@ -133,22 +134,24 @@ export function ArtworkComment() {
   return (
     <div>
       <Affix position={{ bottom: 30, right: 22 }} zIndex={2}>
-        <ActionIcon
-          className={classes.ActionIcon}
-          radius={9999}
-          size={70}
-          style={{
-            backgroundColor: "#111112",
-          }}
-          id="view in 3d"
-          onClick={() => setIsEditMode(!isEditMode)}
-        >
-          {isEditMode ? (
-            <XIcon style={{ width: 20 + 4, color: "#FFFFFF" }} />
-          ) : (
-            <PencilIcon style={{ width: 20 + 4, color: "#FFFFFF" }} />
-          )}
-        </ActionIcon>
+        <PageAnimation>
+          <ActionIcon
+            className={classes.ActionIcon}
+            radius={9999}
+            size={70}
+            style={{
+              backgroundColor: "#111112",
+            }}
+            id="view in 3d"
+            onClick={() => setIsEditMode(!isEditMode)}
+          >
+            {isEditMode ? (
+              <XIcon style={{ width: 20 + 4, color: "#FFFFFF" }} />
+            ) : (
+              <PencilIcon style={{ width: 20 + 4, color: "#FFFFFF" }} />
+            )}
+          </ActionIcon>
+        </PageAnimation>
       </Affix>
       <Drawer
         position="right"

@@ -63,6 +63,7 @@ export const searchArtworkBySearchTerm = async (
 };
 import Masonry, { MasonryOptions } from "react-masonry-component";
 import { MasImage } from "./MasImage";
+import { PageAnimation } from "./components/PageAnimation";
 
 export function SearchByTag() {
   const nav = useNavigate();
@@ -138,31 +139,33 @@ export function SearchByTag() {
           <Affix position={{ bottom: 30, right: 22 }}>
             <Transition mounted={true} transition="slide-left" duration={300}>
               {(transitionStyles) => (
-                <ActionIcon
-                  onClickCapture={() => scrollTo({ y: 0 })}
-                  className={classes.ActionIcon}
-                  radius={9999}
-                  size={70}
-                  style={{
-                    backgroundColor: "#111112",
-                    ...transitionStyles,
-                  }}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 18 18"
+                <PageAnimation>
+                  <ActionIcon
+                    onClickCapture={() => scrollTo({ y: 0 })}
+                    className={classes.ActionIcon}
+                    radius={9999}
+                    size={70}
+                    style={{
+                      backgroundColor: "#111112",
+                      ...transitionStyles,
+                    }}
                   >
-                    <path
-                      id="Up_Icon"
-                      d="M3.377,10.67a1.029,1.029,0,0,1,0-1.591l7.714-6.75a1.419,1.419,0,0,1,1.818,0l7.714,6.75a1.028,1.028,0,0,1,0,1.591,1.419,1.419,0,0,1-1.818,0l-5.52-4.83V18.875A1.213,1.213,0,0,1,12,20a1.213,1.213,0,0,1-1.286-1.125V5.841l-5.52,4.83a1.419,1.419,0,0,1-1.818,0Z"
-                      transform="translate(-3 -2)"
-                      fill="#fff"
-                      fillRule="evenodd"
-                    />
-                  </svg>
-                </ActionIcon>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 18 18"
+                    >
+                      <path
+                        id="Up_Icon"
+                        d="M3.377,10.67a1.029,1.029,0,0,1,0-1.591l7.714-6.75a1.419,1.419,0,0,1,1.818,0l7.714,6.75a1.028,1.028,0,0,1,0,1.591,1.419,1.419,0,0,1-1.818,0l-5.52-4.83V18.875A1.213,1.213,0,0,1,12,20a1.213,1.213,0,0,1-1.286-1.125V5.841l-5.52,4.83a1.419,1.419,0,0,1-1.818,0Z"
+                        transform="translate(-3 -2)"
+                        fill="#fff"
+                        fillRule="evenodd"
+                      />
+                    </svg>
+                  </ActionIcon>
+                </PageAnimation>
               )}
             </Transition>
           </Affix>
@@ -293,4 +296,3 @@ export function SearchByTag() {
     </div>
   );
 }
-

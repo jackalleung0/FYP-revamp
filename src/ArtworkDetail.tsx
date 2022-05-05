@@ -52,6 +52,7 @@ import {
   TwitterShareButton,
   WhatsappShareButton,
 } from "react-share";
+import { PageAnimation } from "./components/PageAnimation";
 
 const rating_weight = 0.8;
 
@@ -564,36 +565,38 @@ export function ArtworkDetail() {
             {/* check if there are arURL first, then display the AR Icon if there are any */}
             {!artworkDataLoading && artworkData?.arURL && (
               <Affix position={{ bottom: 30, right: 22 }} zIndex={2}>
-                <ActionIcon
-                  className={classes.ActionIcon}
-                  radius={9999}
-                  size={70}
-                  style={{
-                    backgroundColor: "#111112",
-                  }}
-                  id="view in 3d"
-                  component="a"
-                  target="_blank"
-                  href={artworkData.arURL}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="22.675"
-                    height="24.338"
-                    viewBox="0 0 22.675 24.338"
+                <PageAnimation>
+                  <ActionIcon
+                    className={classes.ActionIcon}
+                    radius={9999}
+                    size={70}
+                    style={{
+                      backgroundColor: "#111112",
+                    }}
+                    id="view in 3d"
+                    component="a"
+                    target="_blank"
+                    href={artworkData.arURL}
                   >
-                    <path
-                      id="AR_Icon"
-                      d="M16.5,11.556,14,12.778m0,0-2.5-1.222M14,12.778v3.056M24,7.889,21.5,9.111M24,7.889,21.5,6.667M24,7.889v3.056M16.5,4.222,14,3,11.5,4.222M4,7.889,6.5,6.667M4,7.889,6.5,9.111M4,7.889v3.056M14,25l-2.5-1.222M14,25l2.5-1.222M14,25V21.944m-7.5-.611L4,20.111V17.056m17.5,4.278L24,20.111V17.056"
-                      transform="translate(-2.663 -2)"
-                      fill="none"
-                      stroke="#fff"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                    />
-                  </svg>
-                </ActionIcon>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="22.675"
+                      height="24.338"
+                      viewBox="0 0 22.675 24.338"
+                    >
+                      <path
+                        id="AR_Icon"
+                        d="M16.5,11.556,14,12.778m0,0-2.5-1.222M14,12.778v3.056M24,7.889,21.5,9.111M24,7.889,21.5,6.667M24,7.889v3.056M16.5,4.222,14,3,11.5,4.222M4,7.889,6.5,6.667M4,7.889,6.5,9.111M4,7.889v3.056M14,25l-2.5-1.222M14,25l2.5-1.222M14,25V21.944m-7.5-.611L4,20.111V17.056m17.5,4.278L24,20.111V17.056"
+                        transform="translate(-2.663 -2)"
+                        fill="none"
+                        stroke="#fff"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                      />
+                    </svg>
+                  </ActionIcon>
+                </PageAnimation>
               </Affix>
             )}
             <Affix position={{ top: 0, left: 0, right: 0 }}>
