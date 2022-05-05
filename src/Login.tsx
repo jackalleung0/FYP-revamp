@@ -57,7 +57,7 @@ export function Login() {
     user && doc(getFirestore(app), `users/${user.uid}`)
   );
   useEffect(() => {
-    if (!pressedSignIn || userDocLoading) return;
+    if (!pressedSignIn || userDocLoading || !values) return;
     const redirect = query.get("redirect");
     if (!!redirect) {
       nav(redirect);
