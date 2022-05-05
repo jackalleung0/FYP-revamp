@@ -11,7 +11,7 @@ import {
 import { useToggle } from "@mantine/hooks";
 import axios from "axios";
 import { doc, getFirestore } from "firebase/firestore";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async-hook";
 import {
   useDocumentDataOnce,
@@ -179,6 +179,7 @@ export function AboutArtwork() {
       `https://us-central1-final-year-project-8ce2f.cloudfunctions.net/aboutArtwork/${id}`,
     [id]
   );
+  const headerRef = useRef<HTMLDivElement>(null);
 
   return (
     <div>
@@ -191,21 +192,24 @@ export function AboutArtwork() {
         style={{ height: "100vh" }}
       ></LoadingOverlay>
       <div style={{ display: allDoneLoading ? "block" : "none" }}>
-        <div
-          style={{
-            // position: "sticky",
-            paddingTop: 10,
-            paddingLeft: 20,
-            paddingRight: 20,
-            paddingBottom: 24 - 2,
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <BackIcon onClick={() => nav(-1)} />
+        <Affix position={{ top: 0, left: 0, right: 0 }}>
+          <div
+            ref={headerRef}
+            style={{
+              paddingTop: 10,
+              paddingLeft: 20,
+              paddingRight: 20,
+              paddingBottom: 22,
+              background: "#FFFFFF",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <BackIcon onClick={() => nav(-1)} />
 
-            <ShareIcon onClickCapture={toggle} />
+              <ShareIcon onClickCapture={toggle} />
+            </div>
           </div>
-        </div>
+        </Affix>
         <Affix position={{ bottom: 0, left: 0, right: 0 }} zIndex={2}>
           <div
             id="grad"
@@ -216,6 +220,7 @@ export function AboutArtwork() {
             }}
           />
         </Affix>
+        <div style={{ height: headerRef.current?.style.height || 50 }} />
         <Center style={{ backgroundColor: "#F1F2F4" }}>
           <Image
             width={335}

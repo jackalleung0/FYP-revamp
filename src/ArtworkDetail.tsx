@@ -26,7 +26,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import CopyToClipboard from "react-copy-to-clipboard";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async-hook";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useDocumentData } from "react-firebase-hooks/firestore";
@@ -401,6 +401,8 @@ export function ArtworkDetail() {
     [id]
   );
 
+  const headerRef = useRef<HTMLDivElement>(null);
+
   return (
     <div>
       <div style={{ display: allDoneLoading ? "block" : "none" }}>
@@ -593,23 +595,30 @@ export function ArtworkDetail() {
         )}
         {!loading && result && (
           <>
-            <div
-              style={{
-                paddingTop: 10,
-                paddingLeft: 20,
-                paddingRight: 20,
-              }}
-              id="header-bar"
-            >
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <BackIcon onClick={() => nav(-1)} />
+            <Affix position={{ top: 0, left: 0, right: 0 }}>
+              <div
+                ref={headerRef}
+                style={{
+                  paddingTop: 10,
+                  paddingLeft: 20,
+                  paddingRight: 20,
+                  background: "#FFFFFF",
+                }}
+                id="header-bar"
+              >
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
+                  <BackIcon onClick={() => nav(-1)} />
 
-                <div style={{ display: "flex", gap: 32, paddingBottom: 24 }}>
-                  <CommentIcon onClick={toCommentPage} />
-                  <ShareIcon onClickCapture={() => setShow(true)} />
+                  <div style={{ display: "flex", gap: 32, paddingBottom: 24 }}>
+                    <CommentIcon onClick={toCommentPage} />
+                    <ShareIcon onClickCapture={() => setShow(true)} />
+                  </div>
                 </div>
               </div>
-            </div>
+            </Affix>
+            <div style={{ height: headerRef?.current?.style.height || 52 }} />
             <Center style={{ backgroundColor: "#F1F2F4" }}>
               <Image
                 width={335}

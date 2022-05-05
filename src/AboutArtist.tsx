@@ -9,7 +9,7 @@ import {
   LoadingOverlay,
 } from "@mantine/core";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useAsync } from "react-async-hook";
 import { useNavigate, useParams } from "react-router-dom";
 import { BackIcon } from "./BackIcon";
@@ -105,6 +105,8 @@ export function AboutArtist() {
     [id, artistResult]
   );
 
+  const headerRef = useRef<HTMLDivElement>(null);
+
   return (
     <div>
       <ShareSheet {...{ show, toggle }} shareLink={shareLink} />
@@ -115,17 +117,20 @@ export function AboutArtist() {
         loaderProps={{ color: "#111112" }}
         style={{ height: "100vh" }}
       />
-      <div
+      <Affix
+        position={{ top: 0, left: 0, right: 0 }}
         style={{ display: detailsLoading || artistsLoading ? "none" : "block" }}
       >
         <div
+          ref={headerRef}
           style={{
-            position: "sticky",
-            top: 10,
+            paddingTop: 10,
             paddingLeft: 20,
             paddingRight: 20,
+            background: "#FFFFFF",
             paddingBottom: 35,
           }}
+          id="header-bar"
         >
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <BackIcon onClick={() => nav(-1)} />
@@ -133,6 +138,11 @@ export function AboutArtist() {
             <ShareIcon onClickCapture={toggle} />
           </div>
         </div>
+      </Affix>
+      <div
+        style={{ display: detailsLoading || artistsLoading ? "none" : "block" }}
+      >
+        <div style={{ height: headerRef?.current?.style.height || 63 }} />
         <Affix position={{ bottom: 0, left: 0, right: 0 }} zIndex={2}>
           <div
             id="grad"
