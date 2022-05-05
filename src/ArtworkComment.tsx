@@ -300,11 +300,13 @@ function Comment({
   commentOnClick,
   layer2Comment = false,
   noBorder = false,
+  hideReply = false,
 }: {
   comment: Comment;
   commentOnClick: () => void;
   layer2Comment?: boolean;
   noBorder?: boolean;
+  hideReply?: boolean;
 }) {
   const { classes } = useStyles();
 
@@ -401,7 +403,7 @@ function Comment({
           >
             {dayjs(comment.createdAt.toDate()).fromNow()}
           </Text>
-          {!layer2Comment && (
+          {!hideReply && (
             <div
               style={{ display: "flex", alignItems: "center", gap: 8 }}
               onClick={(e) => commentOnClick()}
@@ -609,6 +611,7 @@ const DrawerComment = ({
           commentOnClick={() => {}}
           noBorder
           layer2Comment
+          hideReply
         />
       )}
       <CommentInput
@@ -639,6 +642,7 @@ const DrawerComment = ({
               comment={comment.data()}
               commentOnClick={() => {}}
               key={comment.id}
+              hideReply
             />
           ))}
       </div>
