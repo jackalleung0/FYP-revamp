@@ -19,6 +19,13 @@ export const CustomSelect = ({
           height: "17px",
           lineHeight: "20px",
         },
+        item: {
+          fontSize: "14px",
+          fontFamily: "Inter",
+          fontWeight: "normal",
+          color: "#111112",
+          lineHeight: "20px",
+        },
       }}
     />
   );

@@ -218,7 +218,26 @@ export function UserProfile() {
           <UserAvatar className={classes.userAvatar} />
         )}
       </div>
-      <Tabs>
+      <Tabs
+        styles={{
+          tabLabel: {
+            fontSize: "15px",
+            fontFamily: "Inter",
+            fontWeight: "100",
+            lineHeight: "20px",
+          },
+          tabControl: {
+            width: "50%",
+            padding: 0,
+            color: "#8A94A6 !important",
+          },
+          tabActive: {
+            color: "#111112 !important",
+            borderBottomColor: "#111112 !important",
+          },
+          
+        }}
+      >
         <Tabs.Tab label="Favourite Collections">
           <div
             style={{
