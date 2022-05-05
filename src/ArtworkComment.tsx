@@ -303,12 +303,14 @@ function Comment({
   layer2Comment = false,
   noBorder = false,
   hideReply = false,
+  id,
 }: {
   comment: Comment;
   commentOnClick: () => void;
   layer2Comment?: boolean;
   noBorder?: boolean;
   hideReply?: boolean;
+  id?: string;
 }) {
   const { classes } = useStyles();
 
@@ -320,10 +322,9 @@ function Comment({
     [uid, participants]
   );
 
-  console.log(auth.photoURL);
-
   return (
     <div
+      id={id}
       style={{
         padding: "0px 20px",
         background: layer2Comment ? "#FCFCFD" : "transparent",
@@ -655,6 +656,7 @@ const DrawerComment = ({
         {snapshot &&
           snapshot.docs.map((comment) => (
             <Comment
+              id={comment.id}
               comment={comment.data()}
               commentOnClick={() => {}}
               key={comment.id}
