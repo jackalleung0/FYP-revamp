@@ -177,9 +177,10 @@ export function ArtworkComment() {
       </div>
       <div
         style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          padding: "0 20px 10px",
+          borderBottom: "1px solid #F1F2F4",
+          paddingLeft: 20,
+          paddingBottom: 32,
+          paddingRight: 15,
         }}
       >
         <CustomSelect
@@ -196,12 +197,8 @@ export function ArtworkComment() {
             { value: "popular", label: "Sort By Popular" },
             { value: "latest", label: "Sort By Latest" },
           ]}
-          style={{ width: 160 }}
+          style={{ width: 160, float: "right" }}
         />
-      </div>
-      <div
-        style={{ padding: "0 20px 33px", borderBottom: "1px solid #F1F2F4" }}
-      >
         <Text
           style={{
             fontSize: "24px",
@@ -210,13 +207,14 @@ export function ArtworkComment() {
             color: "#000000",
             height: "29px",
             lineHeight: "28px",
+            paddingTop: 23,
           }}
         >
           Comment
         </Text>
         <Text
           style={{
-            paddingTop: 8,
+            paddingTop: 7,
 
             fontSize: "16px",
             fontFamily: "Inter",
@@ -230,21 +228,29 @@ export function ArtworkComment() {
         </Text>
       </div>
       {isEditMode && (
-        <CommentInput
-          onSubmit={async ({ comment }) => {
-            setIsEditMode(false);
-
-            const ref = await addDoc<Comment>(
-              collection(
-                getFirestore(app),
-                "comments"
-              ) as CollectionReference<Comment>,
-              comment
-            );
-
-            setTempComment((e) => [...e, { comment, id: ref.id }]);
+        <div
+          style={{
+            background: "#FCFCFD",
+            padding: "22px 20px",
+            borderBottom: "1px solid #F1F2F4",
           }}
-        />
+        >
+          <CommentInput
+            onSubmit={async ({ comment }) => {
+              setIsEditMode(false);
+
+              const ref = await addDoc<Comment>(
+                collection(
+                  getFirestore(app),
+                  "comments"
+                ) as CollectionReference<Comment>,
+                comment
+              );
+
+              setTempComment((e) => [...e, { comment, id: ref.id }]);
+            }}
+          />
+        </div>
       )}
       {/* this is use to always put your recent submitted comment on top */}
       {tempComment.map(({ comment, id }, index) => (
@@ -354,9 +360,8 @@ function Comment({
                 fontWeight: "bold",
                 color: "#000000",
                 height: "19px",
-
-                paddingTop: 2,
-                paddingBottom: 2,
+                lineHeight: "23px",
+                paddingBottom: 3,
               }}
             >
               {comment.author}
@@ -393,25 +398,26 @@ function Comment({
             color: "#283A5B",
             lineHeight: "20px",
 
-            paddingTop: 22,
+            paddingTop: 23,
           }}
         >
           {comment.message}
         </Text>
         <div
           style={{
-            paddingTop: 24,
+            paddingTop: 18,
             display: "flex",
             justifyContent: "space-between",
           }}
         >
           <Text
             style={{
-              fontSize: "15px",
+              fontSize: "12px",
               fontFamily: "Inter",
               fontWeight: "100",
               color: "#8A94A6",
               lineHeight: "20px",
+              paddingTop: 2 + 1,
             }}
           >
             {dayjs(comment.createdAt.toDate()).fromNow()}
@@ -426,23 +432,32 @@ function Comment({
                   size={24}
                   src={auth.photoURL}
                   radius="xl"
-                  style={{ marginRight: 14 }}
+                  style={{ marginRight: 5 }}
                 />
               )}
-              <ReplyIcon />
-              <Text
+              <div
                 style={{
-                  fontSize: "14px",
-                  fontFamily: "SFProDisplay",
-                  fontWeight: "100",
-                  color: "#8A94A6",
-                  // height: "16px",
-                  // lineHeight: "20px",
+                  paddingTop: 2,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
                 }}
               >
-                {(!comment.numberOfDiscussion && "Reply") ||
-                  comment.numberOfDiscussion}
-              </Text>
+                <ReplyIcon />
+                <Text
+                  style={{
+                    fontSize: "14px",
+                    fontFamily: "SFProDisplay",
+                    fontWeight: "100",
+                    color: "#8A94A6",
+                    // height: "16px",
+                    // lineHeight: "20px",
+                  }}
+                >
+                  {(!comment.numberOfDiscussion && "Reply") ||
+                    comment.numberOfDiscussion}
+                </Text>
+              </div>
             </div>
           )}
         </div>
@@ -520,51 +535,43 @@ const CommentInput = ({
   });
 
   return (
-    <div
-      style={{
-        background: layer2Comment ? "#FCFCFD" : "#FCFCFD",
-        padding: "22px 20px",
-        borderBottom: layer2Comment ? "0px" : "1px solid #F1F2F4",
-      }}
-    >
-      <form onSubmit={onSubmit}>
-        <TextInput
-          icon={<Avatar radius="xl" size={32} src={user?.photoURL} />}
-          placeholder="Add a comment..."
-          rightSection={<SendIcon onClick={onSubmit} />}
-          {...form.getInputProps("message")}
-          styles={{
-            root: {
-              borderBottom: "1px solid #8A94A6",
-            },
-            // icon: {
-            //   paddingLeft: 17,
-            //   width: "min-content",
-            // },
-            input: {
-              color: "#4E5D78",
-              fontSize: "14px",
-              fontFamily: "Inter",
-              fontWeight: "100",
-              lineHeight: "24px",
-              background: "transparent",
-              // height:17,
+    <form onSubmit={onSubmit}>
+      <TextInput
+        icon={<Avatar radius="xl" size={32} src={user?.photoURL} />}
+        placeholder="Add a comment..."
+        rightSection={<SendIcon onClick={onSubmit} />}
+        {...form.getInputProps("message")}
+        styles={{
+          root: {
+            borderBottom: "1px solid #8A94A6",
+          },
+          icon: {
+            paddingLeft: 0,
+            width: 32,
+            height: 32,
+            // paddingLeft: 17,
+            // width: "min-content",
+          },
+          input: {
+            color: "#4E5D78",
+            fontSize: "14px",
+            fontFamily: "Inter",
+            fontWeight: "100",
+            lineHeight: "24px",
+            background: "transparent",
 
-              // borderRadius: 0,
-              borderWidth: 0,
-              marginBottom: 11,
-              // backgroundColor: "#F1F2F4",
+            borderWidth: 0,
+            marginBottom: 7,
 
-              // padding: 0,
-              // borderLeft: 16,
-              // height: "50px",
-              // paddingTop: 2,
-              paddingLeft: `${32 + 16}px !important`,
-            },
-          }}
-        />
-      </form>
-    </div>
+            paddingLeft: `${48}px !important`,
+          },
+          rightSection: {
+            width: 22,
+            height: 34,
+          },
+        }}
+      />
+    </form>
   );
 };
 const SendIcon = ({ ...props }: any) => (
@@ -613,7 +620,7 @@ const DrawerComment = ({
           paddingTop: 10,
           paddingLeft: 20,
           paddingRight: 20,
-          paddingBottom: 16,
+          paddingBottom: 30,
         }}
         id={id}
       >
@@ -628,33 +635,47 @@ const DrawerComment = ({
           hideReply
         />
       )}
-      <CommentInput
-        onSubmit={async ({ comment }) => {
-          await addDoc<Comment>(
-            collection(
-              getFirestore(app),
-              `/comments/${id}/discussions`
-            ) as CollectionReference<Comment>,
-            comment
-          );
-
-          await setDoc(
-            doc(getFirestore(app), `/comments/${id}`) as DocumentReference<any>,
-            {
-              numberOfDiscussion: increment(1),
-              participants: arrayUnion(user?.uid),
-            },
-            { merge: true }
-          );
-
-          // also update parent document on participants
-          const path = "";
-
-          // setTempComment((e) => [...e, { comment, id: ref.id }]);
-          reload();
+      <div
+        style={{
+          background: "#FCFCFD",
+          paddingTop: 14,
+          paddingBottom: 26,
+          paddingLeft: 20,
+          paddingRight: 20,
+          borderBottom: "0px",
         }}
-        layer2Comment
-      />
+      >
+        <CommentInput
+          onSubmit={async ({ comment }) => {
+            await addDoc<Comment>(
+              collection(
+                getFirestore(app),
+                `/comments/${id}/discussions`
+              ) as CollectionReference<Comment>,
+              comment
+            );
+
+            await setDoc(
+              doc(
+                getFirestore(app),
+                `/comments/${id}`
+              ) as DocumentReference<any>,
+              {
+                numberOfDiscussion: increment(1),
+                participants: arrayUnion(user?.uid),
+              },
+              { merge: true }
+            );
+
+            // also update parent document on participants
+            const path = "";
+
+            // setTempComment((e) => [...e, { comment, id: ref.id }]);
+            reload();
+          }}
+          layer2Comment
+        />
+      </div>
       <div style={{ padding: "0 16px" }}>
         {snapshot &&
           snapshot.docs.map((comment) => (

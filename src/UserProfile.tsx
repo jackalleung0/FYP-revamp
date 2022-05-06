@@ -49,7 +49,7 @@ import { UserAvatar } from "./UserAvatar";
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   userAvatar: {
-    boxShadow: theme.shadows.xl,
+    boxShadow: theme.shadows.xs,
     borderRadius: "999px",
   },
   ActionIcon: {
@@ -85,16 +85,29 @@ export function UserProfile() {
           paddingTop: 10,
           paddingLeft: 20,
           paddingRight: 20,
-          paddingBottom: 16,
+          paddingBottom: 16 - 9 - 1,
         }}
       >
         <BackIcon onClick={() => nav(-1)} />
       </div>
-      <div style={{ padding: "0 20px 36px" }}>
+      <div
+        style={{
+          paddingLeft: 20,
+          paddingRight: 20 - 2,
+        }}
+      >
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <CogIcon style={{ width: 18 + 2 }} onClick={logout} />
+          <CogIcon style={{ width: 18 + 2 + 4 }} onClick={logout} />
         </div>
-
+      </div>
+      <div
+        style={{
+          paddingTop: 2,
+          paddingLeft: 20,
+          paddingRight: 20,
+          paddingBottom: 31 + 1,
+        }}
+      >
         {!authLoading && !!user?.uid ? (
           <div style={{ display: "flex", gap: 22 }}>
             <Avatar
@@ -103,7 +116,7 @@ export function UserProfile() {
               src={user?.photoURL}
               className={classes.userAvatar}
             />
-            <div style={{ paddingTop: 20 }}>
+            <div style={{ paddingTop: 20 - 2 - 2 }}>
               <Text
                 style={{
                   fontSize: "18px",
@@ -112,11 +125,12 @@ export function UserProfile() {
                   color: "#000000",
                   height: "21px",
                   lineHeight: "28px",
+                  marginTop: 1,
                 }}
               >
                 {user.displayName}
               </Text>
-              <div style={{ height: 4 }}></div>
+              <div style={{ height: 4 + 1 + 1 }}></div>
               <Text
                 style={{
                   fontSize: "14px",
@@ -137,6 +151,9 @@ export function UserProfile() {
       </div>
       <Tabs
         styles={{
+          tabsListWrapper: {
+            borderBottomColor: "#F1F2F4 !important",
+          },
           tabLabel: {
             fontSize: "15px",
             fontFamily: "Inter",
@@ -148,9 +165,14 @@ export function UserProfile() {
             padding: 0,
             color: "#8A94A6 !important",
           },
+          tabInner: { paddingBottom: 9 + 1 + 1 },
           tabActive: {
             color: "#111112 !important",
             borderBottomColor: "#111112 !important",
+            borderBottomWidth: 1,
+          },
+          body: {
+            paddingTop: 8,
           },
         }}
       >
@@ -232,7 +254,9 @@ const FavouriteArtwork = ({ user }: { user: User | undefined | null }) => {
         style={{
           display: "flex",
           justifyContent: "flex-end",
-          padding: "0 20px 10px",
+          paddingLeft: 20,
+          paddingRight: 15,
+          paddingBottom: 13,
         }}
       >
         <CustomSelect
@@ -393,7 +417,9 @@ const CommentedArtwork = ({ user }: { user: User | undefined | null }) => {
         style={{
           display: "flex",
           justifyContent: "flex-end",
-          padding: "0 20px 10px",
+          paddingLeft: 20,
+          paddingRight: 15,
+          paddingBottom: 13,
         }}
       >
         <CustomSelect

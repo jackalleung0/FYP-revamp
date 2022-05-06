@@ -10,6 +10,9 @@ export const CustomSelect = ({
       {...props}
       rightSection={<ChevronDownIcon style={{ width: 20 }} />}
       styles={{
+        rightSection: {
+          width: 20,
+        },
         input: {
           border: 0,
           fontSize: "14px",
@@ -18,6 +21,8 @@ export const CustomSelect = ({
           color: "#111112",
           height: "17px",
           lineHeight: "20px",
+          textAlign: "end",
+          paddingRight: 30 - 4 -1,
         },
         item: {
           fontSize: "14px",
