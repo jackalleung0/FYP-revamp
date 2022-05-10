@@ -251,96 +251,117 @@ const FavouriteArtwork = ({ user }: { user: User | undefined | null }) => {
     // reset firebase snapshots
     setLatestSnapshot(null);
   };
+
+  const isFirstTimeLoading = loadedTimes === 0;
+  const haveResult = result.length > 0;
   return (
     <>
-      {loadedTimes > 0 && result.length > 0 ? (
-        <>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              paddingLeft: 20,
-              paddingRight: 15,
-              paddingBottom: 13,
-            }}
-          >
-            <CustomSelect
-              value={favouriteState}
-              onChange={handleSelectChange}
-              data={[
-                { value: "latest", label: "Sort By Latest" },
-                { value: "rating", label: "Sort By Rating" },
-              ]}
-              style={{ width: 160 }}
-            />
-          </div>
-          <Container
-            style={{
-              paddingLeft: 20,
-              paddingRight: 20,
-            }}
-          >
-            <InfiniteScroll
-              dataLength={result.length} //This is important field to render the next data
-              next={async () => {
-                await loadFunc();
+      {!isFirstTimeLoading ? (
+        haveResult ? (
+          <>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                paddingLeft: 20,
+                paddingRight: 15,
+                paddingBottom: 13,
               }}
-              hasMore={haveNext}
-              loader={
-                <div
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "center",
-                    paddingTop: 40,
-                    paddingBottom: 60,
-                  }}
-                >
-                  <Loader
-                    sx={(theme) => ({
-                      stroke: "#111112",
-                    })}
-                  />
-                </div>
-              }
-              endMessage={<></>}
             >
-              <Masonry
-                className={""} // default ''
-                elementType={"div"} // default 'div'
-                options={masonryOptions} // default {}
-                disableImagesLoaded={false} // default false
-                updateOnEachImageLoad={false} // default false and works only if disableImagesLoaded is false
-              >
-                {result.length > 0 &&
-                  result.map((doc, index) => (
-                    <MasImage
-                      key={index}
-                      id={String(doc.id)}
-                      artist={getArtistName(doc.artist_display)}
-                      title={doc.title}
-                      src={getImageURL(doc.image_id)}
+              <CustomSelect
+                value={favouriteState}
+                onChange={handleSelectChange}
+                data={[
+                  { value: "latest", label: "Sort By Latest" },
+                  { value: "rating", label: "Sort By Rating" },
+                ]}
+                style={{ width: 160 }}
+              />
+            </div>
+            <Container
+              style={{
+                paddingLeft: 20,
+                paddingRight: 20,
+              }}
+            >
+              <InfiniteScroll
+                dataLength={result.length} //This is important field to render the next data
+                next={async () => {
+                  await loadFunc();
+                }}
+                hasMore={haveNext}
+                loader={
+                  <div
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                      paddingTop: 40,
+                      paddingBottom: 60,
+                    }}
+                  >
+                    <Loader
+                      sx={(theme) => ({
+                        stroke: "#111112",
+                      })}
                     />
-                  ))}
-              </Masonry>
-            </InfiniteScroll>
-          </Container>
-        </>
+                  </div>
+                }
+                endMessage={<></>}
+              >
+                <Masonry
+                  className={""} // default ''
+                  elementType={"div"} // default 'div'
+                  options={masonryOptions} // default {}
+                  disableImagesLoaded={false} // default false
+                  updateOnEachImageLoad={false} // default false and works only if disableImagesLoaded is false
+                >
+                  {result.length > 0 &&
+                    result.map((doc, index) => (
+                      <MasImage
+                        key={index}
+                        id={String(doc.id)}
+                        artist={getArtistName(doc.artist_display)}
+                        title={doc.title}
+                        src={getImageURL(doc.image_id)}
+                      />
+                    ))}
+                </Masonry>
+              </InfiniteScroll>
+            </Container>
+          </>
+        ) : (
+          <Text
+            style={{
+              paddingTop: 208 - 8,
+              fontSize: "16px",
+              fontFamily: "Inter",
+              fontWeight: "100",
+              color: "#8A94A6",
+              height: "20px",
+              lineHeight: "20px",
+            }}
+            align="center"
+          >
+            You haven't like any artwork yet.
+          </Text>
+        )
       ) : (
-        <Text
+        <div
           style={{
-            paddingTop: 208 - 8,
-            fontSize: "16px",
-            fontFamily: "Inter",
-            fontWeight: "100",
-            color: "#8A94A6",
-            height: "20px",
-            lineHeight: "20px",
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            paddingTop: 40,
+            paddingBottom: 60,
           }}
-          align="center"
         >
-          You haven't like any artwork yet.
-        </Text>
+          <Loader
+            sx={(theme) => ({
+              stroke: "#111112",
+            })}
+          />
+        </div>
       )}
     </>
   );
@@ -430,97 +451,118 @@ const CommentedArtwork = ({ user }: { user: User | undefined | null }) => {
     // reset firebase snapshots
     setLatestSnapshot(null);
   };
+  const isFirstTimeLoading = loadedTimes === 0;
+  const haveResult = result.length > 0;
+
   return (
     <>
-      {loadedTimes > 0 && result.length > 0 ? (
-        <>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              paddingLeft: 20,
-              paddingRight: 15,
-              paddingBottom: 13,
-            }}
-          >
-            <CustomSelect
-              defaultValue="rating"
-              value={commentedState}
-              onChange={handleSelectChange}
-              data={[
-                { value: "latest", label: "Sort By Latest" },
-                { value: "oldest", label: "Sort By Oldest" },
-              ]}
-              style={{ width: 160 }}
-            />
-          </div>
-          <Container
-            style={{
-              paddingLeft: 20,
-              paddingRight: 20,
-            }}
-          >
-            <InfiniteScroll
-              dataLength={result.length} //This is important field to render the next data
-              next={async () => {
-                await loadFunc();
+      {!isFirstTimeLoading ? (
+        haveResult ? (
+          <>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                paddingLeft: 20,
+                paddingRight: 15,
+                paddingBottom: 13,
               }}
-              hasMore={haveNext}
-              loader={
-                <div
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "center",
-                    paddingTop: 40,
-                    paddingBottom: 60,
-                  }}
-                >
-                  <Loader
-                    sx={(theme) => ({
-                      stroke: "#111112",
-                    })}
-                  />
-                </div>
-              }
-              endMessage={<></>}
             >
-              <Masonry
-                className={""} // default ''
-                elementType={"div"} // default 'div'
-                options={masonryOptions} // default {}
-                disableImagesLoaded={false} // default false
-                updateOnEachImageLoad={false} // default false and works only if disableImagesLoaded is false
-              >
-                {result.length > 0 &&
-                  result.map((doc, index) => (
-                    <MasImage
-                      key={index}
-                      id={String(doc.id)}
-                      artist={getArtistName(doc.artist_display)}
-                      title={doc.title}
-                      src={getImageURL(doc.image_id)}
+              <CustomSelect
+                defaultValue="rating"
+                value={commentedState}
+                onChange={handleSelectChange}
+                data={[
+                  { value: "latest", label: "Sort By Latest" },
+                  { value: "oldest", label: "Sort By Oldest" },
+                ]}
+                style={{ width: 160 }}
+              />
+            </div>
+            <Container
+              style={{
+                paddingLeft: 20,
+                paddingRight: 20,
+              }}
+            >
+              <InfiniteScroll
+                dataLength={result.length} //This is important field to render the next data
+                next={async () => {
+                  await loadFunc();
+                }}
+                hasMore={haveNext}
+                loader={
+                  <div
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                      paddingTop: 40,
+                      paddingBottom: 60,
+                    }}
+                  >
+                    <Loader
+                      sx={(theme) => ({
+                        stroke: "#111112",
+                      })}
                     />
-                  ))}
-              </Masonry>
-            </InfiniteScroll>
-          </Container>
-        </>
+                  </div>
+                }
+                endMessage={<></>}
+              >
+                <Masonry
+                  className={""} // default ''
+                  elementType={"div"} // default 'div'
+                  options={masonryOptions} // default {}
+                  disableImagesLoaded={false} // default false
+                  updateOnEachImageLoad={false} // default false and works only if disableImagesLoaded is false
+                >
+                  {result.length > 0 &&
+                    result.map((doc, index) => (
+                      <MasImage
+                        key={index}
+                        id={String(doc.id)}
+                        artist={getArtistName(doc.artist_display)}
+                        title={doc.title}
+                        src={getImageURL(doc.image_id)}
+                      />
+                    ))}
+                </Masonry>
+              </InfiniteScroll>
+            </Container>
+          </>
+        ) : (
+          <Text
+            style={{
+              paddingTop: 208 - 8,
+              fontSize: "16px",
+              fontFamily: "Inter",
+              fontWeight: "100",
+              color: "#8A94A6",
+              height: "20px",
+              lineHeight: "20px",
+            }}
+            align="center"
+          >
+            You haven't post any comment yet.
+          </Text>
+        )
       ) : (
-        <Text
+        <div
           style={{
-            paddingTop: 208 - 8,
-            fontSize: "16px",
-            fontFamily: "Inter",
-            fontWeight: "100",
-            color: "#8A94A6",
-            height: "20px",
-            lineHeight: "20px",
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+            paddingTop: 40,
+            paddingBottom: 60,
           }}
-          align="center"
         >
-          You haven't post any comment yet.
-        </Text>
+          <Loader
+            sx={(theme) => ({
+              stroke: "#111112",
+            })}
+          />
+        </div>
       )}
     </>
   );
