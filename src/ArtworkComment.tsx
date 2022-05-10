@@ -425,9 +425,12 @@ function Comment({
           {!hideReply && (
             <div
               style={{ display: "flex", alignItems: "center", gap: 8 }}
-              onClick={(e) => commentOnClick()}
+              onClick={(e) => {
+                if (layer2Comment) return;
+                commentOnClick();
+              }}
             >
-              {auth && participated && (
+              {auth && participated && !layer2Comment && (
                 <Avatar
                   size={24}
                   src={auth.photoURL}
@@ -633,7 +636,6 @@ const DrawerComment = ({
             commentOnClick={() => {}}
             noBorder
             layer2Comment
-            hideReply
           />
         )}
         <div
