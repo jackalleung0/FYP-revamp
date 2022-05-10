@@ -65,7 +65,6 @@ export function Search() {
     },
   });
   const isSearchMode = isFocus || !!form.values.term;
-
   const [debouncedTerm] = useDebouncedValue(form.values.term, 200);
   const { result } = useAsync(searchArtworkBySearchTerm, [debouncedTerm, 20]);
 
@@ -114,12 +113,18 @@ export function Search() {
           opacity: 0,
           transition: { duration },
         });
-        searchControl.start({
+        await searchControl.start({
           position: "absolute",
           top: 0,
           left: 0,
           right: 0,
           transition: { duration },
+        });
+        trendingTagsControl.set({
+          position: "absolute",
+        });
+        navControl.set({
+          position: "absolute",
         });
       } else {
         searchControl.start({
@@ -133,17 +138,21 @@ export function Search() {
           opacity: 1,
           transition: { duration },
         });
-        trendingTagsControl.set({
-          paddingTop: searchHeight,
-        });
         trendingTagsControl.start({
           opacity: 1,
           transition: { duration },
         });
+        navControl.set({
+          position: "relative",
+        });
+        trendingTagsControl.set({
+          position: "relative",
+          paddingTop: searchHeight,
+        });
       }
     };
     fun();
-  }, [isSearchMode, navControl, searchControl, searchHeight, navHeight]);
+  }, [isSearchMode, searchHeight, navHeight]);
 
   // const [time, setTime] = useState(0);
   // useEffect(() => {
@@ -152,7 +161,7 @@ export function Search() {
   // }, []);
 
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative", height: "100vh" }}>
       <Affix position={{ bottom: 30, right: 22 }}>
         <Transition
           mounted={!isSearchMode}
@@ -216,7 +225,7 @@ export function Search() {
         </Container>
       </motion.div>
 
-      <motion.div animate={searchControl} ref={searchRef}>
+      <motion.div animate={searchControl} ref={searchRef} style={{ zIndex: 1 }}>
         <Container
           style={{
             paddingTop: 14,
@@ -352,6 +361,7 @@ export function Search() {
         <Container
           id="search-result"
           style={{
+            paddingTop: searchHeight,
             paddingLeft: "20px",
             paddingRight: "20px",
           }}
