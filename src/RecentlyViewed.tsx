@@ -96,14 +96,23 @@ export function RecentlyViewed() {
     }
   }, [user]);
 
-  const ids = useMemo(() => snapshot?.map((doc) => doc.id) || [], [snapshot]);
+  const ids = useMemo(
+    () =>
+      snapshot
+        ?.map((doc) => doc.id)
+        .filter((e) => Boolean(e) && e !== "undefined") || [],
+    [snapshot]
+  );
   const [artworks, setArtworks] = useState<Artwork[]>([]);
   useEffect(() => {
     if (ids) {
-      Promise.allSettled(ids.map(fetchArtwork))
+      Promise.allSettled(ids.filter(Boolean).map(fetchArtwork))
         .then((e) =>
           // filter success result, and map to their values
-          e.filter((e) => e.status === "fulfilled").map((e: any) => e.value)
+          e
+            .filter((e) => e.status === "fulfilled")
+            .map((e: any) => e.value)
+            .filter((e) => !!e)
         )
         .then(setArtworks);
     }
