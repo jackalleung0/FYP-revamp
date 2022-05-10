@@ -461,7 +461,7 @@ function Comment({
                     // lineHeight: "20px",
                   }}
                 >
-                  {(!comment.numberOfDiscussion && "Reply") ||
+                  {(!layer2Comment && !comment.numberOfDiscussion && "Reply") ||
                     comment.numberOfDiscussion}
                 </Text>
               </div>
