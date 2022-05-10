@@ -72,7 +72,7 @@ interface Comment {
 export function ArtworkComment() {
   const { classes } = useStyles();
   const nav = useNavigate();
-  const [select, setSelect] = useState<"popular" | "latest">("popular");
+  const [select, setSelect] = useState<"popular" | "latest">("latest");
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
   const [snapshots, setSnapshots] = useState<QueryDocumentSnapshot<Comment>[]>(
