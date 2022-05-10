@@ -10,6 +10,7 @@ import {
   ActionIcon,
   Affix,
   Drawer,
+  Loader,
 } from "@mantine/core";
 import { useToggle } from "@mantine/hooks";
 import { PencilIcon, XIcon } from "@heroicons/react/solid";
@@ -137,174 +138,185 @@ export function ArtworkComment() {
 
   return (
     <div style={{ paddingBottom: 120 }}>
-      <Affix position={{ bottom: 30, right: 22 }} zIndex={2}>
-        <PageAnimation>
-          <ActionIcon
-            className={classes.ActionIcon}
-            radius={9999}
-            size={70}
-            style={{
-              backgroundColor: "#111112",
-            }}
-            id="view in 3d"
-            onClick={() => setIsEditMode(!isEditMode)}
-          >
-            {isEditMode ? (
-              <XIcon style={{ width: 20 + 4, color: "#FFFFFF" }} />
-            ) : (
-              <PencilIcon style={{ width: 20 + 4, color: "#FFFFFF" }} />
-            )}
-          </ActionIcon>
-        </PageAnimation>
-      </Affix>
-      <Drawer
-        position="right"
-        size="100%"
-        opened={openDrawer}
-        onClose={() => setOpenedDrawer(false)}
-        withCloseButton={false}
-      >
-        <DrawerComment
-          onClose={() => setOpenedDrawer(false)}
-          id={drawerDocID}
-        />
-      </Drawer>
-      <div
-        style={{
-          paddingTop: 10,
-          paddingLeft: 20,
-          paddingRight: 20,
-          paddingBottom: 16,
-        }}
-      >
-        <BackIcon onClick={() => nav(-1)} />
-      </div>
-      <div
-        style={{
-          borderBottom: "1px solid #F1F2F4",
-          paddingLeft: 20,
-          paddingBottom: 32,
-          paddingRight: 15,
-        }}
-      >
-        <CustomSelect
-          defaultValue="popular"
-          value={select}
-          onChange={(e: "popular" | "latest") => {
-            // do not update select when is the same value
-            if (e === select) return;
-            setSelect(e);
-            // setSnapshots([]);
-            // setTempComment([]);
-          }}
-          data={[
-            { value: "popular", label: "Sort By Popular" },
-            { value: "latest", label: "Sort By Latest" },
-          ]}
-          style={{ width: 160, float: "right" }}
-        />
-        <Text
-          style={{
-            fontSize: "24px",
-            fontFamily: "SFProDisplay",
-            fontWeight: "bold",
-            color: "#000000",
-            height: "29px",
-            lineHeight: "28px",
-            paddingTop: 23,
-          }}
-        >
-          Comment
-        </Text>
-        <Text
-          style={{
-            paddingTop: 7,
-
-            fontSize: "16px",
-            fontFamily: "Inter",
-            fontWeight: "100",
-            color: "#4E5D78",
-            height: "20px",
-            lineHeight: "20px",
-          }}
-        >
-          Number of comments: {snapshot?.size}
-        </Text>
-      </div>
-      {isEditMode && (
-        <div
-          style={{
-            background: "#FCFCFD",
-            padding: "22px 20px",
-            borderBottom: "1px solid #F1F2F4",
-          }}
-        >
-          <CommentInput
-            onSubmit={async ({ comment }) => {
-              setIsEditMode(false);
-
-              const ref = await addDoc<Comment>(
-                collection(
-                  getFirestore(app),
-                  "comments"
-                ) as CollectionReference<Comment>,
-                comment
-              );
-
-              // setTempComment((e) => [...e, { comment, id: ref.id }]);
-            }}
-          />
-        </div>
-      )}
-      {/* this is use to always put your recent submitted comment on top */}
-      {/* {tempComment.map(({ comment, id }, index) => (
-        <Comment
-          comment={comment}
-          key={index}
-          commentOnClick={() => {
-            setOpenedDrawer(true);
-            setDrawerDocID(id);
-          }}
-        />
-      ))} */}
-      {snapshot?.docs.map((s) => (
-        <Comment
-          comment={s.data()}
-          key={s.id}
-          commentOnClick={() => {
-            setOpenedDrawer(true);
-            setDrawerDocID(s.id);
-          }}
-        />
-      ))}
-      {snapshot?.size === 0 && (
+      {!loading && (
         <>
+          <Affix position={{ bottom: 30, right: 22 }} zIndex={2}>
+            <PageAnimation>
+              <ActionIcon
+                className={classes.ActionIcon}
+                radius={9999}
+                size={70}
+                style={{
+                  backgroundColor: "#111112",
+                }}
+                id="view in 3d"
+                onClick={() => setIsEditMode(!isEditMode)}
+              >
+                {isEditMode ? (
+                  <XIcon style={{ width: 20 + 4, color: "#FFFFFF" }} />
+                ) : (
+                  <PencilIcon style={{ width: 20 + 4, color: "#FFFFFF" }} />
+                )}
+              </ActionIcon>
+            </PageAnimation>
+          </Affix>
+          <Drawer
+            position="right"
+            size="100%"
+            opened={openDrawer}
+            onClose={() => setOpenedDrawer(false)}
+            withCloseButton={false}
+          >
+            <DrawerComment
+              onClose={() => setOpenedDrawer(false)}
+              id={drawerDocID}
+            />
+          </Drawer>
           <div
             style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-
-              paddingTop: 158,
+              paddingTop: 10,
+              paddingLeft: 20,
+              paddingRight: 20,
+              paddingBottom: 16,
             }}
           >
-            <DiscussionIcon />
+            <BackIcon onClick={() => nav(-1)} />
+          </div>
+          <div
+            style={{
+              borderBottom: "1px solid #F1F2F4",
+              paddingLeft: 20,
+              paddingBottom: 32,
+              paddingRight: 15,
+            }}
+          >
+            <CustomSelect
+              defaultValue="popular"
+              value={select}
+              onChange={(e: "popular" | "latest") => {
+                // do not update select when is the same value
+                if (e === select) return;
+                setSelect(e);
+                // setSnapshots([]);
+                // setTempComment([]);
+              }}
+              data={[
+                { value: "popular", label: "Sort By Popular" },
+                { value: "latest", label: "Sort By Latest" },
+              ]}
+              style={{ width: 160, float: "right" }}
+            />
             <Text
               style={{
-                paddingTop: 36,
+                fontSize: "24px",
+                fontFamily: "SFProDisplay",
+                fontWeight: "bold",
+                color: "#000000",
+                height: "29px",
+                lineHeight: "28px",
+                paddingTop: 23,
+              }}
+            >
+              Comment
+            </Text>
+            <Text
+              style={{
+                paddingTop: 7,
 
                 fontSize: "16px",
                 fontFamily: "Inter",
                 fontWeight: "100",
-                color: "#8A94A6",
+                color: "#4E5D78",
+                height: "20px",
                 lineHeight: "20px",
               }}
-              align="center"
             >
-              Start discussion by <br /> posting the first comment.
+              Number of comments: {snapshot?.size}
             </Text>
           </div>
+          {isEditMode && (
+            <div
+              style={{
+                background: "#FCFCFD",
+                padding: "22px 20px",
+                borderBottom: "1px solid #F1F2F4",
+              }}
+            >
+              <CommentInput
+                onSubmit={async ({ comment }) => {
+                  setIsEditMode(false);
+
+                  const ref = await addDoc<Comment>(
+                    collection(
+                      getFirestore(app),
+                      "comments"
+                    ) as CollectionReference<Comment>,
+                    comment
+                  );
+
+                  // setTempComment((e) => [...e, { comment, id: ref.id }]);
+                }}
+              />
+            </div>
+          )}
+
+          {snapshot?.docs.map((s) => (
+            <Comment
+              comment={s.data()}
+              key={s.id}
+              commentOnClick={() => {
+                setOpenedDrawer(true);
+                setDrawerDocID(s.id);
+              }}
+            />
+          ))}
+          {snapshot?.size === 0 && (
+            <>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+
+                  paddingTop: 158,
+                }}
+              >
+                <DiscussionIcon />
+                <Text
+                  style={{
+                    paddingTop: 36,
+
+                    fontSize: "16px",
+                    fontFamily: "Inter",
+                    fontWeight: "100",
+                    color: "#8A94A6",
+                    lineHeight: "20px",
+                  }}
+                  align="center"
+                >
+                  Start discussion by <br /> posting the first comment.
+                </Text>
+              </div>
+            </>
+          )}
         </>
+      )}
+      {loading && (
+        <div
+          style={{
+            width: "100%",
+            height: "100vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Loader
+            sx={(theme) => ({
+              stroke: "#111112",
+            })}
+          />
+        </div>
       )}
     </div>
   );
