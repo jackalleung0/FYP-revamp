@@ -19,6 +19,7 @@ import {
 } from "react-router-dom";
 import { BackIcon } from "./BackIcon";
 import { TagButton } from "./TagButton";
+import { useAnimation, motion } from "framer-motion";
 const useStyles = createStyles((theme, _params, getRef) => ({
   ActionIcon: {
     boxShadow: theme.shadows.lg,
@@ -93,6 +94,8 @@ export function Search() {
     [fav_artwork]
   );
 
+  const controls = useAnimation();
+
   return (
     <div style={{ position: "relative" }}>
       <Affix position={{ bottom: 30, right: 22 }}>
@@ -132,40 +135,47 @@ export function Search() {
           )}
         </Transition>
       </Affix>
+
+      <Transition
+        mounted={!isSearchMode}
+        transition="fade"
+        duration={400}
+        timingFunction="ease"
+      >
+        {(styles) => (
+          <Container
+            style={{
+              paddingTop: 10,
+              paddingLeft: "20px",
+              paddingRight: "20px",
+            }}
+          >
+            <BackIcon onClick={() => nav(-1)} style={styles} />
+            <Text
+              style={{
+                marginTop: "40px",
+                fontSize: "32px",
+                fontFamily: "SFProDisplay",
+                fontWeight: "bold",
+                color: "#000000",
+                height: "58px",
+                lineHeight: "34px",
+                ...styles,
+              }}
+            >
+              Search
+            </Text>
+          </Container>
+        )}
+      </Transition>
+
       <Container
         style={{
-          paddingTop: isSearchMode ? 14 : 10,
+          paddingTop: 14,
           paddingLeft: "20px",
           paddingRight: "20px",
         }}
       >
-        <Transition
-          mounted={!isSearchMode}
-          transition="fade"
-          duration={400}
-          timingFunction="ease"
-        >
-          {(styles) => (
-            <>
-              <BackIcon onClick={() => nav(-1)} style={styles} />
-              <Text
-                style={{
-                  marginTop: "40px",
-                  fontSize: "32px",
-                  fontFamily: "SFProDisplay",
-                  fontWeight: "bold",
-                  color: "#000000",
-                  height: "72px",
-                  lineHeight: "34px",
-                  ...styles,
-                }}
-              >
-                Search
-              </Text>
-            </>
-          )}
-        </Transition>
-
         <form
           style={{ display: "flex", alignItems: "center" }}
           onSubmit={form.onSubmit((values) => {
