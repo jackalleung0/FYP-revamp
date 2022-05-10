@@ -181,6 +181,7 @@ export function AboutArtist() {
               lineHeight: "28px",
               height: "21px",
               color: "#000000",
+              paddingBottom: 6,
             }}
             lineClamp={1}
           >
@@ -188,8 +189,6 @@ export function AboutArtist() {
           </Text>
           <Text
             style={{
-              paddingTop: 6,
-
               fontSize: "14px",
               fontFamily: "Inter",
               fontWeight: "100",
