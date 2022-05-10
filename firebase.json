@@ -1,6 +1,7 @@
 {
   "hosting": [
     {
+      "prebuild":"npm run build",
       "target": "revamp",
       "public": "dist",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
