@@ -7,7 +7,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { getAuth } from "firebase/auth";
-import { doc, getFirestore } from "firebase/firestore";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
 import { useAuthState, useSignInWithGoogle } from "react-firebase-hooks/auth";
 import { useDocumentData } from "react-firebase-hooks/firestore";
@@ -53,22 +53,38 @@ export function Login() {
   };
   const [user, loading, error] = useAuthState(auth);
 
-  const [values, userDocLoading, __, snapshot] = useDocumentData<any>(
-    user && doc(getFirestore(app), `users/${user.uid}`)
-  );
   useEffect(() => {
-    if (!pressedSignIn || userDocLoading || !values) return;
-    const redirect = query.get("redirect");
-    if (!!redirect) {
-      nav(redirect);
-      return;
-    }
-    if (values && values.skipGettingStarted) {
-      nav("/home");
-    } else {
-      nav("/select-artwork");
-    }
-  }, [values, pressedSignIn, userDocLoading]);
+    const _ = async () => {
+      // ensure user is logged in
+      if (!user) return;
+
+      // handle key change
+      const redirect = query.get("redirect");
+      if (!!redirect) {
+        nav(redirect);
+        return;
+      }
+
+      const userDoc = await getDoc(doc(getFirestore(app), `users/${user.uid}`));
+
+      // new user will not have firebase doc
+      const isNewUser = user?.uid && !userDoc.exists();
+
+      const skipGettingStarted = userDoc.data()?.skipGettingStarted || false;
+      // const skipGettingStarted = values && values.skipGettingStarted;
+      console.log({
+        isNewUser,
+        skipGettingStarted,
+      });
+
+      if (isNewUser || !skipGettingStarted) {
+        nav("/select-artwork");
+      } else {
+        nav("/home");
+      }
+    };
+    _();
+  }, [user]);
   return (
     <>
       <Container
