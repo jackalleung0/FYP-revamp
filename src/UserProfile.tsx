@@ -244,6 +244,7 @@ const FavouriteArtwork = ({ user }: { user: User | undefined | null }) => {
     if (e === favouriteState) return;
     // update select value
     setFavouriteState(e);
+    setLoadedTimes(0);
     // reset result
     setResult([]);
     // reset has more data
@@ -442,6 +443,7 @@ const CommentedArtwork = ({ user }: { user: User | undefined | null }) => {
 
   const handleSelectChange = (e: any) => {
     if (e === commentedState) return;
+    setLoadedTimes(0);
     // update select value
     setCommentedState(e);
     // reset result
