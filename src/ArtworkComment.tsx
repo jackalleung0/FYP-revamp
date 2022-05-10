@@ -132,7 +132,7 @@ export function ArtworkComment() {
   const [drawerDocID, setDrawerDocID] = useState<string>("");
 
   return (
-    <div>
+    <div style={{ paddingBottom: 120 }}>
       <Affix position={{ bottom: 30, right: 22 }} zIndex={2}>
         <PageAnimation>
           <ActionIcon
