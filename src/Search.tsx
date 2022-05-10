@@ -96,8 +96,15 @@ export function Search() {
   const searchControl = useAnimation();
   const trendingTagsControl = useAnimation();
   const searchRow = useAnimation();
-  const { ref: navRef, height: navHeight } = useElementSize();
-  const { ref: searchRef, height: searchHeight } = useElementSize();
+  const { ref: navRef, height: _navHeight } = useElementSize();
+  const { ref: searchRef, height: _searchHeight } = useElementSize();
+
+  const [navHeight, setNavHeight] = useState(0);
+  const [searchHeight, setSearchHeight] = useState(0);
+  useEffect(() => {
+    setNavHeight((e) => Math.max(e, _navHeight));
+    setSearchHeight((e) => Math.max(e, _searchHeight));
+  }, [_navHeight, _searchHeight]);
 
   useEffect(() => {
     const fun = async () => {
@@ -121,10 +128,10 @@ export function Search() {
           transition: { duration },
         });
         trendingTagsControl.set({
-          position: "absolute",
+          display: "none",
         });
         navControl.set({
-          position: "absolute",
+          display: "none",
         });
       } else {
         searchControl.start({
@@ -143,10 +150,10 @@ export function Search() {
           transition: { duration },
         });
         navControl.set({
-          position: "relative",
+          display: "block",
         });
         trendingTagsControl.set({
-          position: "relative",
+          display: "block",
           paddingTop: searchHeight,
         });
       }
@@ -225,7 +232,7 @@ export function Search() {
         </Container>
       </motion.div>
 
-      <motion.div animate={searchControl} ref={searchRef} style={{ zIndex: 1 }}>
+      <motion.div animate={searchControl} ref={searchRef} style={{ zIndex: 2 }}>
         <Container
           style={{
             paddingTop: 14,
