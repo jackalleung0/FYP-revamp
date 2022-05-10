@@ -614,7 +614,7 @@ const DrawerComment = ({
   // const [values, loading, error, snapshot] = useCollectionData();
   // console.log(values);
   return (
-    <>
+    <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <div
         style={{
           paddingTop: 10,
@@ -626,69 +626,71 @@ const DrawerComment = ({
       >
         <BackIcon onClick={() => onClose()} />
       </div>
-      {value && (
-        <Comment
-          comment={value}
-          commentOnClick={() => {}}
-          noBorder
-          layer2Comment
-          hideReply
-        />
-      )}
-      <div
-        style={{
-          background: "#FCFCFD",
-          paddingTop: 14,
-          paddingBottom: 26,
-          paddingLeft: 20,
-          paddingRight: 20,
-          borderBottom: "0px",
-        }}
-      >
-        <CommentInput
-          onSubmit={async ({ comment }) => {
-            await addDoc<Comment>(
-              collection(
-                getFirestore(app),
-                `/comments/${id}/discussions`
-              ) as CollectionReference<Comment>,
-              comment
-            );
-
-            await setDoc(
-              doc(
-                getFirestore(app),
-                `/comments/${id}`
-              ) as DocumentReference<any>,
-              {
-                numberOfDiscussion: increment(1),
-                participants: arrayUnion(user?.uid),
-              },
-              { merge: true }
-            );
-
-            // also update parent document on participants
-            const path = "";
-
-            // setTempComment((e) => [...e, { comment, id: ref.id }]);
-            reload();
+      <div style={{ overflowY: "scroll", flexGrow: 1, paddingBottom: 120 }}>
+        {value && (
+          <Comment
+            comment={value}
+            commentOnClick={() => {}}
+            noBorder
+            layer2Comment
+            hideReply
+          />
+        )}
+        <div
+          style={{
+            background: "#FCFCFD",
+            paddingTop: 14,
+            paddingBottom: 26,
+            paddingLeft: 20,
+            paddingRight: 20,
+            borderBottom: "0px",
           }}
-          layer2Comment
-        />
+        >
+          <CommentInput
+            onSubmit={async ({ comment }) => {
+              await addDoc<Comment>(
+                collection(
+                  getFirestore(app),
+                  `/comments/${id}/discussions`
+                ) as CollectionReference<Comment>,
+                comment
+              );
+
+              await setDoc(
+                doc(
+                  getFirestore(app),
+                  `/comments/${id}`
+                ) as DocumentReference<any>,
+                {
+                  numberOfDiscussion: increment(1),
+                  participants: arrayUnion(user?.uid),
+                },
+                { merge: true }
+              );
+
+              // also update parent document on participants
+              const path = "";
+
+              // setTempComment((e) => [...e, { comment, id: ref.id }]);
+              reload();
+            }}
+            layer2Comment
+          />
+        </div>
+        <div style={{ padding: "0 16px" }}>
+          {snapshot &&
+            snapshot.docs.map((comment) => (
+              <Comment
+                id={comment.id}
+                comment={comment.data()}
+                commentOnClick={() => {}}
+                key={comment.id}
+                hideReply
+              />
+            ))}
+        </div>
       </div>
-      <div style={{ padding: "0 16px" }}>
-        {snapshot &&
-          snapshot.docs.map((comment) => (
-            <Comment
-              id={comment.id}
-              comment={comment.data()}
-              commentOnClick={() => {}}
-              key={comment.id}
-              hideReply
-            />
-          ))}
-      </div>
-    </>
+    </div>
   );
 };
 
