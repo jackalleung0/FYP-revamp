@@ -10,7 +10,7 @@ import {
   Image,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import React, { useMemo } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import {
   useNavigate,
   Link,
@@ -33,7 +33,7 @@ const scaleY = {
   transitionProperty: "transform, opacity",
 };
 
-import { useDebouncedValue } from "@mantine/hooks";
+import { useDebouncedValue, useElementSize, useInterval } from "@mantine/hooks";
 import { searchArtworkBySearchTerm } from "./searchArtworkBySearchTerm";
 import { useAsync } from "react-async-hook";
 import { getImageURL } from "./getImageURL";
@@ -68,7 +68,6 @@ export function Search() {
 
   const [debouncedTerm] = useDebouncedValue(form.values.term, 200);
   const { result } = useAsync(searchArtworkBySearchTerm, [debouncedTerm, 20]);
-  console.log(result);
 
   const toArtwork = (id: string) => () => {
     nav(`/artwork/${id}`);
@@ -94,7 +93,63 @@ export function Search() {
     [fav_artwork]
   );
 
-  const controls = useAnimation();
+  const navControl = useAnimation();
+  const searchControl = useAnimation();
+  const trendingTagsControl = useAnimation();
+  const searchRow = useAnimation();
+  const { ref: navRef, height: navHeight } = useElementSize();
+  const { ref: searchRef, height: searchHeight } = useElementSize();
+
+  useEffect(() => {
+    const fun = async () => {
+      if (navHeight === 0) return;
+      if (searchHeight === 0) return;
+      const duration = 0.3;
+      if (isSearchMode) {
+        navControl.start({
+          opacity: 0,
+          transition: { duration },
+        });
+        trendingTagsControl.start({
+          opacity: 0,
+          transition: { duration },
+        });
+        searchControl.start({
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          transition: { duration },
+        });
+      } else {
+        searchControl.start({
+          left: 0,
+          right: 0,
+          position: "absolute",
+          top: navHeight,
+          transition: { duration },
+        });
+        navControl.start({
+          opacity: 1,
+          transition: { duration },
+        });
+        trendingTagsControl.set({
+          paddingTop: searchHeight,
+        });
+        trendingTagsControl.start({
+          opacity: 1,
+          transition: { duration },
+        });
+      }
+    };
+    fun();
+  }, [isSearchMode, navControl, searchControl, searchHeight, navHeight]);
+
+  // const [time, setTime] = useState(0);
+  // useEffect(() => {
+  //   const timer = setInterval(() => setTime((e) => e + 1), 1000);
+  //   () => clearInterval(timer);
+  // }, []);
 
   return (
     <div style={{ position: "relative" }}>
@@ -136,246 +191,230 @@ export function Search() {
         </Transition>
       </Affix>
 
-      <Transition
-        mounted={!isSearchMode}
-        transition="fade"
-        duration={400}
-        timingFunction="ease"
-      >
-        {(styles) => (
-          <Container
-            style={{
-              paddingTop: 10,
-              paddingLeft: "20px",
-              paddingRight: "20px",
-            }}
-          >
-            <BackIcon onClick={() => nav(-1)} style={styles} />
-            <Text
-              style={{
-                marginTop: "40px",
-                fontSize: "32px",
-                fontFamily: "SFProDisplay",
-                fontWeight: "bold",
-                color: "#000000",
-                height: "58px",
-                lineHeight: "34px",
-                ...styles,
-              }}
-            >
-              Search
-            </Text>
-          </Container>
-        )}
-      </Transition>
-
-      <Container
-        style={{
-          paddingTop: 14,
-          paddingLeft: "20px",
-          paddingRight: "20px",
-        }}
-      >
-        <form
-          style={{ display: "flex", alignItems: "center" }}
-          onSubmit={form.onSubmit((values) => {
-            console.log(values);
-            nav(`/search-result?term=${values.term}`);
-          })}
+      <motion.div animate={navControl} ref={navRef}>
+        <Container
+          style={{
+            paddingTop: 10,
+            paddingLeft: "20px",
+            paddingRight: "20px",
+          }}
         >
-          <TextInput
-            placeholder={isSearchMode ? "" : "Search artworks & artists..."}
-            icon={<SearchIcon />}
-            onFocus={() => setIsFocus(true)}
-            onBlur={() => setIsFocus(false)}
-            {...form.getInputProps("term")}
-            styles={{
-              root: {
-                borderRadius: "8px",
-                flexGrow: 1,
-              },
-              icon: {
-                paddingLeft: 17,
-                width: "min-content",
-              },
-              input: {
-                color: "#8A94A6",
-                fontSize: "16px",
-                fontFamily: "Inter",
-                fontWeight: 100,
-                lineHeight: "24px",
-
-                borderRadius: "8px",
-                borderWidth: 0,
-                backgroundColor: "#F1F2F4",
-
-                padding: 0,
-                borderLeft: 10,
-                height: "50px",
-                paddingTop: 2,
-                paddingLeft: "46px !important",
-              },
+          <BackIcon onClick={() => nav(-1)} />
+          <Text
+            style={{
+              marginTop: "40px",
+              fontSize: "32px",
+              fontFamily: "SFProDisplay",
+              fontWeight: "bold",
+              color: "#000000",
+              height: "58px",
+              lineHeight: "34px",
             }}
-          />
-          <Transition
-            mounted={isSearchMode}
-            transition="fade"
-            duration={400}
-            timingFunction="ease"
           >
-            {(styles) => (
-              <Button
-                variant="subtle"
-                styles={{
-                  root: {
-                    "&:hover": {
-                      backgroundColor: "transparent",
+            Search
+          </Text>
+        </Container>
+      </motion.div>
+
+      <motion.div animate={searchControl} ref={searchRef}>
+        <Container
+          style={{
+            paddingTop: 14,
+            paddingLeft: "20px",
+            paddingRight: "20px",
+          }}
+        >
+          <form
+            style={{ display: "flex", alignItems: "center" }}
+            onSubmit={form.onSubmit((values) => {
+              console.log(values);
+              nav(`/search-result?term=${values.term}`);
+            })}
+          >
+            <TextInput
+              placeholder={isSearchMode ? "" : "Search artworks & artists..."}
+              icon={<SearchIcon />}
+              onFocus={() => setIsFocus(true)}
+              onBlur={() => setIsFocus(false)}
+              {...form.getInputProps("term")}
+              styles={{
+                root: {
+                  borderRadius: "8px",
+                  flexGrow: 1,
+                },
+                icon: {
+                  paddingLeft: 17,
+                  width: "min-content",
+                },
+                input: {
+                  color: "#8A94A6",
+                  fontSize: "16px",
+                  fontFamily: "Inter",
+                  fontWeight: 100,
+                  lineHeight: "24px",
+
+                  borderRadius: "8px",
+                  borderWidth: 0,
+                  backgroundColor: "#F1F2F4",
+
+                  padding: 0,
+                  borderLeft: 10,
+                  height: "50px",
+                  paddingTop: 2,
+                  paddingLeft: "46px !important",
+                },
+              }}
+            />
+            <Transition
+              mounted={isSearchMode}
+              transition="fade"
+              duration={400}
+              timingFunction="ease"
+            >
+              {(styles) => (
+                <Button
+                  variant="subtle"
+                  styles={{
+                    root: {
+                      "&:hover": {
+                        backgroundColor: "transparent",
+                      },
+                      border: 0,
+                      paddingRight: 0,
                     },
-                    border: 0,
-                    paddingRight: 0,
-                  },
-                }}
-                onClick={() => {
-                  form.setFieldValue("term", "");
-                  // console.log((form.values.term = ""))
-                }}
-              >
-                <Text
-                  style={{
-                    color: "#4E5D78",
-                    fontFamily: "Inter",
-                    fontSize: "14px",
-                    fontWeight: "normal",
-                    ...styles,
+                  }}
+                  onClick={() => {
+                    form.setFieldValue("term", "");
+                    // console.log((form.values.term = ""))
                   }}
                 >
-                  Cancel
-                </Text>
-              </Button>
-            )}
-          </Transition>
-        </form>
-
-        <Transition
-          mounted={isSearchMode}
-          transition="fade"
-          duration={400}
-          timingFunction="ease"
+                  <Text
+                    style={{
+                      color: "#4E5D78",
+                      fontFamily: "Inter",
+                      fontSize: "14px",
+                      fontWeight: "normal",
+                      ...styles,
+                    }}
+                  >
+                    Cancel
+                  </Text>
+                </Button>
+              )}
+            </Transition>
+          </form>
+        </Container>
+      </motion.div>
+      <motion.div animate={trendingTagsControl} id="trend-tags">
+        <Container
+          style={{
+            paddingLeft: "20px",
+            paddingRight: "20px",
+          }}
         >
-          {(styles) => (
-            <div
+          <div>
+            <Text
               style={{
-                paddingTop: "14px",
-                ...styles,
+                paddingTop: "37px",
+                fontSize: "13px",
+                fontFamily: "Inter",
+                fontWeight: "bold",
+                color: "#4E5D78",
+                height: "16px",
+                lineHeight: "16px",
+                paddingBottom: "15px",
               }}
             >
-              {result &&
-                result.map((artwork: any) => (
-                  <>
-                    <div
-                      onClick={toArtwork(artwork.id)}
-                      style={{
-                        display: "flex",
-                        gap: 18,
-                        paddingTop: 16,
-                        paddingBottom: 15,
-                      }}
-                    >
-                      <Image
-                        width={58}
-                        height={46}
-                        withPlaceholder
-                        src={artwork.image_id && getImageURL(artwork.image_id)}
-                      />
-                      <div>
-                        <Text
-                          style={{
-                            paddingTop: 3,
-                            fontSize: "16px",
-                            fontFamily: "Inter",
-                            fontWeight: "normal",
-                            color: "#111112",
-                            height: 20,
-                            paddingBottom: 4,
-                          }}
-                          lineClamp={1}
-                        >
-                          {artwork.title || "(Untitled)"}
-                        </Text>
-                        <Text
-                          style={{
-                            fontSize: "12px",
-                            fontFamily: "Inter",
-                            fontWeight: "100",
-                            color: "#8A94A6",
-                            height: 15,
-                            paddingBottom: 4,
-                          }}
-                          lineClamp={1}
-                        >
-                          {getArtistName(artwork.artist_display)}
-                        </Text>
-                      </div>
-                    </div>
-                    <hr
-                      style={{
-                        margin: 0,
-                        border: "none",
-                        height: "1px",
-                        backgroundColor: "#F1F2F4",
-                      }}
-                    />
-                  </>
-                ))}
+              TRENDING TAGS
+            </Text>
+            <div
+              style={{
+                display: "flex",
+                gap: "16px 6px",
+                minWidth: "min-content",
+                flexWrap: "wrap",
+              }}
+            >
+              {tags.map((value, i) => (
+                <TagButton
+                  popular={i === 0}
+                  to={`/search-result?term=${value}`}
+                  key={i}
+                >
+                  {value}
+                </TagButton>
+              ))}
             </div>
-          )}
-        </Transition>
-
-        <Transition
-          mounted={!isSearchMode}
-          transition="fade"
-          duration={400}
-          timingFunction="ease"
+          </div>
+        </Container>
+      </motion.div>
+      {result && (
+        <Container
+          id="search-result"
+          style={{
+            paddingLeft: "20px",
+            paddingRight: "20px",
+          }}
         >
-          {(styles) => (
-            <div>
-              <Text
-                style={{
-                  marginTop: "37px",
-                  fontSize: "13px",
-                  fontFamily: "Inter",
-                  fontWeight: "bold",
-                  color: "#4E5D78",
-                  height: "16px",
-                  lineHeight: "16px",
-                  paddingBottom: "15px",
-                  ...styles,
-                }}
-              >
-                TRENDING TAGS
-              </Text>
+          {result.map((artwork: any) => (
+            <>
               <div
+                onClick={toArtwork(artwork.id)}
                 style={{
                   display: "flex",
-                  gap: "16px 6px",
-                  minWidth: "min-content",
-                  flexWrap: "wrap",
+                  gap: 18,
+                  paddingTop: 16,
+                  paddingBottom: 15,
                 }}
               >
-                {tags.map((value, i) => (
-                  <TagButton
-                    popular={i === 0}
-                    to={`/search-result?term=${value}`}
-                    key={i}
+                <Image
+                  width={58}
+                  height={46}
+                  withPlaceholder
+                  src={artwork.image_id && getImageURL(artwork.image_id)}
+                />
+                <div>
+                  <Text
+                    style={{
+                      paddingTop: 3,
+                      fontSize: "16px",
+                      fontFamily: "Inter",
+                      fontWeight: "normal",
+                      color: "#111112",
+                      height: 20,
+                      paddingBottom: 4,
+                    }}
+                    lineClamp={1}
                   >
-                    {value}
-                  </TagButton>
-                ))}
+                    {artwork.title || "(Untitled)"}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: "12px",
+                      fontFamily: "Inter",
+                      fontWeight: "100",
+                      color: "#8A94A6",
+                      height: 15,
+                      paddingBottom: 4,
+                    }}
+                    lineClamp={1}
+                  >
+                    {getArtistName(artwork.artist_display)}
+                  </Text>
+                </div>
               </div>
-            </div>
-          )}
-        </Transition>
-      </Container>
+              <hr
+                style={{
+                  margin: 0,
+                  border: "none",
+                  height: "1px",
+                  backgroundColor: "#F1F2F4",
+                }}
+              />
+            </>
+          ))}
+        </Container>
+      )}
     </div>
   );
 }
