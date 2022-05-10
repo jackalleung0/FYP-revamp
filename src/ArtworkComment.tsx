@@ -75,14 +75,16 @@ export function ArtworkComment() {
   const [select, setSelect] = useState<"popular" | "latest">("latest");
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
 
-  const [snapshots, setSnapshots] = useState<QueryDocumentSnapshot<Comment>[]>(
-    []
-  );
+  // const [snapshots, setSnapshots] = useState<QueryDocumentSnapshot<Comment>[]>(
+  //   []
+  // );
   const { id } = useParams();
 
-  const [tempComment, setTempComment] = useState<
-    { comment: Comment; id: string }[]
-  >([]);
+  // const [tempComment, setTempComment] = useState<
+  //   { comment: Comment; id: string }[]
+  // >([]);
+
+  const isFirstLoading = useState(true);
 
   const _query = useMemo(() => {
     if (!id) {
@@ -101,33 +103,35 @@ export function ArtworkComment() {
     );
   }, [select]);
 
-  const loadFunc = useCallback(async () => {
-    const _limit = 10;
-    if (!_query) return;
+  const [snapshot, loading, error] = useCollection(_query);
 
-    let __query =
-      snapshots.length > 0
-        ? query(
-            _query,
-            limit(_limit),
-            startAfter(snapshots[snapshots.length - 1])
-          )
-        : query(_query, limit(_limit));
+  // const loadFunc = useCallback(async () => {
+  //   const _limit = 10;
+  //   if (!_query) return;
 
-    const snapshot = await getDocs(__query);
-    setSnapshots((e) => [...e, ...snapshot.docs]);
-  }, [_query]);
+  //   let __query =
+  //     snapshots.length > 0
+  //       ? query(
+  //           _query,
+  //           limit(_limit),
+  //           startAfter(snapshots[snapshots.length - 1])
+  //         )
+  //       : query(_query, limit(_limit));
 
-  const { result } = useAsync(
-    async () => _query && (await getDocs(_query)),
-    [_query]
-  );
+  //   const snapshot = await getDocs(__query);
+  //   setSnapshots((e) => [...e, ...snapshot.docs]);
+  // }, [_query]);
 
-  useEffect(() => {
-    if (snapshots.length === 0) {
-      loadFunc();
-    }
-  }, [select]);
+  // const { result } = useAsync(
+  //   async () => _query && (await getDocs(_query)),
+  //   [_query]
+  // );
+
+  // useEffect(() => {
+  //   if (snapshots.length === 0) {
+  //     loadFunc();
+  //   }
+  // }, [select]);
   const [openDrawer, setOpenedDrawer] = useState(false);
   const [drawerDocID, setDrawerDocID] = useState<string>("");
 
@@ -190,8 +194,8 @@ export function ArtworkComment() {
             // do not update select when is the same value
             if (e === select) return;
             setSelect(e);
-            setSnapshots([]);
-            setTempComment([]);
+            // setSnapshots([]);
+            // setTempComment([]);
           }}
           data={[
             { value: "popular", label: "Sort By Popular" },
@@ -224,7 +228,7 @@ export function ArtworkComment() {
             lineHeight: "20px",
           }}
         >
-          Number of comments: {result?.size}
+          Number of comments: {snapshot?.size}
         </Text>
       </div>
       {isEditMode && (
@@ -247,13 +251,13 @@ export function ArtworkComment() {
                 comment
               );
 
-              setTempComment((e) => [...e, { comment, id: ref.id }]);
+              // setTempComment((e) => [...e, { comment, id: ref.id }]);
             }}
           />
         </div>
       )}
       {/* this is use to always put your recent submitted comment on top */}
-      {tempComment.map(({ comment, id }, index) => (
+      {/* {tempComment.map(({ comment, id }, index) => (
         <Comment
           comment={comment}
           key={index}
@@ -262,8 +266,8 @@ export function ArtworkComment() {
             setDrawerDocID(id);
           }}
         />
-      ))}
-      {snapshots.map((s) => (
+      ))} */}
+      {snapshot?.docs.map((s) => (
         <Comment
           comment={s.data()}
           key={s.id}
@@ -273,7 +277,7 @@ export function ArtworkComment() {
           }}
         />
       ))}
-      {snapshots.length === 0 && tempComment.length === 0 && (
+      {snapshot?.size === 0 && (
         <>
           <div
             style={{
