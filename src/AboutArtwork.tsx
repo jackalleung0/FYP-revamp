@@ -175,8 +175,7 @@ export function AboutArtwork() {
   const [show, toggle] = useState(false);
 
   const shareLink = useMemo(
-    () =>
-      `https://revamp.arartgallery.site/api/aboutArtwork/${id}`,
+    () => `https://revamp.arartgallery.site/api/aboutArtwork/${id}`,
     [id]
   );
   const headerRef = useRef<HTMLDivElement>(null);
@@ -193,7 +192,7 @@ export function AboutArtwork() {
       ></LoadingOverlay>
       <div style={{ display: allDoneLoading ? "block" : "none" }}>
         <Affix position={{ top: 0, left: 0, right: 0 }}>
-          <div
+          {/* <div
             ref={headerRef}
             style={{
               paddingTop: 10,
@@ -207,6 +206,24 @@ export function AboutArtwork() {
               <BackIcon onClick={() => nav(-1)} />
 
               <ShareIcon onClickCapture={toggle} />
+            </div>
+          </div> */}
+          <div
+            ref={headerRef}
+            style={{
+              paddingTop: 10,
+              paddingLeft: 20,
+              paddingRight: 20,
+              background: "#FFFFFF",
+            }}
+            id="header-bar"
+          >
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <BackIcon onClick={() => nav(-1)} />
+
+              <div style={{ display: "flex", gap: 32, paddingBottom: 24 }}>
+                <ShareIcon onClickCapture={toggle} />
+              </div>
             </div>
           </div>
         </Affix>

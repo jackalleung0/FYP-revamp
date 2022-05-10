@@ -117,7 +117,7 @@ export function AboutArtist() {
         loaderProps={{ color: "#111112" }}
         style={{ height: "100vh" }}
       />
-      <Affix
+      {/* <Affix
         position={{ top: 0, left: 0, right: 0 }}
         style={{ display: detailsLoading || artistsLoading ? "none" : "block" }}
       >
@@ -136,6 +136,29 @@ export function AboutArtist() {
             <BackIcon onClick={() => nav(-1)} />
 
             <ShareIcon onClickCapture={toggle} />
+          </div>
+        </div>
+      </Affix> */}
+      <Affix
+        position={{ top: 0, left: 0, right: 0 }}
+        style={{ display: detailsLoading || artistsLoading ? "none" : "block" }}
+      >
+        <div
+          ref={headerRef}
+          style={{
+            paddingTop: 10,
+            paddingLeft: 20,
+            paddingRight: 20,
+            background: "#FFFFFF",
+          }}
+          id="header-bar"
+        >
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <BackIcon onClick={() => nav(-1)} />
+
+            <div style={{ display: "flex", gap: 32, paddingBottom: 24 }}>
+              <ShareIcon onClickCapture={toggle} />
+            </div>
           </div>
         </div>
       </Affix>
