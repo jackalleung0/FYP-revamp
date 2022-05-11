@@ -787,7 +787,7 @@ export function ArtworkDetail() {
                   lineHeight: "20px",
                 }}
               >
-                {result.thumbnail.alt_text}
+                {result.thumbnail && result.thumbnail.alt_text || "No Information"}
               </Text>
               <hr
                 style={{
