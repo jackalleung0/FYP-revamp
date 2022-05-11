@@ -57,6 +57,7 @@ export function Login() {
     const _ = async () => {
       // ensure user is logged in
       if (!user) return;
+      if (!pressedSignIn) return;
 
       // handle key change
       const redirect = query.get("redirect");
@@ -84,7 +85,7 @@ export function Login() {
       }
     };
     _();
-  }, [user]);
+  }, [user, pressedSignIn]);
   return (
     <>
       <Container
