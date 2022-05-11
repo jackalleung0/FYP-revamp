@@ -168,7 +168,7 @@ export function SelectArtwork() {
         <Transition mounted={true} transition="slide-left" duration={300}>
           {(transitionStyles) =>
             selectedArtwork.length > 0 ? (
-              <PageAnimation>
+              <PageAnimation style={{ overflow: "visible" }}>
                 <ActionIcon
                   className={classes.ActionIcon}
                   // component={Link}

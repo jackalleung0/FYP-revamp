@@ -3,7 +3,10 @@ import { TransitionGroup, CSSTransition } from "react-transition-group";
 import React from "react";
 import "./PageAnimation.css";
 
-export function PageAnimation({ children }: React.PropsWithChildren<{}>) {
+export function PageAnimation({
+  children,
+  style,
+}: React.PropsWithChildren<{ style?: any }>) {
   const location = useLocation();
   const navType = useNavigationType();
 
@@ -30,6 +33,7 @@ export function PageAnimation({ children }: React.PropsWithChildren<{}>) {
       <TransitionGroup
         style={{
           overflowX: "hidden",
+          ...style,
         }}
       >
         <CSSTransition

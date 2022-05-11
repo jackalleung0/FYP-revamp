@@ -116,7 +116,7 @@ export function Home() {
         <Affix position={{ bottom: 30, right: 22 }} id="searchbutton">
           <Transition mounted={true} transition="slide-left" duration={300}>
             {(transitionStyles) => (
-              <PageAnimation>
+              <PageAnimation style={{ overflow: "visible" }}>
                 <ActionIcon
                   component={Link}
                   to="/search"

@@ -150,7 +150,7 @@ export function RecentlyViewed() {
         <Affix position={{ bottom: 30, right: 22 }}>
           <Transition mounted={true} transition="slide-left" duration={300}>
             {(transitionStyles) => (
-              <PageAnimation>
+              <PageAnimation style={{ overflow: "visible" }}>
                 <ActionIcon
                   onClickCapture={() => scrollTo({ y: 0 })}
                   className={classes.ActionIcon}

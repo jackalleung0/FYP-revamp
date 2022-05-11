@@ -141,7 +141,7 @@ export function ArtworkComment() {
       {!loading && (
         <>
           <Affix position={{ bottom: 30, right: 22 }} zIndex={2}>
-            <PageAnimation>
+            <PageAnimation style={{ overflow: "visible" }}>
               <ActionIcon
                 className={classes.ActionIcon}
                 radius={9999}

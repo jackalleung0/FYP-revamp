@@ -565,7 +565,7 @@ export function ArtworkDetail() {
             {/* check if there are arURL first, then display the AR Icon if there are any */}
             {!artworkDataLoading && artworkData?.arURL && (
               <Affix position={{ bottom: 30, right: 22 }} zIndex={2}>
-                <PageAnimation>
+                <PageAnimation style={{ overflow: "visible" }}>
                   <ActionIcon
                     className={classes.ActionIcon}
                     radius={9999}

@@ -177,7 +177,7 @@ export function Search() {
           duration={300}
         >
           {(transitionStyles) => (
-            <PageAnimation>
+            <PageAnimation style={{ overflow: "visible" }}>
               <ActionIcon
                 className={classes.ActionIcon}
                 component={Link}
