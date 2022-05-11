@@ -255,6 +255,7 @@ const FavouriteArtwork = ({ user }: { user: User | undefined | null }) => {
 
   const isFirstTimeLoading = loadedTimes === 0;
   const haveResult = result.length > 0;
+  // no more result
   return (
     <>
       {!isFirstTimeLoading ? (
@@ -330,6 +331,22 @@ const FavouriteArtwork = ({ user }: { user: User | undefined | null }) => {
                 </Masonry>
               </InfiniteScroll>
             </Container>
+            {!haveNext && (
+              <Text
+                align="center"
+                style={{
+                  fontSize: "12px",
+                  fontFamily: "Inter",
+                  fontWeight: 100,
+                  color: "#4E5D78",
+                  height: "15px",
+                  paddingTop: 40,
+                  paddingBottom: 40,
+                }}
+              >
+                No More Result
+              </Text>
+            )}
           </>
         ) : (
           <Text
@@ -532,6 +549,22 @@ const CommentedArtwork = ({ user }: { user: User | undefined | null }) => {
                 </Masonry>
               </InfiniteScroll>
             </Container>
+            {!haveNext && (
+              <Text
+                align="center"
+                style={{
+                  fontSize: "12px",
+                  fontFamily: "Inter",
+                  fontWeight: 100,
+                  color: "#4E5D78",
+                  height: "15px",
+                  paddingTop: 40,
+                  paddingBottom: 40,
+                }}
+              >
+                No More Result
+              </Text>
+            )}
           </>
         ) : (
           <Text
