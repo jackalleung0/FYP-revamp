@@ -50,6 +50,7 @@ import { useCollectionOnce } from "react-firebase-hooks/firestore";
 import { app } from "./firebaseConfig";
 import { getArtworkDetails } from "./getArtworkDetails";
 import { PageAnimation } from "./components/PageAnimation";
+import Div100vh from "react-div-100vh";
 
 export function Search() {
   const { classes } = useStyles();
@@ -114,7 +115,7 @@ export function Search() {
       if (isSearchMode) {
         navControl.start({
           opacity: 0,
-          transition: { duration:0.1 },
+          transition: { duration: 0.1 },
         });
         trendingTagsControl.start({
           opacity: 0,
@@ -168,7 +169,7 @@ export function Search() {
   // }, []);
 
   return (
-    <div style={{ position: "relative", height: "100vh" }}>
+    <Div100vh>
       <Affix position={{ bottom: 30, right: 22 }}>
         <Transition
           mounted={!isSearchMode}
@@ -238,10 +239,14 @@ export function Search() {
             paddingTop: 14,
             paddingLeft: "20px",
             paddingRight: "20px",
+            backgroundColor: "white",
           }}
         >
           <form
-            style={{ display: "flex", alignItems: "center" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+            }}
             onSubmit={form.onSubmit((values) => {
               console.log(values);
               nav(`/search-result?term=${values.term}`);
@@ -364,15 +369,15 @@ export function Search() {
           </div>
         </Container>
       </motion.div>
-      {result && (
+      {result && isSearchMode && (
         <Container
           id="search-result"
           style={{
-            paddingTop: searchHeight,
             paddingLeft: "20px",
             paddingRight: "20px",
           }}
         >
+          <div style={{ height: searchHeight }} />
           {result.map((artwork: any) => (
             <>
               <div
@@ -432,7 +437,7 @@ export function Search() {
           ))}
         </Container>
       )}
-    </div>
+    </Div100vh>
   );
 }
 
