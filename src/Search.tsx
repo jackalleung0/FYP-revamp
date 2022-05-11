@@ -114,7 +114,7 @@ export function Search() {
       if (isSearchMode) {
         navControl.start({
           opacity: 0,
-          transition: { duration },
+          transition: { duration:0.1 },
         });
         trendingTagsControl.start({
           opacity: 0,
