@@ -398,7 +398,7 @@ export function ArtworkDetail() {
 
   const shareLink = React.useMemo(
     () =>
-      `https://revamp.arartgallery.site/api/artworks/${id}`,
+      `https://final-year-project-revamp.web.app/api/artworks/${id}`,
     [id]
   );
 

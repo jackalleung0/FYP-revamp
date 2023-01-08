@@ -175,7 +175,7 @@ export function AboutArtwork() {
   const [show, toggle] = useState(false);
 
   const shareLink = useMemo(
-    () => `https://revamp.arartgallery.site/api/aboutArtwork/${id}`,
+    () => `https://final-year-project-revamp.web.app/api/aboutArtwork/${id}`,
     [id]
   );
   const headerRef = useRef<HTMLDivElement>(null);
