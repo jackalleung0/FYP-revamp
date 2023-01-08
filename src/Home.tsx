@@ -620,15 +620,19 @@ const instance = axios.create({
 const getRecommendArtworks = async (values: any) => {
   if (!values) return [];
   const should =
-    Object.entries(values.preferenceTags || {}).map(([tags, rating]) => {
-      return {
-        multi_match: {
-          query: tags,
-          fields: ["term_titles"],
-          boost: rating,
-        },
-      };
-    }) || [];
+    Object.entries(values.preferenceTags || {})
+      .map(([tags, rating]) => {
+        return {
+          multi_match: {
+            query: tags,
+            fields: ["term_titles"],
+            boost: rating as number,
+          },
+        };
+      })
+      .filter((e) => e.multi_match.boost > 0) || [];
+
+  // console.log(JSON.stringify(should));
 
   const must_not =
     (values.likedArtworks || []).map((id: string) => ({
