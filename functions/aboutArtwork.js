@@ -16,7 +16,7 @@ function buildHTML({ title, url, alt, id, description }) {
       </head>
       <body>
         <script>
-          window.location="https://revamp.arartgallery.site/artwork/${id}/about";
+          window.location="https://final-year-project-revamp.web.app/artwork/${id}/about";
         </script>
       </body>
     </html>
