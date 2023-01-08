@@ -6,6 +6,7 @@ function buildHTML({ title, url, alt, id }) {
     <html lang="en">
       <head>
         <title>${title} | AR Art Gallery</title>
+        <meta property="og:site_name" content="${title} | AR Art Gallery">
         <meta property="og:title" content="${title}" />
         <meta property="og:image" content="${url}" />
         <meta property="og:image:type" content="image/jpeg" />
